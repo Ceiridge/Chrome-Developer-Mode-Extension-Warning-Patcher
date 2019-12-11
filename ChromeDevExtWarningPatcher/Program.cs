@@ -72,6 +72,7 @@ namespace ChromeDevExtWarningPatcher
                 if (bytePatch.GetHashCode() == removalHashCode)
                 {
                     Console.WriteLine("Ignoring a pattern with hashcode " + removalHashCode);
+                    patches++;
                     continue;
                 }
 
@@ -132,7 +133,7 @@ namespace ChromeDevExtWarningPatcher
         {
             foreach(string argi in args)
             {
-                if (argi.ToLower().Replace("-", "").Equals(arg))
+                if (argi.ToLower().Replace("-", "").Equals(arg.ToLower()))
                     return true;
             }
             return false;
