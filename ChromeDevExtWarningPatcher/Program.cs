@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 
-// Ugly code ahead
+// Ugly and uncommented code ahead
 namespace ChromeDevExtWarningPatcher
 {
     class Program
@@ -42,6 +43,8 @@ namespace ChromeDevExtWarningPatcher
                     break;
                 }
             }
+
+            Thread.Sleep(5000); // Wait a bit to let the user see the result
         }
 
         private static bool BytePatchChrome(FileInfo chromeDll)
