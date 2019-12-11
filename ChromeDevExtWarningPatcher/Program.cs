@@ -12,9 +12,12 @@ namespace ChromeDevExtWarningPatcher
         private const string CHROME_INSTALLATION_FOLDER = @"C:\Program Files (x86)\Google\Chrome\Application";
 
         private static readonly byte[] SHOULDINCLUDEEXTENSION_FUNCTION_PATTERN = { 0x56, 0x48, 0x83, 0xEC, 0x20, 0x48, 0x89, 0xD6, 0x48, 0x89, 0xD1, 0xE8, 0xFF, 0xFF, 0xFF, 0xFF, 0x89, 0xC1 }; // 0xFF is ?
+        private static readonly byte[] CREATE_FUNCTION_PATTERN = { 0x41, 0x57, 0x41, 0x56, 0x56, 0x57, 0x53, 0x48, 0x81, 0xEC, 0xFF, 0xFF, 0xFF, 0xFF, 0x48, 0x89, 0xCE, 0x48, 0x8B, 0x05, 0xFF, 0xFF, 0xFF, 0xFF, 0x48, 0x31, 0xE0, 0x48, 0x89, 0x84, 0x24, 0xFF, 0xFF, 0xFF, 0xFF, 0x48, 0x8D, 0x4A, 0x08 }; // 0xFF is ?; debugPatch
+        private static readonly byte[] SHOULDPREVENTELISION_FUNCTION_PATTERN = { 0x56, 0x57, 0x53, 0x48, 0x83, 0xEC, 0x40, 0x48, 0x8B, 0x05, 0xFF, 0xFF, 0xFF, 0xFF, 0x48, 0x31, 0xE0, 0x48, 0x89, 0x44, 0x24, 0xFF, 0xE8, 0xFF, 0xFF, 0xFF, 0xFF, 0x48, 0x85, 0xC0, 0x74, 0x61 }; // 0xFF is ?
 
+        private static BytePatch[] BYTE_PATCHES = { new BytePatch(SHOULDINCLUDEEXTENSION_FUNCTION_PATTERN, 0x04, 0xFF, 22), new BytePatch(SHOULDINCLUDEEXTENSION_FUNCTION_PATTERN, 0x08, 0xFF, 35), new BytePatch(SHOULDPREVENTELISION_FUNCTION_PATTERN, 0x56, 0xC3, 0x0), new BytePatch(CREATE_FUNCTION_PATTERN, 0x41, 0xC3, 0x0) };
 
-        private static readonly BytePatch[] BYTE_PATCHES = { new BytePatch(SHOULDINCLUDEEXTENSION_FUNCTION_PATTERN, 0x04, 0xFF, 22), new BytePatch(SHOULDINCLUDEEXTENSION_FUNCTION_PATTERN, 0x08, 0xFF, 35) };
+        private static readonly BytePatch REMOVAL_PATCH = new BytePatch(new byte[] { }, 0x0, 0x0, int.MinValue);
 
         private static double GetUnixTime(DateTime date)
         {
@@ -23,8 +26,15 @@ namespace ChromeDevExtWarningPatcher
 
         public static void Main(string[] args)
         {
-            DirectoryInfo chromeFolder = new DirectoryInfo(CHROME_INSTALLATION_FOLDER);
+            if (ContainsArg(args, "noWarningPatch"))
+                RemovePatches(SHOULDINCLUDEEXTENSION_FUNCTION_PATTERN);
+            if (ContainsArg(args, "noWWWPatch"))
+                RemovePatches(SHOULDPREVENTELISION_FUNCTION_PATTERN);
+            if (ContainsArg(args, "noDebugPatch"))
+                RemovePatches(CREATE_FUNCTION_PATTERN);
 
+            DirectoryInfo chromeFolder = new DirectoryInfo(CHROME_INSTALLATION_FOLDER);
+            
             List<DirectoryInfo> chromeVersions = new List<DirectoryInfo>(chromeFolder.EnumerateDirectories());
             chromeVersions = chromeVersions.OrderByDescending(dirInfo => GetUnixTime(dirInfo.LastWriteTime)).ToList();
             foreach (DirectoryInfo dirs in chromeVersions)
@@ -46,16 +56,25 @@ namespace ChromeDevExtWarningPatcher
                     break;
                 }
             }
-
-            Thread.Sleep(5000); // Wait a bit to let the user see the result
+            
+            if(!ContainsArg(args, "noWait"))
+                Thread.Sleep(5000); // Wait a bit to let the user see the result
         }
 
         private static bool BytePatchChrome(FileInfo chromeDll)
         {
             byte[] chromeBytes = File.ReadAllBytes(chromeDll.FullName);
+            int patches = 0;
+            int removalHashCode = REMOVAL_PATCH.GetHashCode();
 
             foreach (BytePatch bytePatch in BYTE_PATCHES)
             {
+                if (bytePatch.GetHashCode() == removalHashCode)
+                {
+                    Console.WriteLine("Ignoring a pattern with hashcode " + removalHashCode);
+                    continue;
+                }
+
                 int patternIndex = 0, patternOffset = 0;
                 bool foundPattern = false;
 
@@ -85,7 +104,6 @@ namespace ChromeDevExtWarningPatcher
                 }
                 else
                 {
-                    bool patched = false;
                     int index = patternOffset + bytePatch.offset;
                     byte sourceByte = chromeBytes[index];
 
@@ -94,20 +112,45 @@ namespace ChromeDevExtWarningPatcher
                     {
                         chromeBytes[index] = bytePatch.patchByte;
                         Console.WriteLine(index + " => " + bytePatch.patchByte);
-                        patched = true;
+                        patches++;
                     }
                     else
                         Console.WriteLine("Source byte unexpected, should be " + bytePatch.origByte + "!");
-
-                    if (patched)
-                    {
-                        File.WriteAllBytes(chromeDll.FullName, chromeBytes);
-                        Console.WriteLine("Patched one byte in " + chromeDll.FullName);
-                        return true;
-                    }
                 }
             }
+
+            if (patches == BYTE_PATCHES.Length)
+            {
+                File.WriteAllBytes(chromeDll.FullName, chromeBytes);
+                Console.WriteLine("Patched " + patches + " bytes in " + chromeDll.FullName);
+                return true;
+            }
             return false;
+        }
+
+        private static bool ContainsArg(string[] args, string arg)
+        {
+            foreach(string argi in args)
+            {
+                if (argi.ToLower().Replace("-", "").Equals(arg))
+                    return true;
+            }
+            return false;
+        }
+
+        private static void RemovePatches(byte[] pattern)
+        {
+            int hashCode = pattern.GetHashCode();
+
+            int i = 0;
+            foreach(BytePatch bp in BYTE_PATCHES)
+            {
+                if(bp.pattern.GetHashCode() == hashCode)
+                {
+                    BYTE_PATCHES[i] = REMOVAL_PATCH;
+                }
+                i++;
+            }
         }
     }
 }

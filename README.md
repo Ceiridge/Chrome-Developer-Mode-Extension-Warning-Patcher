@@ -43,11 +43,27 @@ Manifest::COMMAND_LINE = 0x8
 ### Debugging Warning Patch
 The tool is also able to fully remove the debugging warning. You used to be able to disable it with Chrome itself with the `silent-debugger-extension-api` flag, which has been removed in Chrome 79 ( >:( ).
 
+The Chromium open source project contains a file called `extension_dev_tools_infobar.cc` and a function called `Create`, which is responsible for showing that warning.
 
-### WWW/HTTPS Removal Patch
+### WWW/HTTPS/Elision Removal Patch
 Chromium also decided to remove `www` and `https` from every url in the omnibox. You were able to disable it with a flag, which has been removed in Chrome 79 ( >:( ). This tool is also able to add these again.
 
+The Chromium open source project contains a file called `chrome_location_bar_model_delegate.cc` and a function called `ShouldPreventElision`, which is responsible for preventing the removal of url extensions.
 
+This is patched by always instantly returning.
+
+```c++
+bool ChromeLocationBarModelDelegate::ShouldPreventElision() const {
+#if BUILDFLAG(ENABLE_EXTENSIONS)
+  Profile* const profile = GetProfile();
+  return profile && extensions::ExtensionRegistry::Get(profile)
+                        ->enabled_extensions()
+                        .Contains(kPreventElisionExtensionId);
+#else
+  return false;
+#endif
+}
+```
 
 ## How and when to run it
 Run it after every chrome update with administrator rights.
