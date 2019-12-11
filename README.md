@@ -43,14 +43,56 @@ Manifest::COMMAND_LINE = 0x8
 ### Debugging Warning Patch
 The tool is also able to fully remove the debugging warning. You used to be able to disable it with Chrome itself with the `silent-debugger-extension-api` flag, which has been removed in Chrome 79 ( >:( ).
 
-The Chromium open source project contains a file called `extension_dev_tools_infobar.cc` and a function called `Create`, which is responsible for showing that warning.
+The Chromium open source project contains a file called `global_confirm_info_bar.cc` and a function called `MaybeAddInfoBar`, which is responsible for showing that warning and another one which is not of importance (automation warning; ChromeDriver).
+
+This patch just instantly returns this:
+
+```c++
+void GlobalConfirmInfoBar::MaybeAddInfoBar(content::WebContents* web_contents) {
+  InfoBarService* infobar_service =
+      InfoBarService::FromWebContents(web_contents);
+  // WebContents from the tab strip must have the infobar service.
+  DCHECK(infobar_service);
+  if (base::Contains(proxies_, infobar_service))
+    return;
+
+  std::unique_ptr<GlobalConfirmInfoBar::DelegateProxy> proxy(
+      new GlobalConfirmInfoBar::DelegateProxy(weak_factory_.GetWeakPtr()));
+  GlobalConfirmInfoBar::DelegateProxy* proxy_ptr = proxy.get();
+  infobars::InfoBar* added_bar = infobar_service->AddInfoBar(
+      infobar_service->CreateConfirmInfoBar(std::move(proxy)));
+
+  // If AddInfoBar() fails, either infobars are globally disabled, or something
+  // strange has gone wrong and we can't show the infobar on every tab. In
+  // either case, it doesn't make sense to keep the global object open,
+  // especially since some callers expect it to delete itself when a user acts
+  // on the underlying infobars.
+  //
+  // Asynchronously delete the global object because the BrowserTabStripTracker
+  // doesn't support being deleted while iterating over the existing tabs.
+  if (!added_bar) {
+    if (!is_closing_) {
+      is_closing_ = true;
+
+      base::SequencedTaskRunnerHandle::Get()->PostTask(
+          FROM_HERE, base::BindOnce(&GlobalConfirmInfoBar::Close,
+                                    weak_factory_.GetWeakPtr()));
+    }
+    return;
+  }
+
+  proxy_ptr->info_bar_ = added_bar;
+  proxies_[infobar_service] = proxy_ptr;
+  infobar_service->AddObserver(this);
+}
+```
 
 ### WWW/HTTPS/Elision Removal Patch
 Chromium also decided to remove `www` and `https` from every url in the omnibox. You were able to disable it with a flag, which has been removed in Chrome 79 ( >:( ). This tool is also able to add these again.
 
 The Chromium open source project contains a file called `chrome_location_bar_model_delegate.cc` and a function called `ShouldPreventElision`, which is responsible for preventing the removal of url extensions.
 
-This is patched by always instantly returning.
+This is patched by always instantly returning this:
 
 ```c++
 bool ChromeLocationBarModelDelegate::ShouldPreventElision() const {
