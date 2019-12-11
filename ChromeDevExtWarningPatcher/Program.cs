@@ -10,8 +10,11 @@ namespace ChromeDevExtWarningPatcher
     class Program
     {
         private const string CHROME_INSTALLATION_FOLDER = @"C:\Program Files (x86)\Google\Chrome\Application";
+
         private static readonly byte[] SHOULDINCLUDEEXTENSION_FUNCTION_PATTERN = { 0x56, 0x48, 0x83, 0xEC, 0x20, 0x48, 0x89, 0xD6, 0x48, 0x89, 0xD1, 0xE8, 0xFF, 0xFF, 0xFF, 0xFF, 0x89, 0xC1 }; // 0xFF is ?
-        private static readonly BytePatch[] BYTE_PATCHES = { new BytePatch(0x04, 0xFF, 22), new BytePatch(0x08, 0xFF, 35) };
+
+
+        private static readonly BytePatch[] BYTE_PATCHES = { new BytePatch(SHOULDINCLUDEEXTENSION_FUNCTION_PATTERN, 0x04, 0xFF, 22), new BytePatch(SHOULDINCLUDEEXTENSION_FUNCTION_PATTERN, 0x08, 0xFF, 35) };
 
         private static double GetUnixTime(DateTime date)
         {
@@ -50,58 +53,61 @@ namespace ChromeDevExtWarningPatcher
         private static bool BytePatchChrome(FileInfo chromeDll)
         {
             byte[] chromeBytes = File.ReadAllBytes(chromeDll.FullName);
-            int patternIndex = 0, patternOffset = 0;
-            bool foundPattern = false;
 
-            for (int i = 0; i < chromeBytes.Length; i++)
+            foreach (BytePatch bytePatch in BYTE_PATCHES)
             {
-                byte chromeByte = chromeBytes[i];
-                byte expectedByte = SHOULDINCLUDEEXTENSION_FUNCTION_PATTERN[patternIndex];
+                int patternIndex = 0, patternOffset = 0;
+                bool foundPattern = false;
 
-                if (expectedByte == 0xFF ? true : (chromeByte == expectedByte))
-                    patternIndex++;
-                else
-                    patternIndex = 0;
-
-                if (patternIndex == SHOULDINCLUDEEXTENSION_FUNCTION_PATTERN.Length)
+                for (int i = 0; i < chromeBytes.Length; i++)
                 {
-                    foundPattern = true;
-                    patternOffset = i - (patternIndex - 1);
-                    Console.WriteLine("Found pattern offset at " + patternOffset);
-                    break;
+                    byte chromeByte = chromeBytes[i];
+                    byte expectedByte = bytePatch.pattern[patternIndex];
+
+                    if (expectedByte == 0xFF ? true : (chromeByte == expectedByte))
+                        patternIndex++;
+                    else
+                        patternIndex = 0;
+
+                    if (patternIndex == bytePatch.pattern.Length)
+                    {
+                        foundPattern = true;
+                        patternOffset = i - (patternIndex - 1);
+                        Console.WriteLine("Found pattern offset at " + patternOffset);
+                        break;
+                    }
                 }
-            }
 
-            if(!foundPattern)
-            {
-                Console.WriteLine("Pattern not found!");
-                return false;
-            } else
-            {
-                int patches = 0;
-                foreach(BytePatch patch in BYTE_PATCHES)
+                if (!foundPattern)
                 {
-                    int index = patternOffset + patch.offset;
+                    Console.WriteLine("Pattern not found!");
+                    return false;
+                }
+                else
+                {
+                    bool patched = false;
+                    int index = patternOffset + bytePatch.offset;
                     byte sourceByte = chromeBytes[index];
 
-                    Console.WriteLine("Source byte of patch at " + patch.offset + ": " + sourceByte);
-                    if (sourceByte == patch.origByte)
+                    Console.WriteLine("Source byte of patch at " + bytePatch.offset + ": " + sourceByte);
+                    if (sourceByte == bytePatch.origByte)
                     {
-                        chromeBytes[index] = patch.patchByte;
-                        Console.WriteLine(index + " => " + patch.patchByte);
-                        patches++;
-                    } else
-                        Console.WriteLine("Source byte unexpected, should be " + patch.origByte + "!");
-                }
+                        chromeBytes[index] = bytePatch.patchByte;
+                        Console.WriteLine(index + " => " + bytePatch.patchByte);
+                        patched = true;
+                    }
+                    else
+                        Console.WriteLine("Source byte unexpected, should be " + bytePatch.origByte + "!");
 
-                if(patches == BYTE_PATCHES.Length)
-                {
-                    File.WriteAllBytes(chromeDll.FullName, chromeBytes);
-                    Console.WriteLine("Patched " + patches + " bytes in " + chromeDll.FullName);
-                    return true;
+                    if (patched)
+                    {
+                        File.WriteAllBytes(chromeDll.FullName, chromeBytes);
+                        Console.WriteLine("Patched one byte in " + chromeDll.FullName);
+                        return true;
+                    }
                 }
-                return false;
             }
+            return false;
         }
     }
 }
