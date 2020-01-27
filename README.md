@@ -1,5 +1,22 @@
-# Disable Chrome's Developer Mode Extension Warning Popup
-Download it in the [release section](https://github.com/Ceiridge/Chrome-Developer-Mode-Extension-Warning-Patcher/releases).
+# Disable Chrome's and Chromium's Developer Mode Extension Warning Popup
+**Download** it in the [release section](https://github.com/Ceiridge/Chrome-Developer-Mode-Extension-Warning-Patcher/releases).
+
+## Supported browsers
+See below for the custom paths (commandline option).
+```javascript
+- All Chromium-based browsers, including:
+- Chrome
+- Chromium
+- Brave
+- New Edge
+- Opera?
+- Vivaldi
+- Blisk
+- Colibri
+- Epic Browser
+- Iron Browser
+- Ungoogled Chromium?
+```
 
 ## Message to Chromium contributors
 This project is not meant for malicious use, especially because patching requires administrative rights. If an attacker wants to get rid of that notification, they will always be able to do it somehow, since it clientsided. Additionally, you can just install a crx-file and allow it with some group policies, which makes absolutely no sense, because it punishes developers with this annoying popup, but crx files that are already packed can be installed easily.
@@ -7,11 +24,13 @@ This project is not meant for malicious use, especially because patching require
 The idea originates from that one stackoverflow patching method, which forces a command line option in the `chrome.dll`.
 
 ## How the program works
-It discovers your `chrome.dll` file of the latest installed Chrome version. Then it performs a pattern scan for a function that gets patched, so the dialog does not appear anymore.
+It discovers your `chrome.dll` file of the latest installed Chrome/Chromium version. Then it performs a pattern scan for a function that gets patched, so the dialog does not appear anymore.
 
 ## Commandline Options
+All commandline options are **optional** and not required.
+
 ```bash
-ChromeDevExtWarningPatcher.exe [-noDebugPatch] [-noWWWPatch] [-noWarningPatch] [-noWait]
+ChromeDevExtWarningPatcher.exe [-noDebugPatch] [-noWWWPatch] [-noWarningPatch] [-noWait] [-customPath "C:\Path"]
 
 Explanation:
 -noDebugPatch: Disables the patch for the warning of debugging extensions (chrome.debugger)
@@ -19,6 +38,17 @@ Explanation:
 -noWarningPatch: Disables the patch for the warning of developer extensions
 
 -noWait: Disables the almost-pointless wait after finishing
+
+-customPath: Tell the patcher to use another patch to find the chrome.dll file, see below.
+```
+
+**Recommended `customPath`s:**
+```java
+Chrome (default): C:\Program Files (x86)\Google\Chrome\Application
+Brave: C:\Program Files (x86)\BraveSoftware\Brave-Browser\Application
+
+Remember: The path always needs to include the version folders of the browser.
+Please create a new issue with a path, if you want to contribute to this list.
 ```
 
 ## What is the pattern and what does it patch
@@ -109,4 +139,4 @@ bool ChromeLocationBarModelDelegate::ShouldPreventElision() const {
 ```
 
 ## How and when to run it
-Run it after every chrome update with administrator rights.
+Run it after every chrome/chromium update with administrator rights.

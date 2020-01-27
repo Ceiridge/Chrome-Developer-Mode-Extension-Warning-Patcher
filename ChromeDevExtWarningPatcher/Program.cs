@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 
 // Ugly and uncommented code ahead
@@ -9,7 +11,7 @@ namespace ChromeDevExtWarningPatcher
 {
     class Program
     {
-        private const string CHROME_INSTALLATION_FOLDER = @"C:\Program Files (x86)\Google\Chrome\Application";
+        private static string CHROME_INSTALLATION_FOLDER = @"C:\Program Files (x86)\Google\Chrome\Application";
 
         private static readonly byte[] SHOULDINCLUDEEXTENSION_FUNCTION_PATTERN = { 0x56, 0x48, 0x83, 0xEC, 0x20, 0x48, 0x89, 0xD6, 0x48, 0x89, 0xD1, 0xE8, 0xFF, 0xFF, 0xFF, 0xFF, 0x89, 0xC1 }; // 0xFF is ?
         private static readonly byte[] MAYBEADDINFOBAR_FUNCTION_PATTERN = { 0x41, 0x57, 0x41, 0x56, 0x56, 0x57, 0x53, 0x48, 0x81, 0xEC, 0xFF, 0xFF, 0xFF, 0xFF, 0x48, 0x89, 0xCE, 0x48, 0x8B, 0x05, 0xFF, 0xFF, 0xFF, 0xFF, 0x48, 0x31, 0xE0, 0x48, 0x89, 0x84, 0x24, 0xFF, 0xFF, 0xFF, 0xFF, 0x48, 0x8D, 0x4A, 0x08 }; // 0xFF is ?; debugPatch
@@ -32,6 +34,7 @@ namespace ChromeDevExtWarningPatcher
                 RemovePatches(SHOULDPREVENTELISION_FUNCTION_PATTERN);
             if (ContainsArg(args, "noDebugPatch"))
                 RemovePatches(MAYBEADDINFOBAR_FUNCTION_PATTERN);
+            SetNewFolder(args);
 
             DirectoryInfo chromeFolder = new DirectoryInfo(CHROME_INSTALLATION_FOLDER);
             
@@ -151,6 +154,37 @@ namespace ChromeDevExtWarningPatcher
                     BYTE_PATCHES[i] = REMOVAL_PATCH;
                 }
                 i++;
+            }
+        }
+
+        private const string PATH_REGEX = @"\\([a-zA-Z]{4,})";
+        private static void SetNewFolder(string[] args) {
+            StringBuilder sb = new StringBuilder();
+
+            for (int i = 0; i < args.Length; i++) {
+                sb.Append(args[i] + " ");
+            }
+            if(sb.Length > 0)
+                sb.Remove(sb.Length - 1, 1);
+            string fullArgs = sb.ToString().ToLower();
+
+            string arg = "-custompath ";
+            int pathIndex = fullArgs.IndexOf(arg);
+            if(pathIndex != -1) {
+                pathIndex += arg.Length;
+                fullArgs = fullArgs.Substring(pathIndex).Replace("\"", "");
+
+                var regMatches = Regex.Matches(fullArgs, PATH_REGEX);
+                if (regMatches.Count == 0) {
+                    Console.WriteLine("Invalid path given");
+                    Environment.Exit(1);
+                    return;
+                }
+                Match regMatch = regMatches[regMatches.Count - 1];
+                string regMatchGroup = regMatch.Groups[0].Value;
+
+                CHROME_INSTALLATION_FOLDER = fullArgs.Substring(0, regMatch.Index + regMatchGroup.Length);
+                Console.WriteLine("New installation folder set: " + CHROME_INSTALLATION_FOLDER);
             }
         }
     }
