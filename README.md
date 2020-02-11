@@ -4,7 +4,7 @@
 ## Supported browsers
 See below for the custom paths (commandline option).
 ```javascript
-- All Chromium-based browsers, including:
+All x64 Chromium-based browsers, including:
 - Chrome
 - Chromium
 - Brave
