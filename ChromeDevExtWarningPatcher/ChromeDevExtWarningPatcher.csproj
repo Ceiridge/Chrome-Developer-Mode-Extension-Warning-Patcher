@@ -82,6 +82,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BytePatch.cs" />
+    <Compile Include="InstallationFinder\Defaults\Brave.cs" />
+    <Compile Include="InstallationFinder\Defaults\Chrome.cs" />
+    <Compile Include="InstallationFinder\Defaults\Edge.cs" />
+    <Compile Include="InstallationFinder\Installation.cs" />
+    <Compile Include="InstallationFinder\InstallationManager.cs" />
     <Compile Include="PatcherGui.xaml.cs">
       <DependentUpon>PatcherGui.xaml</DependentUpon>
     </Compile>

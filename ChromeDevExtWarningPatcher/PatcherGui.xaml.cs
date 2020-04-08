@@ -25,8 +25,7 @@ namespace ChromeDevExtWarningPatcher {
             openFile.Title = "Select a chrome.dll";
             openFile.Filter = "chrome.dll/msedge.dll file (chrome.dll;msedge.dll)|chrome.dll;msedge.dll|Alternative chrome.dll file (*.dll)|*.dll|All files (*.*)|*.*";
             openFile.FilterIndex = 1;
-            openFile.AddExtension = true;
-            openFile.CheckFileExists = openFile.CheckPathExists = true;
+            openFile.CheckFileExists = openFile.CheckPathExists = openFile.AddExtension = true;
 
             if(openFile.ShowDialog(this) == true) { // No, I am not a noob, I have to do it like this
                 AddChromiumInstallation(openFile.FileName);
@@ -34,7 +33,11 @@ namespace ChromeDevExtWarningPatcher {
         }
 
         private void PatchBtn_Click(object sender, RoutedEventArgs e) {
+            foreach(CheckBox installationBox in InstallationList.Items) {
+                if(installationBox.IsChecked == true) { // No, I am not a noob, I have to do it like this
 
+                }
+            }
         }
 
         protected override void OnInitialized(EventArgs e) {
@@ -43,6 +46,10 @@ namespace ChromeDevExtWarningPatcher {
             new TextRange(ConsoleBox.Document.ContentStart, ConsoleBox.Document.ContentEnd).Text = "";
             Log("Patcher gui initialized");
             Log("Searching for Chromium installations...");
+
+            foreach(string path in new InstallationFinder.InstallationManager().FindAllChromiumInstallations()) {
+                AddChromiumInstallation(path);
+            }
         }
 
         public void Log(string str) {
@@ -56,6 +63,12 @@ namespace ChromeDevExtWarningPatcher {
         }
 
         private void AddChromiumInstallation(string chromeDll) {
+            CheckBox installationBox = new CheckBox();
+            installationBox.Content = chromeDll;
+            installationBox.IsChecked = true;
+            installationBox.Foreground = new SolidColorBrush(Color.FromRgb(202, 62, 71));
+
+            InstallationList.Items.Add(installationBox);
             Log("Added Chromium installation at " + chromeDll);
         }
     }
