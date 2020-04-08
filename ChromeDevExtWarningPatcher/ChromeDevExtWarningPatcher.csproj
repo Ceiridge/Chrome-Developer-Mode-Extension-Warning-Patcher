@@ -81,7 +81,8 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BytePatch.cs" />
+    <Compile Include="Patches\BytePatch.cs" />
+    <Compile Include="DllPatcher.cs" />
     <Compile Include="InstallationFinder\Defaults\Brave.cs" />
     <Compile Include="InstallationFinder\Defaults\Chrome.cs" />
     <Compile Include="InstallationFinder\Defaults\Edge.cs" />
@@ -90,6 +91,10 @@
     <Compile Include="PatcherGui.xaml.cs">
       <DependentUpon>PatcherGui.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Patches\BytePatchManager.cs" />
+    <Compile Include="Patches\BytePatchPattern.cs" />
+    <Compile Include="Patches\Defaults\Patches.cs" />
+    <Compile Include="Patches\Defaults\Patterns.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -110,5 +115,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

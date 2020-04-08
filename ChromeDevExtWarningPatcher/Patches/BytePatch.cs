@@ -1,12 +1,14 @@
-﻿namespace ChromeDevExtWarningPatcher
+﻿using ChromeDevExtWarningPatcher.Patches;
+
+namespace ChromeDevExtWarningPatcher
 {
     public class BytePatch
     {
         public byte origByte, patchByte;
         public int offset;
-        public byte[] pattern;
+        public BytePatchPattern pattern;
 
-        public BytePatch(byte[] pattern, byte origByte, byte patchByte, int offset)
+        public BytePatch(BytePatchPattern pattern, byte origByte, byte patchByte, int offset)
         {
             this.pattern = pattern;
             this.origByte = origByte;

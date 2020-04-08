@@ -8,8 +8,8 @@ namespace ChromeDevExtWarningPatcher.InstallationFinder.Defaults {
         public override List<string> FindDllFiles() {
             List<string> dllFiles = new List<string>();
 
-            AddDllToList(dllFiles, GetLatestDll(new DirectoryInfo(@"C:\Progion"), "msedge.dll"));
-            AddDllToList(dllFiles, GetLatestDll(new DirectoryInfo(@"C:\Prcation"), "msedge.dll"));
+            AddDllToList(dllFiles, GetLatestDll(new DirectoryInfo(@"C:\Program Files (x86)\Microsoft\Edge\Application"), "msedge.dll"));
+            AddDllToList(dllFiles, GetLatestDll(new DirectoryInfo(@"C:\Program Files\Microsoft\Edge\Application"), "msedge.dll"));
 
             return dllFiles;
         }

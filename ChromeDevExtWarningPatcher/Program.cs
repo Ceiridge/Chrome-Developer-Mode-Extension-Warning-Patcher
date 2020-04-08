@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ChromeDevExtWarningPatcher.Patches;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -12,32 +13,18 @@ namespace ChromeDevExtWarningPatcher
 {
     class Program
     {
-        private static string CHROME_INSTALLATION_FOLDER = @"C:\Program Files (x86)\Google\Chrome\Application";
-
-        private static readonly byte[] SHOULDINCLUDEEXTENSION_FUNCTION_PATTERN = { 0x56, 0x48, 0x83, 0xEC, 0x20, 0x48, 0x89, 0xD6, 0x48, 0x89, 0xD1, 0xE8, 0xFF, 0xFF, 0xFF, 0xFF, 0x89, 0xC1 }; // 0xFF is ?
-        private static readonly byte[] MAYBEADDINFOBAR_FUNCTION_PATTERN = { 0x41, 0x57, 0x41, 0x56, 0x56, 0x57, 0x53, 0x48, 0x81, 0xEC, 0xFF, 0xFF, 0xFF, 0xFF, 0x48, 0x89, 0xCE, 0x48, 0x8B, 0x05, 0xFF, 0xFF, 0xFF, 0xFF, 0x48, 0x31, 0xE0, 0x48, 0x89, 0x84, 0x24, 0xFF, 0xFF, 0xFF, 0xFF, 0x48, 0x8D, 0x4A, 0x08 }; // 0xFF is ?; debugPatch
-        private static readonly byte[] SHOULDPREVENTELISION_FUNCTION_PATTERN = { 0x56, 0x57, 0x53, 0x48, 0x83, 0xEC, 0x40, 0x48, 0x8B, 0x05, 0xFF, 0xFF, 0xFF, 0xFF, 0x48, 0x31, 0xE0, 0x48, 0x89, 0x44, 0x24, 0xFF, 0xE8, 0xFF, 0xFF, 0xFF, 0xFF, 0x48, 0x85, 0xC0, 0x74, 0x61 }; // 0xFF is ?
-
-        private static BytePatch[] BYTE_PATCHES = { new BytePatch(SHOULDINCLUDEEXTENSION_FUNCTION_PATTERN, 0x04, 0xFF, 22), new BytePatch(SHOULDINCLUDEEXTENSION_FUNCTION_PATTERN, 0x08, 0xFF, 35), new BytePatch(SHOULDPREVENTELISION_FUNCTION_PATTERN, 0x56, 0xC3, 0x0), new BytePatch(MAYBEADDINFOBAR_FUNCTION_PATTERN, 0x41, 0xC3, 0x0) };
-
-        private static readonly BytePatch REMOVAL_PATCH = new BytePatch(new byte[] { }, 0x0, 0x0, int.MinValue);
-
-
         private static Application guiApp;
         private static Window guiWindow;
-
-        private static double GetUnixTime(DateTime date)
-        {
-            return (DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
-        }
+        public static BytePatchManager bytePatchManager;
 
         [STAThread]
         public static void Main(string[] args)
         {
+            bytePatchManager = new BytePatchManager();
             guiApp = new Application();
             guiApp.Run(guiWindow = new PatcherGui());
 
-            if (ContainsArg(args, "noWarningPatch"))
+            /*if (ContainsArg(args, "noWarningPatch"))
                 RemovePatches(SHOULDINCLUDEEXTENSION_FUNCTION_PATTERN);
             if (ContainsArg(args, "noWWWPatch"))
                 RemovePatches(SHOULDPREVENTELISION_FUNCTION_PATTERN);
@@ -70,10 +57,10 @@ namespace ChromeDevExtWarningPatcher
             }
             
             if(!ContainsArg(args, "noWait"))
-                Thread.Sleep(5000); // Wait a bit to let the user see the result
+                Thread.Sleep(5000); // Wait a bit to let the user see the result*/
         }
 
-        private static bool BytePatchChrome(FileInfo chromeDll)
+        /*private static bool BytePatchChrome(FileInfo chromeDll)
         {
             byte[] chromeBytes = File.ReadAllBytes(chromeDll.FullName);
             int patches = 0;
@@ -195,6 +182,6 @@ namespace ChromeDevExtWarningPatcher
                 CHROME_INSTALLATION_FOLDER = fullArgs.Substring(0, regMatch.Index + regMatchGroup.Length);
                 Console.WriteLine("New installation folder set: " + CHROME_INSTALLATION_FOLDER);
             }
-        }
+        }*/
     }
 }

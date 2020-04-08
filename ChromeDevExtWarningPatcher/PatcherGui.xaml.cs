@@ -1,8 +1,10 @@
-﻿using Microsoft.Win32;
+﻿using ChromeDevExtWarningPatcher.Patches.Defaults;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -27,15 +29,34 @@ namespace ChromeDevExtWarningPatcher {
             openFile.FilterIndex = 1;
             openFile.CheckFileExists = openFile.CheckPathExists = openFile.AddExtension = true;
 
-            if(openFile.ShowDialog(this) == true) { // No, I am not a noob, I have to do it like this
+            if(openFile.ShowDialog(this) == true) { // No, I am not a noob, I have to do it like this and further below
                 AddChromiumInstallation(openFile.FileName);
             }
         }
 
         private void PatchBtn_Click(object sender, RoutedEventArgs e) {
-            foreach(CheckBox installationBox in InstallationList.Items) {
-                if(installationBox.IsChecked == true) { // No, I am not a noob, I have to do it like this
+            Program.bytePatchManager.disabledTypes.Clear();
+            if (RemoveExtWarning.IsChecked == false) {
+                Program.bytePatchManager.disabledTypes.Add(typeof(RemoveExtensionWarningPatch1));
+                Program.bytePatchManager.disabledTypes.Add(typeof(RemoveExtensionWarningPatch2));
+            }
+            if (RemoveExtWarning.IsChecked == false)
+                Program.bytePatchManager.disabledTypes.Add(typeof(RemoveDebugWarningPatch));
+            if (RemoveElision.IsChecked == false)
+                Program.bytePatchManager.disabledTypes.Add(typeof(RemoveElisionPatch));
 
+            foreach (CheckBox installationBox in InstallationList.Items) {
+                if (installationBox.IsChecked == true) {
+                    string path = installationBox.Content.ToString();
+
+                    new Thread(() => {
+                        try {
+                            DllPatcher patcher = new DllPatcher(path);
+                            patcher.Patch(Log);
+                        } catch (Exception ex) {
+                            Log("Error while patching " + path + ":" + ex.Message);
+                        }
+                    }).Start();
                 }
             }
         }
