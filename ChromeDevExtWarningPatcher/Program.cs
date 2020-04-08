@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Windows;
 
 // Ugly and uncommented code ahead
 namespace ChromeDevExtWarningPatcher
@@ -21,13 +22,21 @@ namespace ChromeDevExtWarningPatcher
 
         private static readonly BytePatch REMOVAL_PATCH = new BytePatch(new byte[] { }, 0x0, 0x0, int.MinValue);
 
+
+        private static Application guiApp;
+        private static Window guiWindow;
+
         private static double GetUnixTime(DateTime date)
         {
             return (DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
         }
 
+        [STAThread]
         public static void Main(string[] args)
         {
+            guiApp = new Application();
+            guiApp.Run(guiWindow = new PatcherGui());
+
             if (ContainsArg(args, "noWarningPatch"))
                 RemovePatches(SHOULDINCLUDEEXTENSION_FUNCTION_PATTERN);
             if (ContainsArg(args, "noWWWPatch"))

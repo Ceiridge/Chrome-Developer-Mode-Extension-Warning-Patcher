@@ -1,0 +1,73 @@
+﻿<Window x:Class="ChromeDevExtWarningPatcher.PatcherGui"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:ChromeDevExtWarningPatcher"
+             mc:Ignorable="d" Title="Ceiridge's Chromium Patcher (Extension Warning Patcher)" WindowStartupLocation="CenterScreen" ResizeMode="CanMinimize" Height="450.667" Width="800">
+    <Grid Background="#FF313131">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="701*"/>
+            <ColumnDefinition Width="93*"/>
+        </Grid.ColumnDefinitions>
+        <GroupBox Header="Chromium Installations" Margin="55,10,426,10" Background="#FF414141" BorderBrush="#FF525252" FontWeight="Bold" FontSize="18">
+            <GroupBox.Foreground>
+                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                    <GradientStop Color="#FFFF5E68" Offset="0"/>
+                    <GradientStop Color="#FFCA3E47" Offset="1"/>
+                </LinearGradientBrush>
+            </GroupBox.Foreground>
+            <Grid Margin="0">
+                <Button x:Name="SelectFolderBtn" Content="Manually add an installation" HorizontalAlignment="Center" Height="27" Margin="11,0,11,5" VerticalAlignment="Bottom" Width="186" Background="#FF525252" BorderBrush="White" FontWeight="Normal" FontSize="14">
+                    <Button.Foreground>
+                        <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                            <GradientStop Color="#FFFF5E68" Offset="0"/>
+                            <GradientStop Color="#FFCA3E47" Offset="1"/>
+                        </LinearGradientBrush>
+                    </Button.Foreground>
+                </Button>
+                <ListBox x:Name="InstallationList" Height="329" Margin="10,5,10,0" Background="{x:Null}" Foreground="#FFCA3E47" FontSize="12" VerticalAlignment="Top" HorizontalAlignment="Center" Width="188" FontWeight="Normal">
+                </ListBox>
+            </Grid>
+        </GroupBox>
+        <GroupBox Header="Patch Chromium" Margin="285,10,196,10" Background="#FF414141" BorderBrush="#FF525252" FontWeight="Bold" FontSize="18">
+            <GroupBox.Foreground>
+                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                    <GradientStop Color="#FFFF5E68" Offset="0"/>
+                    <GradientStop Color="#FFCA3E47" Offset="1"/>
+                </LinearGradientBrush>
+            </GroupBox.Foreground>
+            <Grid Margin="2,7,2,0">
+                <ListBox Height="325" Margin="10,0" Background="{x:Null}" Foreground="#FFCA3E47" FontSize="12" HorizontalAlignment="Center" VerticalAlignment="Top" FontWeight="Normal" Width="184">
+                    <CheckBox x:Name="RemoveExtWarning" Content="Remove extension warning" BorderBrush="#FFCA3E47" Background="White" Foreground="#FFCA3E47" IsChecked="True" ToolTip="This patch removes the warning of developer mode extensions when starting a Chromium browser"/>
+                    <CheckBox x:Name="RemoveDebugWarning" Content="Remove debugging warning" BorderBrush="#FFCA3E47" Background="White" Foreground="#FFCA3E47" IsChecked="True" ToolTip="This patch gets rid of the debugging warning when using chrome.debugger in extensions"/>
+                    <CheckBox Content="Disable Elision" BorderBrush="#FFCA3E47" Background="White" Foreground="#FFCA3E47" IsChecked="True" ToolTip="This patch forces chrome to show WWW and HTTPS again in the url bar!"/>
+                </ListBox>
+                <Button x:Name="PatchBtn" Content="Patch" HorizontalAlignment="Center" Height="27" Margin="9,0,10,5" VerticalAlignment="Bottom" Width="185" Background="#FF525252" BorderBrush="White" FontWeight="Normal" FontSize="14">
+                    <Button.Foreground>
+                        <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                            <GradientStop Color="#FFFF5E68" Offset="0"/>
+                            <GradientStop Color="#FFCA3E47" Offset="1"/>
+                        </LinearGradientBrush>
+                    </Button.Foreground>
+                </Button>
+                <Label Content="Hover over a patch to find out what it does." HorizontalAlignment="Center" VerticalAlignment="Top" Margin="11,302,9,0" Foreground="#FFCA3E47" FontSize="9" Width="184" FontWeight="Normal"/>
+            </Grid>
+        </GroupBox>
+        <GroupBox Header="Log Output" Margin="515,10,59,10" Background="#FF414141" BorderBrush="#FF525252" FontWeight="Bold" FontSize="18" IsEnabled="False" Grid.ColumnSpan="2">
+            <GroupBox.Foreground>
+                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                    <GradientStop Color="#FFFF5E68" Offset="0"/>
+                    <GradientStop Color="#FFCA3E47" Offset="1"/>
+                </LinearGradientBrush>
+            </GroupBox.Foreground>
+            <RichTextBox x:Name="ConsoleBox" Margin="10,5" BorderBrush="{x:Null}" Foreground="#FFCA3E47" SelectionBrush="White" Background="{x:Null}" FontFamily="Consolas" FontSize="10" FontWeight="Normal" IsReadOnly="True" IsUndoEnabled="False" Block.TextAlignment="Justify">
+                <FlowDocument>
+                    <Paragraph>
+                        <Run Text="RichTextBox"/>
+                    </Paragraph>
+                </FlowDocument>
+            </RichTextBox>
+        </GroupBox>
+    </Grid>
+</Window>
