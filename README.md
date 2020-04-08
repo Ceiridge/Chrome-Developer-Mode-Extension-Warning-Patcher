@@ -5,10 +5,10 @@
 See below for the custom paths (commandline option).
 ```javascript
 - All Chromium-based browsers, including:
-- Chrome
+- Chrome ✓
 - Chromium
-- Brave
-- New Edge
+- Brave ✓
+- New Edge ✓
 - Opera?
 - Vivaldi
 - Blisk
@@ -24,10 +24,10 @@ This project is not meant for malicious use, especially because patching require
 The idea originates from that one stackoverflow patching method, which forces a command line option in the `chrome.dll`.
 
 ## How the program works
-It discovers your `chrome.dll` file of the latest installed Chrome/Chromium version. Then it performs a pattern scan for a function that gets patched, so the dialog does not appear anymore.
+It discovers all `chrome.dll` files of the latest installed Chromium browsers. Then it performs a pattern scan for functions that getspatched, so the dialog does not appear anymore.
 
-## Commandline Options
-All commandline options are **optional** and not required.
+## Commandline Options (removed, use the gui instead)
+All commandline options are removed. ~~**optional** and not required.~~
 
 ```bash
 ChromeDevExtWarningPatcher.exe [-noDebugPatch] [-noWWWPatch] [-noWarningPatch] [-noWait] [-customPath "C:\Path"]
