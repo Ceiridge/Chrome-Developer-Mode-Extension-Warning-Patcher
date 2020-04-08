@@ -26,6 +26,9 @@ The idea originates from that one stackoverflow patching method, which forces a 
 ## How the program works
 It discovers all `chrome.dll` files of the latest installed Chromium browsers. Then it performs a pattern scan for functions that getspatched, so the dialog does not appear anymore.
 
+## Gui Screenshot
+![Gui Screenshot](https://raw.githubusercontent.com/Ceiridge/Chrome-Developer-Mode-Extension-Warning-Patcher/master/media/guiscreenshot.png)
+
 ## Commandline Options (removed, use the gui instead)
 All commandline options are removed. ~~**optional** and not required.~~
 
