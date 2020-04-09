@@ -1,10 +1,10 @@
-# Disable Chrome's and Chromium's Developer Mode Extension Warning Popup
+# Disable Chromium's and Chrome's Developer Mode Extension Warning Popup & Elision WWW/HTTPS Hiding & Debugging Extension Popup
 **Download** it in the [release section](https://github.com/Ceiridge/Chrome-Developer-Mode-Extension-Warning-Patcher/releases).
 
 ## Supported browsers
 See below for the custom paths (commandline option).
 ```javascript
-- All x64 Chromium-based browsers, including:
+- All x64 and x86/x32 bit Chromium-based browsers, including:
 - Chrome ✓
 - Chromium
 - Brave ✓

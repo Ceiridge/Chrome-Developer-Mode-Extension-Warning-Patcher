@@ -25,18 +25,21 @@ namespace ChromeDevExtWarningPatcher.Patches {
                     continue;
                 }
                 long addr = patch.pattern.FindAddress(raw, x64, log);
+                int patchOffset = x64 ? patch.offsetX64 : patch.offsetX86;
+                byte patchOrigByte = x64 ? patch.origByteX64 : patch.origByteX86;
+                byte patchPatchByte = x64 ? patch.patchByteX64 : patch.patchByteX86;
 
                 if(addr != -1) {
-                    long index = addr + patch.offset;
+                    long index = addr + patchOffset;
                     byte sourceByte = raw[index];
 
-                    log("Source byte of patch at " + patch.offset + ": " + sourceByte);
-                    if (sourceByte == patch.origByte) {
-                        raw[index] = patch.patchByte;
-                        log(index + " => " + patch.patchByte);
+                    log("Source byte of patch at " + patchOffset + ": " + sourceByte);
+                    if (sourceByte == patchOrigByte) {
+                        raw[index] = patchPatchByte;
+                        log(index + " => " + patchPatchByte);
                         patches++;
                     } else
-                        log("Source byte unexpected, should be " + patch.origByte + "!");
+                        log("Source byte unexpected, should be " + patchOrigByte + "!");
                 } else {
                     log("Couldn't find offset for a patch " + patch.pattern.Name);
                 }
