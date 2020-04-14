@@ -40,7 +40,7 @@ namespace ChromeDevExtWarningPatcher.Patches {
 
 
             if(xmlDoc != null) {
-                // Comma cultuer setter from https://stackoverflow.com/questions/9160059/set-up-dot-instead-of-comma-in-numeric-values
+                // Comma culture setter from https://stackoverflow.com/questions/9160059/set-up-dot-instead-of-comma-in-numeric-values
                 CultureInfo customCulture = (CultureInfo) Thread.CurrentThread.CurrentCulture.Clone();                customCulture.NumberFormat.NumberDecimalSeparator = ".";
                 Thread.CurrentThread.CurrentCulture = customCulture;
 
