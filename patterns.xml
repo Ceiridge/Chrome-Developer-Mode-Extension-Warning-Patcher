@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- 
+	This file contains all patterns of functions that need to be patched and its patches. It is downloaded everytime you start the patcher and is saved in your %temp% folder. This allows auto-updating patterns.
+	Every pattern & patch has some comments that give hints on how to find the function.
+	Alternative patterns exist so that the patches work on older and other versions (there are differences between Chromium 80 & 81 and Chrome & Edge (do they use another compiler?)).
+	Patterns here are stored in the default IDA format. ? is replaced to 0xFF in the C# code (and is still treated as a wildcard).
+
+	Normally, I prefer JSON over XML, but C# already has XML parsing built-in, so no extra library is needed.
+
+	Create a new issue if a pattern stops working with any browser.
+-->
+
+<Defaults version="3.2">
+	<Patterns>
+		<Pattern name="Remove Extension Warning">
+			<!-- ShouldIncludeExtension; "ProxyOverriddenBubble.UserSelection" 2nd function in the vtable -->
+			<BytePatternList type="x64">
+				<BytePattern>56 48 83 EC 20 48 89 D6 48 89 D1 E8 ? ? ? ? 89 C1</BytePattern> <!-- Chr 79 -->
+
+				<BytePattern>56 48 83 EC ? 48 89 D6 48 89 D1 E8 ? ? ? ? 83 F8 ? 74 ?</BytePattern> <!-- Edg 81 -->
+			</BytePatternList>
+	
+			<BytePatternList type="x86">
+				<BytePattern>55 89 E5 56 8B 75 ? 89 F1 E8 ? ? ? ? 89 C1 B0 ? 83 F9 ?</BytePattern> <!-- Chr 81 -->
+			</BytePatternList>
+		</Pattern>
+	
+		<Pattern name="Remove Debug Warning">
+			<!-- MaybeAddInfoBar; "MaybeAddInfoBar" in the function -->
+			<BytePatternList type="x64">
+				<BytePattern>41 57 41 56 41 54 56 57 53 48 81 EC ? ? ? ? 49 89 CC 48 8B 05 ? ? ? ? 48 31 E0 48 89 84 24 ? ? ? ? 48 8D 4A ?</BytePattern> <!-- Chr 81 -->
+				<BytePattern>41 57 41 56 56 57 53 48 81 EC ? ? ? ? 48 89 CE 48 8B 05 ? ? ? ? 48 31 E0 48 89 84 24 ? ? ? ? 48 8D 4A 08</BytePattern> <!-- Chr 79 -->
+	
+				<BytePattern>41 57 41 56 56 57 53 48 81 EC ? ? ? ? 49 89 CF 48 8B 05 ? ? ? ? 48 31 E0 48 89 84 24 ? ? ? ? 48 8D 4A ?</BytePattern> <!-- Edg 81 -->
+			</BytePatternList>
+	
+			<BytePatternList type="x86">
+				<BytePattern>55 89 E5 53 57 56 83 E4 ? 83 EC ? 89 E6 A1 ? ? ? ? 89 CF 8B 4D ? 31 E8 83 C1 ?</BytePattern> <!-- Chr 81 -->
+			</BytePatternList>
+		</Pattern>
+	
+		<Pattern name="Remove Elision">
+			<!-- ShouldPreventElision; "jknemblkbdhdcpllfgbfekkdciegfboi" in the function or "https://support.google.com/chrome/?p=unauthenticated" 3rd function in the vtable OR IN EDGE: "https://to-be-replaced.invalid/chrome/?p=unauthenticated" -->
+			<BytePatternList type="x64">
+				<BytePattern>56 57 53 48 83 EC 40 48 8B 05 ? ? ? ? 48 31 E0 48 89 44 24 ? E8 ? ? ? ? 48 85 C0 74 61</BytePattern> <!-- Chr 79 -->
+
+				<BytePattern>56 57 53 48 83 EC ? 48 8B 05 ? ? ? ? 48 31 E0 48 89 44 24 ? E8 ? ? ? ? 48 85 C0 74 ? 48 89 C1</BytePattern> <!-- Edg 81 -->
+			</BytePatternList>
+	
+			<BytePatternList type="x86">
+				<BytePattern>55 89 E5 53 57 56 83 EC ? A1 ? ? ? ? 31 E8 89 45 ? E8 ? ? ? ? 85 C0 74 ? 50 E8 ? ? ? ? 83 C4 ? 8D 58 ?</BytePattern> <!-- Chr 81 -->
+			</BytePatternList>
+		</Pattern>
+	</Patterns>
+
+
+	<!-- Everything should be in hex here -->
+	<Patches>
+		<Patch pattern="Remove Extension Warning" group="0">
+			<PatchData type="x64" offset="0x16" alternativeOffset="0x12" orig="0x04" patch="0xFF"></PatchData> <!-- 0x04 is an enum value, 0xFF breaks the check -->
+			<PatchData type="x86" offset="0x14" orig="0x04" patch="0xFF"></PatchData> <!-- The alternative offsets here are used to support Edge -->
+		</Patch>
+
+		<Patch pattern="Remove Extension Warning" group="0">
+			<PatchData type="x64" offset="0x23" alternativeOffset="0x1F" orig="0x08" patch="0xFF"></PatchData> <!-- 0x08 is an enum value, 0xFF breaks the check -->
+			<PatchData type="x86" offset="0x20" orig="0x08" patch="0xFF"></PatchData> <!-- The alternative offsets here are used to support Edge -->
+		</Patch>
+
+		<Patch pattern="Remove Debug Warning" group="1">
+			<PatchData type="x64" offset="0x00" orig="0x41" patch="0xC3"></PatchData> <!-- 0xC3 = ret -->
+			<PatchData type="x86" offset="0x00" orig="0x55" patch="0xC3"></PatchData>
+		</Patch>
+
+		<Patch pattern="Remove Elision" group="2">
+			<PatchData type="x64" offset="0x00" orig="0x56" patch="0xC3"></PatchData> <!-- 0xC3 = ret -->
+			<PatchData type="x86" offset="0x00" orig="0x55" patch="0xC3"></PatchData>
+		</Patch>
+	</Patches>
+</Defaults>

@@ -1,19 +1,10 @@
-﻿using ChromeDevExtWarningPatcher.Patches.Defaults;
-using Microsoft.Win32;
+﻿using Microsoft.Win32;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace ChromeDevExtWarningPatcher {
     public partial class PatcherGui : Window {
@@ -35,15 +26,13 @@ namespace ChromeDevExtWarningPatcher {
         }
 
         private void PatchBtn_Click(object sender, RoutedEventArgs e) {
-            Program.bytePatchManager.disabledTypes.Clear();
-            if (RemoveExtWarning.IsChecked == false) {
-                Program.bytePatchManager.disabledTypes.Add(typeof(RemoveExtensionWarningPatch1));
-                Program.bytePatchManager.disabledTypes.Add(typeof(RemoveExtensionWarningPatch2));
-            }
+            Program.bytePatchManager.DisabledGroups.Clear();
             if (RemoveExtWarning.IsChecked == false)
-                Program.bytePatchManager.disabledTypes.Add(typeof(RemoveDebugWarningPatch));
+                Program.bytePatchManager.DisabledGroups.Add(0);
+            if (RemoveDebugWarning.IsChecked == false)
+                Program.bytePatchManager.DisabledGroups.Add(1);
             if (RemoveElision.IsChecked == false)
-                Program.bytePatchManager.disabledTypes.Add(typeof(RemoveElisionPatch));
+                Program.bytePatchManager.DisabledGroups.Add(2);
 
             foreach (CheckBox installationBox in InstallationList.Items) {
                 if (installationBox.IsChecked == true) {
@@ -87,7 +76,7 @@ namespace ChromeDevExtWarningPatcher {
             CheckBox installationBox = new CheckBox();
             installationBox.Content = chromeDll;
             installationBox.IsChecked = true;
-            installationBox.Foreground = new SolidColorBrush(Color.FromRgb(202, 62, 71));
+            installationBox.Foreground = installationBox.BorderBrush = new SolidColorBrush(Color.FromRgb(202, 62, 71));
 
             InstallationList.Items.Add(installationBox);
             Log("Added Chromium installation at " + chromeDll);

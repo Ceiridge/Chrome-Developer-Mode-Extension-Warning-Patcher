@@ -17,6 +17,8 @@ namespace ChromeDevExtWarningPatcher
         private static Window guiWindow;
         public static BytePatchManager bytePatchManager;
 
+        public const float VERSION = 3.2F;
+
         [STAThread]
         public static void Main(string[] args)
         {

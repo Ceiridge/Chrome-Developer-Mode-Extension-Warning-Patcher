@@ -93,8 +93,6 @@
     </Compile>
     <Compile Include="Patches\BytePatchManager.cs" />
     <Compile Include="Patches\BytePatchPattern.cs" />
-    <Compile Include="Patches\Defaults\Patches.cs" />
-    <Compile Include="Patches\Defaults\Patterns.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

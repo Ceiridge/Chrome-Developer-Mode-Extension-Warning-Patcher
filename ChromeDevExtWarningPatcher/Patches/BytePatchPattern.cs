@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 
 namespace ChromeDevExtWarningPatcher.Patches {
-    public abstract class BytePatchPattern {
+    public class BytePatchPattern {
         public string Name;
-        protected List<byte[]> AlternativePatternsX86 = new List<byte[]>();
-        protected List<byte[]> AlternativePatternsX64 = new List<byte[]>();
+        public List<byte[]> AlternativePatternsX86 = new List<byte[]>();
+        public List<byte[]> AlternativePatternsX64 = new List<byte[]>();
 
         public BytePatchPattern(string name) {
             Name = name;
