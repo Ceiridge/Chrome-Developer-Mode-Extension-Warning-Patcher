@@ -1,12 +1,7 @@
 ﻿using ChromeDevExtWarningPatcher.Patches;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading;
 using System.Windows;
+using CommandLine;
 
 // Ugly and uncommented code ahead
 namespace ChromeDevExtWarningPatcher
@@ -23,7 +18,7 @@ namespace ChromeDevExtWarningPatcher
             bytePatchManager = new BytePatchManager();
             guiApp = new Application();
             guiApp.Run(guiWindow = new PatcherGui());
-
+            
             /*if (ContainsArg(args, "noWarningPatch"))
                 RemovePatches(SHOULDINCLUDEEXTENSION_FUNCTION_PATTERN);
             if (ContainsArg(args, "noWWWPatch"))

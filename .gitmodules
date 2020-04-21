@@ -1,0 +1,3 @@
+[submodule "lib/commandlineparser_commandline"]
+	path = lib/commandlineparser_commandline
+	url = https://github.com/commandlineparser/commandline.git

@@ -113,6 +113,11 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\lib\commandlineparser_commandline\src\CommandLine\CommandLine.csproj">
+      <Project>{29d94f79-97b1-4801-8a65-4a8becbf2d46}</Project>
+      <Name>CommandLine</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
