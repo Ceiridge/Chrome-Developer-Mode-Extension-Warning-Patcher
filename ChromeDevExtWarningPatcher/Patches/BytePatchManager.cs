@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Net;
+using System.Reflection;
 using System.Threading;
 using System.Windows;
 using System.Xml.Linq;
@@ -45,7 +46,9 @@ namespace ChromeDevExtWarningPatcher.Patches {
                 Thread.CurrentThread.CurrentCulture = customCulture;
 
                 float newVersion = float.Parse(xmlDoc.Root.Attribute("version").Value);
-                if(newVersion > Program.VERSION) {
+                Version myVersion = Assembly.GetCallingAssembly().GetName().Version;
+
+                if (newVersion > float.Parse(myVersion.Major + "." + myVersion.Minor)) {
                     MessageBox.Show("A new version of this patcher has been found.\nDownload it at:\nhttps://github.com/Ceiridge/Chrome-Developer-Mode-Extension-Warning-Patcher/releases", "New update available");
                 }
 
