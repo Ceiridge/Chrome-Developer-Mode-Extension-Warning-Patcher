@@ -2,12 +2,12 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-[assembly: AssemblyTitle("Chrome Developer Extension Warning Patcher")]
-[assembly: AssemblyDescription("Removes the developer extension warning")]
+[assembly: AssemblyTitle("Chromium Developer Extension Warning Patcher")]
+[assembly: AssemblyDescription("Patches Chromium and disables the developer extension warning among others")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Chrome Developer Extension Warning Patcher")]
-[assembly: AssemblyCopyright("GNU3")]
+[assembly: AssemblyProduct("Chromium Developer Extension Warning Patcher")]
+[assembly: AssemblyCopyright("GNU General Public License 3, Ceiridge")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -16,5 +16,5 @@ using System.Runtime.InteropServices;
 [assembly: Guid("0254db23-b64d-4d54-8ff8-f4d570e95ad4")]
 
 
-[assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.0.0.0")]
+[assembly: AssemblyVersion("3.3.0.0")]
+[assembly: AssemblyFileVersion("3.3.0.0")]
