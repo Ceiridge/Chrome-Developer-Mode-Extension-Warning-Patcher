@@ -15,7 +15,8 @@ namespace ChromeDevExtWarningPatcher.Patches {
 
         public List<int> DisabledGroups = new List<int>();
 
-        public BytePatchManager() {
+        public delegate MessageBoxResult WriteLineOrMessageBox(string str, string title);
+        public BytePatchManager(WriteLineOrMessageBox log) {
             BytePatches.Clear();
             BytePatterns.Clear();
 
@@ -32,9 +33,9 @@ namespace ChromeDevExtWarningPatcher.Patches {
             } catch (Exception ex) {
                 if(File.Exists(xmlFile)) {
                     xmlDoc = XDocument.Parse(File.ReadAllText(xmlFile));
-                    MessageBox.Show("An error occurred trying to fetch the new patterns. The old cached version will be used instead. Expect patch errors.\n\n" + ex.Message, "Warning");
+                    log("An error occurred trying to fetch the new patterns. The old cached version will be used instead. Expect patch errors.\n\n" + ex.Message, "Warning");
                 } else {
-                    MessageBox.Show("An error occurred trying to fetch the new patterns. The program has to exit, as no cached version of this file has been found.\n\n" + ex.Message, "Error");
+                    log("An error occurred trying to fetch the new patterns. The program has to exit, as no cached version of this file has been found.\n\n" + ex.Message, "Error");
                     Environment.Exit(1);
                 }
             }
@@ -49,7 +50,7 @@ namespace ChromeDevExtWarningPatcher.Patches {
                 Version myVersion = Assembly.GetCallingAssembly().GetName().Version;
 
                 if (newVersion > float.Parse(myVersion.Major + "." + myVersion.Minor)) {
-                    MessageBox.Show("A new version of this patcher has been found.\nDownload it at:\nhttps://github.com/Ceiridge/Chrome-Developer-Mode-Extension-Warning-Patcher/releases", "New update available");
+                    log("A new version of this patcher has been found.\nDownload it at:\nhttps://github.com/Ceiridge/Chrome-Developer-Mode-Extension-Warning-Patcher/releases", "New update available");
                 }
 
                 foreach(XElement pattern in xmlDoc.Root.Element("Patterns").Elements("Pattern")) {

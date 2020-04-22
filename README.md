@@ -29,30 +29,35 @@ It discovers all `chrome.dll` files of the latest installed Chromium browsers. T
 ## Gui Screenshot
 ![Gui Screenshot](https://raw.githubusercontent.com/Ceiridge/Chrome-Developer-Mode-Extension-Warning-Patcher/master/media/guiscreenshot.png)
 
-## Commandline Options (removed, use the gui instead)
-All commandline options are removed. ~~**optional** and not required.~~
+## Commandline Options
+All commandline options are **optional** and not required. If none are given, the gui will start.
 
-```bash
-ChromeDevExtWarningPatcher.exe [-noDebugPatch] [-noWWWPatch] [-noWarningPatch] [-noWait] [-customPath "C:\Path"]
+```
+ChromeDevExtWarningPatcher.exe 
+  --disableGroups    Set what patch groups you don't want to use. See patterns.xml to get the group ids (comma-seperated: 0,1,2)
 
-Explanation:
--noDebugPatch: Disables the patch for the warning of debugging extensions (chrome.debugger)
--noWWWPatch: Disables the patch for re-adding the `https` or `www` in a url, because it matters!
--noWarningPatch: Disables the patch for the warning of developer extensions
+  -w, --noWait       Disable the almost-pointless wait after finishing
 
--noWait: Disables the almost-pointless wait after finishing
+  --customPath       Instead of automatically detecting and patching all chrome.dll files, define a custom Application-folder path
+                     (see README) (string in quotes is recommended)
 
--customPath: Tell the patcher to use another patch to find the chrome.dll file, see below.
+  --help             Display this help screen.
+
+  --version          Display version information.
 ```
 
 **Recommended `customPath`s:**
 ```java
 Chrome (default): C:\Program Files (x86)\Google\Chrome\Application
 Brave: C:\Program Files (x86)\BraveSoftware\Brave-Browser\Application
+Edge: C:\Program Files (x86)\Microsoft\Edge\Application
 
 Remember: The path always needs to include the version folders of the browser.
 Please create a new issue with a path, if you want to contribute to this list.
 ```
+
+## Contributing
+Clone this repository with `git clone --recursive https://github.com/Ceiridge/Chrome-Developer-Mode-Extension-Warning-Patcher.git` and open the `.sln` file with Visual Studio (Community 2017, newer versions should also work).
 
 ## What is the pattern and what does it patch
 
