@@ -49,7 +49,7 @@ namespace ChromeDevExtWarningPatcher
 
             List<string> applicationPaths = new List<string>();
             
-            if(clOptions.CustomPath.Length > 0) {
+            if(clOptions.CustomPath != null && clOptions.CustomPath.Length > 0) {
                 if(!Directory.Exists(clOptions.CustomPath)) {
                     Console.WriteLine("CustomPath not found");
                     return;
