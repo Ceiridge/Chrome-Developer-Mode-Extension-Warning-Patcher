@@ -43,7 +43,11 @@ namespace ChromeDevExtWarningPatcher {
                     new Thread(() => {
                         try {
                             DllPatcher patcher = new DllPatcher(path);
-                            patcher.Patch(Log);
+                            if (patcher.Patch(Log)) {
+                                installationBox.Dispatcher.Invoke(new Action(() => {
+                                    installationBox.Foreground = installationBox.BorderBrush = new SolidColorBrush(Color.FromRgb(72, 207, 133));
+                                }));
+                            }
                         } catch (Exception ex) {
                             Log("Error while patching " + path + ":" + ex.Message);
                         }

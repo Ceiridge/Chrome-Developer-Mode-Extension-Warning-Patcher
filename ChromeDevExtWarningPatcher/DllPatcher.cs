@@ -10,7 +10,7 @@ namespace ChromeDevExtWarningPatcher {
             DllPath = dllPath;
         }
 
-        public void Patch(BytePatchPattern.WriteToLog log) {
+        public bool Patch(BytePatchPattern.WriteToLog log) {
             FileInfo dllFile = new FileInfo(DllPath);
             if (!dllFile.Exists)
                 throw new IOException("File not found");
@@ -20,9 +20,12 @@ namespace ChromeDevExtWarningPatcher {
             if(Program.bytePatchManager.PatchBytes(ref raw, IsImageX64(dllFile.FullName), log)) {
                 File.WriteAllBytes(dllFile.FullName, raw);
                 log("Patched and saved successfully " + dllFile.FullName);
+                return true;
             } else {
                 log("Error trying to patch " + dllFile.FullName);
             }
+
+            return false;
         }
 
         // Taken from https://stackoverflow.com/questions/480696/how-to-find-if-a-native-dll-file-is-compiled-as-x64-or-x86
