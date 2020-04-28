@@ -11,7 +11,7 @@
 	Create a new issue if a pattern stops working with any browser.
 -->
 
-<Defaults version="3.4">
+<Defaults version="3.5">
 	<Patterns>
 		<Pattern name="Remove Extension Warning">
 			<!-- ShouldIncludeExtension; "ProxyOverriddenBubble.UserSelection" 2nd function in the vtable -->
@@ -52,6 +52,19 @@
 				<BytePattern>55 89 E5 53 57 56 83 EC ? A1 ? ? ? ? 31 E8 89 45 ? E8 ? ? ? ? 85 C0 74 ? 50 E8 ? ? ? ? 83 C4 ? 8D 58 ?</BytePattern> <!-- Chr 81 -->
 			</BytePatternList>
 		</Pattern>
+
+		<Pattern name="Remove Crash Warning">
+			<!-- session_crashed_bubble_view.cc:Show; "SessionCrashed.Bubble" brings you to RecordBubbleHistogramValue (find references) => search for the function where it is called at least twice and is called each with the arg 0, a variable (either 3 or 1) or 3 or 1 directly (200 IQ required to understand this sentence) -->
+			<BytePatternList type="x64">
+				<BytePattern>41 57 41 56 56 57 55 53 48 83 EC ? 41 89 D6 48 89 CE 48 8B 05 ? ? ? ? 48 31 E0 48 89 44 24 ? 84 D2</BytePattern> <!-- Chr 81 -->
+
+				<BytePattern>41 57 41 56 56 57 55 53 48 83 EC ? 41 89 D7 48 89 CE 48 8B 05 ? ? ? ? 48 31 E0 48 89 44 24 ? 84 D2</BytePattern> <!-- Edg 81 -->
+			</BytePatternList>
+
+			<BytePatternList type="x86">
+				<BytePattern>55 89 E5 53 57 56 83 E4 ? 83 EC ? A1 ? ? ? ? 8D 75 ? 31 E8 89 44 24 ? 80 7E ? ? 74 ? 31 DB</BytePattern> <!-- Chr 81 -->
+			</BytePatternList>
+		</Pattern>
 	</Patterns>
 
 
@@ -74,6 +87,11 @@
 
 		<Patch pattern="Remove Elision" group="2">
 			<PatchData type="x64" offset="0x00" orig="0x56" patch="0xC3"></PatchData> <!-- 0xC3 = ret -->
+			<PatchData type="x86" offset="0x00" orig="0x55" patch="0xC3"></PatchData>
+		</Patch>
+
+		<Patch pattern="Remove Crash Warning" group="3">
+			<PatchData type="x64" offset="0x00" orig="0x41" patch="0xC3"></PatchData> <!-- 0xC3 = ret -->
 			<PatchData type="x86" offset="0x00" orig="0x55" patch="0xC3"></PatchData>
 		</Patch>
 	</Patches>

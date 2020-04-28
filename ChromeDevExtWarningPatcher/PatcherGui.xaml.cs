@@ -33,6 +33,8 @@ namespace ChromeDevExtWarningPatcher {
                 Program.bytePatchManager.DisabledGroups.Add(1);
             if (RemoveElision.IsChecked == false)
                 Program.bytePatchManager.DisabledGroups.Add(2);
+            if (RemoveCrash.IsChecked == false)
+                Program.bytePatchManager.DisabledGroups.Add(3);
 
             foreach (CheckBox installationBox in InstallationList.Items) {
                 if (installationBox.IsChecked == true) {
