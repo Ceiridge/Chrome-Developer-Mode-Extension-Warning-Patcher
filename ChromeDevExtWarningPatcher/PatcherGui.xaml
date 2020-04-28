@@ -42,7 +42,7 @@
                     <CheckBox x:Name="RemoveExtWarning" Content="Remove extension warning" BorderBrush="#FFCA3E47" Background="White" Foreground="#FFCA3E47" IsChecked="True" ToolTip="This patch removes the warning of developer mode extensions when starting a Chromium browser"/>
                     <CheckBox x:Name="RemoveDebugWarning" Content="Remove debugging warning" BorderBrush="#FFCA3E47" Background="White" Foreground="#FFCA3E47" IsChecked="True" ToolTip="This patch gets rid of the debugging warning when using chrome.debugger in extensions"/>
                     <CheckBox x:Name="RemoveElision" Content="Disable Elision" BorderBrush="#FFCA3E47" Background="White" Foreground="#FFCA3E47" IsChecked="True" ToolTip="This patch forces Chromium to show WWW and HTTPS again in the url bar!"/>
-                    <CheckBox x:Name="RemoveCrash" Content="Remove crash warning" BorderBrush="#FFCA3E47" Background="White" Foreground="#FFCA3E47" ToolTip="This patch removes the warning after a Chromium crash"/>
+                    <CheckBox x:Name="RemoveCrash" Content="Remove crash warning" BorderBrush="#FFCA3E47" Background="White" Foreground="#FFCA3E47" ToolTip="This patch removes the warning after a Chromium crash (does not work for some browsers like Brave)"/>
                 </ListBox>
                 <Button x:Name="PatchBtn" Content="Patch" HorizontalAlignment="Center" Height="27" Margin="9,0,10,5" VerticalAlignment="Bottom" Width="185" Background="#FF525252" BorderBrush="White" FontWeight="Normal" FontSize="14" Click="PatchBtn_Click">
                     <Button.Foreground>
