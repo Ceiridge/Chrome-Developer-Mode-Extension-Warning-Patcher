@@ -11,7 +11,7 @@
 	Create a new issue if a pattern stops working with any browser.
 -->
 
-<Defaults version="3.5">
+<Defaults version="3.6">
 	<Patterns>
 		<Pattern name="Remove Extension Warning">
 			<!-- ShouldIncludeExtension; "ProxyOverriddenBubble.UserSelection" 2nd function in the vtable -->
@@ -95,4 +95,27 @@
 			<PatchData type="x86" offset="0x00" orig="0x55" patch="0xC3"></PatchData>
 		</Patch>
 	</Patches>
+
+
+	<GroupedPatches> <!-- This list represents the checkboxes in the gui. Commandline arguments aren't affected by this -->
+		<GroupedPatch group="0" default="true">
+			<Name>Remove extension warning</Name>
+			<Tooltip>This patch removes the warning of developer mode extensions when starting a Chromium browser</Tooltip>
+		</GroupedPatch>
+
+		<GroupedPatch group="1" default="true">
+			<Name>Remove debugging warning</Name>
+			<Tooltip>This patch gets rid of the debugging warning when using chrome.debugger in extensions</Tooltip>
+		</GroupedPatch>
+
+		<GroupedPatch group="2" default="true">
+			<Name>Disable Elision</Name>
+			<Tooltip>This patch forces Chromium to show WWW and HTTPS again in the url bar!</Tooltip>
+		</GroupedPatch>
+
+		<GroupedPatch group="3" default="false">
+			<Name>Remove crash warning</Name>
+			<Tooltip>This patch removes the warning after a Chromium crash (doesn't work for some browsers like Brave)</Tooltip>
+		</GroupedPatch>
+	</GroupedPatches>
 </Defaults>

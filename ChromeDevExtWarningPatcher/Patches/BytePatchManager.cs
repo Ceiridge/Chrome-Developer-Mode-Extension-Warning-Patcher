@@ -14,6 +14,7 @@ namespace ChromeDevExtWarningPatcher.Patches {
         private Dictionary<string, BytePatchPattern> BytePatterns = new Dictionary<string, BytePatchPattern>();
 
         public List<int> DisabledGroups = new List<int>();
+        public List<GuiPatchGroupData> PatchGroups = new List<GuiPatchGroupData>();
 
         public delegate MessageBoxResult WriteLineOrMessageBox(string str, string title);
         public BytePatchManager(WriteLineOrMessageBox log) {
@@ -21,9 +22,12 @@ namespace ChromeDevExtWarningPatcher.Patches {
             BytePatterns.Clear();
 
             XDocument xmlDoc = null;
-            string xmlFile = Path.GetTempPath() + "chrome_patcher_patterns.xml";
+            string xmlFile = Program.DEBUG ? @"..\..\..\patterns.xml" : (Path.GetTempPath() + "chrome_patcher_patterns.xml");
 
             try {
+                if (Program.DEBUG)
+                    throw new Exception("Forcing to use local patterns.xml");
+
                 using (WebClient web = new WebClient()) {
                     string xmlStr;
                     xmlDoc = XDocument.Parse(xmlStr = web.DownloadString("https://raw.githubusercontent.com/Ceiridge/Chrome-Developer-Mode-Extension-Warning-Patcher/master/patterns.xml")); // Hardcoded defaults xml file; This makes quick fixes possible
@@ -101,6 +105,15 @@ namespace ChromeDevExtWarningPatcher.Patches {
                         }
                     }
                     BytePatches.Add(new BytePatch(pattern, origX64, patchX64, offsetX64, aoffsetX64, origX86, patchX86, offsetX86, aoffsetX86, group));
+                }
+
+                foreach(XElement patchGroup in xmlDoc.Root.Element("GroupedPatches").Elements("GroupedPatch")) {
+                    PatchGroups.Add(new GuiPatchGroupData {
+                        Group = int.Parse(patchGroup.Attribute("group").Value),
+                        Default = bool.Parse(patchGroup.Attribute("default").Value),
+                        Name = patchGroup.Element("Name").Value,
+                        Tooltip = patchGroup.Element("Tooltip").Value
+                    });
                 }
             }
         }

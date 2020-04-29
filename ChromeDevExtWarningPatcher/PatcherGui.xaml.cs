@@ -27,14 +27,10 @@ namespace ChromeDevExtWarningPatcher {
 
         private void PatchBtn_Click(object sender, RoutedEventArgs e) {
             Program.bytePatchManager.DisabledGroups.Clear();
-            if (RemoveExtWarning.IsChecked == false)
-                Program.bytePatchManager.DisabledGroups.Add(0);
-            if (RemoveDebugWarning.IsChecked == false)
-                Program.bytePatchManager.DisabledGroups.Add(1);
-            if (RemoveElision.IsChecked == false)
-                Program.bytePatchManager.DisabledGroups.Add(2);
-            if (RemoveCrash.IsChecked == false)
-                Program.bytePatchManager.DisabledGroups.Add(3);
+            foreach(CustomCheckBox patchBox in PatchGroupList.Items) {
+                if (patchBox.IsChecked == false)
+                    Program.bytePatchManager.DisabledGroups.Add(patchBox.Group);
+            }
 
             foreach (CheckBox installationBox in InstallationList.Items) {
                 if (installationBox.IsChecked == true) {
@@ -66,6 +62,10 @@ namespace ChromeDevExtWarningPatcher {
             foreach(string path in new InstallationFinder.InstallationManager().FindAllChromiumInstallations()) {
                 AddChromiumInstallation(path);
             }
+
+            foreach(GuiPatchGroupData patchGroup in Program.bytePatchManager.PatchGroups) {
+                PatchGroupList.Items.Add(new CustomCheckBox(patchGroup));
+            }
         }
 
         public void Log(string str) {
@@ -79,10 +79,8 @@ namespace ChromeDevExtWarningPatcher {
         }
 
         private void AddChromiumInstallation(string chromeDll) {
-            CheckBox installationBox = new CheckBox();
-            installationBox.Content = chromeDll;
+            CustomCheckBox installationBox = new CustomCheckBox(chromeDll);
             installationBox.IsChecked = true;
-            installationBox.Foreground = installationBox.BorderBrush = new SolidColorBrush(Color.FromRgb(202, 62, 71));
 
             InstallationList.Items.Add(installationBox);
             Log("Added Chromium installation at " + chromeDll);

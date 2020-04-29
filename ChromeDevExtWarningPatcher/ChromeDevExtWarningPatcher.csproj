@@ -82,6 +82,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CommandLineOptions.cs" />
+    <Compile Include="CustomCheckBox.cs" />
     <Compile Include="InstallationFinder\Defaults\CustomPath.cs" />
     <Compile Include="Patches\BytePatch.cs" />
     <Compile Include="DllPatcher.cs" />

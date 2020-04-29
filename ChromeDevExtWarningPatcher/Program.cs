@@ -18,6 +18,8 @@ namespace ChromeDevExtWarningPatcher
         private static Window guiWindow;
         public static BytePatchManager bytePatchManager;
 
+        public const bool DEBUG = false;
+
         [DllImport("kernel32.dll", SetLastError = true, ExactSpelling = true)]
         private static extern bool FreeConsole();
 
