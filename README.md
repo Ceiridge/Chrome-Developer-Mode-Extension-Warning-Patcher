@@ -34,7 +34,7 @@ All commandline options are **optional** and not required. If none are given, th
 
 ```
 ChromeDevExtWarningPatcher.exe 
-  --disableGroups    Set what patch groups you don't want to use. See patterns.xml to get the group ids (comma-seperated: 0,1,2)
+  --groups           Set what patch groups you want to use. See patterns.xml to get the group ids (comma-seperated: 0,1,2)
 
   -w, --noWait       Disable the almost-pointless wait after finishing
 

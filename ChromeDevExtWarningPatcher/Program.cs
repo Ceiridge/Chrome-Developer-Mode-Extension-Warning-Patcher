@@ -50,8 +50,14 @@ namespace ChromeDevExtWarningPatcher
             bytePatchManager = new BytePatchManager(CustomConsoleWrite);
 
             List<string> applicationPaths = new List<string>();
-            
-            if(clOptions.CustomPath != null && clOptions.CustomPath.Length > 0) {
+            List<int> groups = new List<int>(clOptions.Groups);
+
+            if(groups.Count == 0) {
+                Console.WriteLine("Groups need to be defined. Use --help for help.");
+                return;
+            }
+
+            if (clOptions.CustomPath != null && clOptions.CustomPath.Length > 0) {
                 if(!Directory.Exists(clOptions.CustomPath)) {
                     Console.WriteLine("CustomPath not found");
                     return;
@@ -62,7 +68,10 @@ namespace ChromeDevExtWarningPatcher
                 applicationPaths.AddRange(new InstallationFinder.InstallationManager().FindAllChromiumInstallations());
             }
 
-            bytePatchManager.DisabledGroups.AddRange(clOptions.DisabledGroups);
+            foreach (GuiPatchGroupData patchData in bytePatchManager.PatchGroups) {
+                if (!groups.Contains(patchData.Group))
+                    bytePatchManager.DisabledGroups.Add(patchData.Group);
+            }
 
             foreach (string path in applicationPaths) {
                 try {
