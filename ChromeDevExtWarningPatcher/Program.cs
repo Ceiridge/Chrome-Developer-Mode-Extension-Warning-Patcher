@@ -73,6 +73,9 @@ namespace ChromeDevExtWarningPatcher
                     bytePatchManager.DisabledGroups.Add(patchData.Group);
             }
 
+            if (applicationPaths.Count == 0)
+                Console.WriteLine("Error: No patchable dll file found!");
+
             foreach (string path in applicationPaths) {
                 try {
                     DllPatcher patcher = new DllPatcher(path);

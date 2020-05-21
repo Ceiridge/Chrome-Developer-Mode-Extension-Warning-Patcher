@@ -17,6 +17,12 @@ namespace ChromeDevExtWarningPatcher {
 
             byte[] raw = File.ReadAllBytes(dllFile.FullName);
 
+            FileInfo dllFileBackup = new FileInfo(dllFile.FullName + ".bck");
+            if (!dllFileBackup.Exists) {
+                File.WriteAllBytes(dllFileBackup.FullName, raw);
+                log("Backupped to " + dllFileBackup.FullName);
+            }
+
             if(Program.bytePatchManager.PatchBytes(ref raw, IsImageX64(dllFile.FullName), log)) {
                 File.WriteAllBytes(dllFile.FullName, raw);
                 log("Patched and saved successfully " + dllFile.FullName);
