@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:ChromeDevExtWarningPatcher"
              mc:Ignorable="d" Title="Ceiridge's Chromium Patcher (Extension Warning Patcher)" WindowStartupLocation="CenterScreen" ResizeMode="CanMinimize" Height="450.667" Width="800">
-    <Grid Background="#FFBDC3C7">
+    <Grid Background="#FFD1D8E0">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="701*"/>
             <ColumnDefinition Width="93*"/>
