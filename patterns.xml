@@ -41,12 +41,13 @@
 		</Pattern>
 	
 		<Pattern name="Remove Elision">
-			<!-- ShouldPreventElision; "jknemblkbdhdcpllfgbfekkdciegfboi" or "omnibox.prevent_url_elisions" in the function or "https://support.google.com/chrome/?p=unauthenticated" 3rd function in the vtable OR IN EDGE: "https://to-be-replaced.invalid/chrome/?p=unauthenticated" -->
+			<!-- ShouldPreventElision; "jknemblkbdhdcpllfgbfekkdciegfboi" or "omnibox.prevent_url_elisions" in the function or "https://support.google.com/chrome/?p=unauthenticated" 3rd function in the vtable OR IN EDGE: "https://to-be-replaced.invalid/chrome/?p=unauthenticated" or "https://permanently-removed.invalid/chrome/?p=unauthenticated" -->
 			<BytePatternList type="x64">
 				<BytePattern>56 57 55 53 48 83 EC ? 48 8B 05 ? ? ? ? 48 31 E0 48 89 44 24 ? E8 ? ? ? ? 48 85 C0 0F 84 ? ? ? ? 48 89 C6</BytePattern> <!-- Chr 83, but maybe also works for Edge? -->
 				<BytePattern>56 57 53 48 83 EC 40 48 8B 05 ? ? ? ? 48 31 E0 48 89 44 24 ? E8 ? ? ? ? 48 85 C0 74 61</BytePattern> <!-- Chr 79 -->
 
 				<BytePattern>56 57 53 48 83 EC ? 48 8B 05 ? ? ? ? 48 31 E0 48 89 44 24 ? E8 ? ? ? ? 48 85 C0 74 ? 48 89 C1</BytePattern> <!-- Edg 81 -->
+				<BytePattern>41 57 41 56 41 54 56 57 55 53 48 83 EC ? 48 8B 05 ? ? ? ? 48 31 E0 48 89 44 24 ? E8 ? ? ? ? 48 85 C0</BytePattern> <!-- Edg 83 -->
 			</BytePatternList>
 	
 			<BytePatternList type="x86">
