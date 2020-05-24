@@ -126,10 +126,16 @@ namespace ChromeDevExtWarningPatcher.Patches {
                     patches++;
                     continue;
                 }
-                long addr = patch.pattern.FindAddress(raw, x64, log);
+                Tuple<long, byte[]> addrPattern = patch.pattern.FindAddress(raw, x64, log);
+                long addr = addrPattern.Item1;
+                byte[] searchPattern = addrPattern.Item2;
+
                 int patchOffset = x64 ? patch.offsetX64 : patch.offsetX86;
                 byte patchOrigByte = x64 ? patch.origByteX64 : patch.origByteX86;
                 byte patchPatchByte = x64 ? patch.patchByteX64 : patch.patchByteX86;
+
+                if (patchOffset < searchPattern.Length && searchPattern[patchOffset] != 0xFF)
+                    patchOrigByte = searchPattern[patchOffset]; // The patterns can sometimes start at different places (yes, I'm looking at you, Edge), so the byte in the pattern should be always preferred
 
                 if(addr != -1) {
 REDO_CHECKS:

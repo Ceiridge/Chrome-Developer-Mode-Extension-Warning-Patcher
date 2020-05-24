@@ -14,7 +14,7 @@ namespace ChromeDevExtWarningPatcher.Patches {
         }
 
         public delegate void WriteToLog(string str);
-        public long FindAddress(byte[] raw, bool x64, WriteToLog log) {
+        public Tuple<long, byte[]> FindAddress(byte[] raw, bool x64, WriteToLog log) { // This returns the offset and pattern
             foreach (byte[] pattern in (x64 ? AlternativePatternsX64 : AlternativePatternsX86)) {
                 int patternIndex = 0, patternOffset = 0;
 
@@ -30,12 +30,12 @@ namespace ChromeDevExtWarningPatcher.Patches {
                     if (patternIndex == pattern.Length) {
                         patternOffset = i - (patternIndex - 1);
                         log("Found pattern offset at " + patternOffset);
-                        return patternOffset;
+                        return new Tuple<long, byte[]>(patternOffset, pattern);
                     }
                 }
             }
 
-            return -1L;
+            return new Tuple<long, byte[]>(-1L, null);
         }
     }
 }
