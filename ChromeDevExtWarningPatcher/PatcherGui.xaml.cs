@@ -1,5 +1,6 @@
 ﻿using Microsoft.Win32;
 using System;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
@@ -52,10 +53,16 @@ namespace ChromeDevExtWarningPatcher {
             }
         }
 
+        private void CopyBtn_Click(object sender, RoutedEventArgs e)
+        {
+            Clipboard.SetText(ConsoleBox.GetTotalTextRange().Text);
+        }
+
         protected override void OnInitialized(EventArgs e) {
             base.OnInitialized(e);
 
-            new TextRange(ConsoleBox.Document.ContentStart, ConsoleBox.Document.ContentEnd).Text = "";
+            ConsoleBox.GetTotalTextRange().Text = "";
+
             Log("Patcher gui initialized");
             Log("Searching for Chromium installations...");
 
@@ -81,9 +88,18 @@ namespace ChromeDevExtWarningPatcher {
         private void AddChromiumInstallation(string chromeDll) {
             CustomCheckBox installationBox = new CustomCheckBox(chromeDll);
             installationBox.IsChecked = true;
+            installationBox.ToolTip = chromeDll;
 
             InstallationList.Items.Add(installationBox);
             Log("Added Chromium installation at " + chromeDll);
+        }
+    }
+
+    public static class RichTextBoxExtensions
+    {
+        public static TextRange GetTotalTextRange(this RichTextBox richTextBox)
+        {
+            return new TextRange(richTextBox.Document.ContentStart, richTextBox.Document.ContentEnd);
         }
     }
 }

@@ -5,12 +5,12 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:ChromeDevExtWarningPatcher"
              mc:Ignorable="d" Title="Ceiridge's Chromium Patcher (Extension Warning Patcher)" WindowStartupLocation="CenterScreen" ResizeMode="CanMinimize" Height="450.667" Width="800">
-    <Grid Background="#FF313131">
+    <Grid Background="#FFBDC3C7">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="701*"/>
             <ColumnDefinition Width="93*"/>
         </Grid.ColumnDefinitions>
-        <GroupBox Header="Chromium Installations" Margin="55,10,426,10" Background="#FF414141" BorderBrush="#FF525252" FontWeight="Bold" FontSize="18">
+        <GroupBox Header="Chromium Installations" Margin="55,10,426,10" Background="#FFECF0F1" BorderBrush="#FF525252" FontWeight="Bold" FontSize="18">
             <GroupBox.Foreground>
                 <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                     <GradientStop Color="#FFFF5E68" Offset="0"/>
@@ -18,7 +18,7 @@
                 </LinearGradientBrush>
             </GroupBox.Foreground>
             <Grid Margin="0">
-                <Button x:Name="SelectFolderBtn" Content="Manually add an installation" HorizontalAlignment="Center" Height="27" Margin="11,0,11,5" VerticalAlignment="Bottom" Width="186" Background="#FF525252" BorderBrush="White" FontWeight="Normal" FontSize="14" Click="SelectFolderBtn_Click">
+                <Button x:Name="SelectFolderBtn" Content="Manually add an installation" HorizontalAlignment="Center" Height="27" Margin="11,0,11,5" VerticalAlignment="Bottom" Width="186" Background="{x:Null}" BorderBrush="Black" FontWeight="Normal" FontSize="14" Click="SelectFolderBtn_Click">
                     <Button.Foreground>
                         <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                             <GradientStop Color="#FFFF5E68" Offset="0"/>
@@ -26,11 +26,11 @@
                         </LinearGradientBrush>
                     </Button.Foreground>
                 </Button>
-                <ListBox x:Name="InstallationList" Height="329" Margin="10,5,10,0" Background="{x:Null}" Foreground="#FFCA3E47" FontSize="12" VerticalAlignment="Top" HorizontalAlignment="Center" Width="188" FontWeight="Normal">
+                <ListBox x:Name="InstallationList" Height="329" Margin="10,5,10,0" Background="{x:Null}" Foreground="#FFCA3E47" FontSize="12" VerticalAlignment="Top" HorizontalAlignment="Center" Width="188" FontWeight="Normal" BorderBrush="Black">
                 </ListBox>
             </Grid>
         </GroupBox>
-        <GroupBox Header="Patch Chromium" Margin="285,10,196,10" Background="#FF414141" BorderBrush="#FF525252" FontWeight="Bold" FontSize="18">
+        <GroupBox Header="Patch Chromium" Margin="285,10,196,10" Background="#FFECF0F1" BorderBrush="#FF525252" FontWeight="Bold" FontSize="18">
             <GroupBox.Foreground>
                 <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                     <GradientStop Color="#FFFF5E68" Offset="0"/>
@@ -38,8 +38,8 @@
                 </LinearGradientBrush>
             </GroupBox.Foreground>
             <Grid Margin="2,7,2,0">
-                <ListBox x:Name="PatchGroupList" Height="325" Margin="10,0" Background="{x:Null}" Foreground="#FFCA3E47" FontSize="12" HorizontalAlignment="Center" VerticalAlignment="Top" FontWeight="Normal" Width="184"/>
-                <Button x:Name="PatchBtn" Content="Patch" HorizontalAlignment="Center" Height="27" Margin="9,0,10,5" VerticalAlignment="Bottom" Width="185" Background="#FF525252" BorderBrush="White" FontWeight="Normal" FontSize="14" Click="PatchBtn_Click">
+                <ListBox x:Name="PatchGroupList" Height="325" Margin="10,0" Background="{x:Null}" Foreground="#FFCA3E47" FontSize="12" HorizontalAlignment="Center" VerticalAlignment="Top" FontWeight="Normal" Width="184" BorderBrush="Black"/>
+                <Button x:Name="PatchBtn" Content="Patch" HorizontalAlignment="Center" Height="27" Margin="9,0,10,5" VerticalAlignment="Bottom" Width="185" Background="{x:Null}" BorderBrush="Black" FontWeight="Normal" FontSize="14" Click="PatchBtn_Click">
                     <Button.Foreground>
                         <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                             <GradientStop Color="#FFFF5E68" Offset="0"/>
@@ -50,20 +50,30 @@
                 <Label Content="Hover over a patch to find out what it does." HorizontalAlignment="Center" VerticalAlignment="Top" Margin="11,302,9,0" Foreground="#FFCA3E47" FontSize="9" Width="184" FontWeight="Normal"/>
             </Grid>
         </GroupBox>
-        <GroupBox Header="Log Output" Margin="515,10,59,10" Background="#FF414141" BorderBrush="#FF525252" FontWeight="Bold" FontSize="18" IsEnabled="False" Grid.ColumnSpan="2">
+        <GroupBox Header="Log Output" Margin="515,10,59,10" Background="#FFECF0F1" BorderBrush="#FF525252" FontWeight="Bold" FontSize="18" Grid.ColumnSpan="2">
             <GroupBox.Foreground>
                 <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                     <GradientStop Color="#FFFF5E68" Offset="0"/>
                     <GradientStop Color="#FFCA3E47" Offset="1"/>
                 </LinearGradientBrush>
             </GroupBox.Foreground>
-            <RichTextBox x:Name="ConsoleBox" Margin="10,5" BorderBrush="{x:Null}" Foreground="#FFCA3E47" SelectionBrush="White" Background="{x:Null}" FontFamily="Consolas" FontSize="10" FontWeight="Normal" IsReadOnly="True" IsUndoEnabled="False" Block.LineHeight="6">
-                <FlowDocument LineHeight="1">
-                    <Paragraph>
-                        <Run Text="RichTextBox"/>
-                    </Paragraph>
-                </FlowDocument>
-            </RichTextBox>
+            <Grid Margin="0">
+                <RichTextBox x:Name="ConsoleBox" Margin="10,10,10,36" BorderBrush="{x:Null}" Foreground="#FFCA3E47" SelectionBrush="#FF72CCE6" Background="{x:Null}" FontFamily="Consolas" FontSize="10" FontWeight="Normal" Block.LineHeight="6" IsUndoEnabled="False" IsReadOnly="True" IsReadOnlyCaretVisible="True">
+                    <FlowDocument LineHeight="1">
+                        <Paragraph>
+                            <Run Text="RichTextBox"/>
+                        </Paragraph>
+                    </FlowDocument>
+                </RichTextBox>
+                <Button x:Name="CopyBtn" Content="Copy Log" HorizontalAlignment="Center" Height="27" Margin="0,0,0,5" VerticalAlignment="Bottom" Width="184" Background="{x:Null}" BorderBrush="Black" FontWeight="Normal" FontSize="14" Click="CopyBtn_Click">
+                    <Button.Foreground>
+                        <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                            <GradientStop Color="#FFFF5E68" Offset="0"/>
+                            <GradientStop Color="#FFCA3E47" Offset="1"/>
+                        </LinearGradientBrush>
+                    </Button.Foreground>
+                </Button>
+            </Grid>
         </GroupBox>
     </Grid>
 </Window>
