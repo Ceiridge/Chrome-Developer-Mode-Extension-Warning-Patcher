@@ -2,20 +2,20 @@
 using System.IO;
 
 namespace ChromeDevExtWarningPatcher.InstallationFinder.Defaults {
-    class CustomPath : Installation {
-        private string Path;
+	class CustomPath : Installation {
+		private string Path;
 
-        public CustomPath(string path) : base("CustomPath") {
-            Path = path;
-        }
+		public CustomPath(string path) : base("CustomPath") {
+			Path = path;
+		}
 
-        public override List<string> FindDllFiles() {
-            List<string> dllFiles = new List<string>();
+		public override List<string> FindDllFiles() {
+			List<string> dllFiles = new List<string>();
 
-            AddDllToList(dllFiles, GetLatestDll(new DirectoryInfo(Path), "chrome.dll"));
-            AddDllToList(dllFiles, GetLatestDll(new DirectoryInfo(Path), "msedge.dll"));
+			AddDllToList(dllFiles, GetLatestDll(new DirectoryInfo(Path), "chrome.dll"));
+			AddDllToList(dllFiles, GetLatestDll(new DirectoryInfo(Path), "msedge.dll"));
 
-            return dllFiles;
-        }
-    }
+			return dllFiles;
+		}
+	}
 }

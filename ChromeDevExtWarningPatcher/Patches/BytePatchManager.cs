@@ -9,159 +9,159 @@ using System.Windows;
 using System.Xml.Linq;
 
 namespace ChromeDevExtWarningPatcher.Patches {
-    class BytePatchManager {
-        private List<BytePatch> BytePatches = new List<BytePatch>();
-        private Dictionary<string, BytePatchPattern> BytePatterns = new Dictionary<string, BytePatchPattern>();
+	class BytePatchManager {
+		private List<BytePatch> BytePatches = new List<BytePatch>();
+		private Dictionary<string, BytePatchPattern> BytePatterns = new Dictionary<string, BytePatchPattern>();
 
-        public List<int> DisabledGroups = new List<int>();
-        public List<GuiPatchGroupData> PatchGroups = new List<GuiPatchGroupData>();
+		public List<int> DisabledGroups = new List<int>();
+		public List<GuiPatchGroupData> PatchGroups = new List<GuiPatchGroupData>();
 
-        public delegate MessageBoxResult WriteLineOrMessageBox(string str, string title);
-        public BytePatchManager(WriteLineOrMessageBox log) {
-            BytePatches.Clear();
-            BytePatterns.Clear();
+		public delegate MessageBoxResult WriteLineOrMessageBox(string str, string title);
+		public BytePatchManager(WriteLineOrMessageBox log) {
+			BytePatches.Clear();
+			BytePatterns.Clear();
 
-            XDocument xmlDoc = null;
-            string xmlFile = Program.DEBUG ? @"..\..\..\patterns.xml" : (Path.GetTempPath() + "chrome_patcher_patterns.xml");
+			XDocument xmlDoc = null;
+			string xmlFile = Program.DEBUG ? @"..\..\..\patterns.xml" : (Path.GetTempPath() + "chrome_patcher_patterns.xml");
 
-            try {
-                if (Program.DEBUG)
-                    throw new Exception("Forcing to use local patterns.xml");
+			try {
+				if (Program.DEBUG)
+					throw new Exception("Forcing to use local patterns.xml");
 
-                using (WebClient web = new WebClient()) {
-                    string xmlStr;
-                    xmlDoc = XDocument.Parse(xmlStr = web.DownloadString("https://raw.githubusercontent.com/Ceiridge/Chrome-Developer-Mode-Extension-Warning-Patcher/master/patterns.xml")); // Hardcoded defaults xml file; This makes quick fixes possible
+				using (WebClient web = new WebClient()) {
+					string xmlStr;
+					xmlDoc = XDocument.Parse(xmlStr = web.DownloadString("https://raw.githubusercontent.com/Ceiridge/Chrome-Developer-Mode-Extension-Warning-Patcher/master/patterns.xml")); // Hardcoded defaults xml file; This makes quick fixes possible
 
-                    File.WriteAllText(xmlFile, xmlStr);
-                }
-            } catch (Exception ex) {
-                if (File.Exists(xmlFile)) {
-                    xmlDoc = XDocument.Parse(File.ReadAllText(xmlFile));
-                    log("An error occurred trying to fetch the new patterns. The old cached version will be used instead. Expect patch errors.\n\n" + ex.Message, "Warning");
-                } else {
-                    log("An error occurred trying to fetch the new patterns. The program has to exit, as no cached version of this file has been found.\n\n" + ex.Message, "Error");
-                    Environment.Exit(1);
-                }
-            }
+					File.WriteAllText(xmlFile, xmlStr);
+				}
+			} catch (Exception ex) {
+				if (File.Exists(xmlFile)) {
+					xmlDoc = XDocument.Parse(File.ReadAllText(xmlFile));
+					log("An error occurred trying to fetch the new patterns. The old cached version will be used instead. Expect patch errors.\n\n" + ex.Message, "Warning");
+				} else {
+					log("An error occurred trying to fetch the new patterns. The program has to exit, as no cached version of this file has been found.\n\n" + ex.Message, "Error");
+					Environment.Exit(1);
+				}
+			}
 
 
-            if (xmlDoc != null) {
-                // Comma culture setter from https://stackoverflow.com/questions/9160059/set-up-dot-instead-of-comma-in-numeric-values
-                CultureInfo customCulture = (CultureInfo)Thread.CurrentThread.CurrentCulture.Clone(); customCulture.NumberFormat.NumberDecimalSeparator = ".";
-                Thread.CurrentThread.CurrentCulture = customCulture;
+			if (xmlDoc != null) {
+				// Comma culture setter from https://stackoverflow.com/questions/9160059/set-up-dot-instead-of-comma-in-numeric-values
+				CultureInfo customCulture = (CultureInfo)Thread.CurrentThread.CurrentCulture.Clone(); customCulture.NumberFormat.NumberDecimalSeparator = ".";
+				Thread.CurrentThread.CurrentCulture = customCulture;
 
-                float newVersion = float.Parse(xmlDoc.Root.Attribute("version").Value);
-                Version myVersion = Assembly.GetCallingAssembly().GetName().Version;
+				float newVersion = float.Parse(xmlDoc.Root.Attribute("version").Value);
+				Version myVersion = Assembly.GetCallingAssembly().GetName().Version;
 
-                if (newVersion > float.Parse(myVersion.Major + "." + myVersion.Minor)) {
-                    log("A new version of this patcher has been found.\nDownload it at:\nhttps://github.com/Ceiridge/Chrome-Developer-Mode-Extension-Warning-Patcher/releases", "New update available");
-                }
+				if (newVersion > float.Parse(myVersion.Major + "." + myVersion.Minor)) {
+					log("A new version of this patcher has been found.\nDownload it at:\nhttps://github.com/Ceiridge/Chrome-Developer-Mode-Extension-Warning-Patcher/releases", "New update available");
+				}
 
-                foreach (XElement pattern in xmlDoc.Root.Element("Patterns").Elements("Pattern")) {
-                    BytePatchPattern patternClass = new BytePatchPattern(pattern.Attribute("name").Value);
+				foreach (XElement pattern in xmlDoc.Root.Element("Patterns").Elements("Pattern")) {
+					BytePatchPattern patternClass = new BytePatchPattern(pattern.Attribute("name").Value);
 
-                    foreach (XElement patternList in pattern.Elements("BytePatternList")) {
-                        bool isX64 = patternList.Attribute("type").Value.Equals("x64");
+					foreach (XElement patternList in pattern.Elements("BytePatternList")) {
+						bool isX64 = patternList.Attribute("type").Value.Equals("x64");
 
-                        foreach (XElement bytePattern in patternList.Elements("BytePattern")) {
-                            string[] unparsedBytes = bytePattern.Value.Split(' ');
-                            byte[] patternBytesArr = new byte[unparsedBytes.Length];
+						foreach (XElement bytePattern in patternList.Elements("BytePattern")) {
+							string[] unparsedBytes = bytePattern.Value.Split(' ');
+							byte[] patternBytesArr = new byte[unparsedBytes.Length];
 
-                            for (int i = 0; i < unparsedBytes.Length; i++) {
-                                string unparsedByte = unparsedBytes[i].Equals("?") ? "FF" : unparsedBytes[i];
-                                patternBytesArr[i] = Convert.ToByte(unparsedByte, 16);
-                            }
-                            (isX64 ? patternClass.AlternativePatternsX64 : patternClass.AlternativePatternsX86).Add(patternBytesArr);
-                        }
-                    }
-                    BytePatterns.Add(patternClass.Name, patternClass);
-                }
+							for (int i = 0; i < unparsedBytes.Length; i++) {
+								string unparsedByte = unparsedBytes[i].Equals("?") ? "FF" : unparsedBytes[i];
+								patternBytesArr[i] = Convert.ToByte(unparsedByte, 16);
+							}
+							(isX64 ? patternClass.AlternativePatternsX64 : patternClass.AlternativePatternsX86).Add(patternBytesArr);
+						}
+					}
+					BytePatterns.Add(patternClass.Name, patternClass);
+				}
 
-                foreach (XElement patch in xmlDoc.Root.Element("Patches").Elements("Patch")) {
-                    BytePatchPattern pattern = BytePatterns[patch.Attribute("pattern").Value];
-                    int group = int.Parse(patch.Attribute("group").Value);
+				foreach (XElement patch in xmlDoc.Root.Element("Patches").Elements("Patch")) {
+					BytePatchPattern pattern = BytePatterns[patch.Attribute("pattern").Value];
+					int group = int.Parse(patch.Attribute("group").Value);
 
-                    byte origX64 = 0, origX86 = 0, patchX64 = 0, patchX86 = 0;
-                    int offsetX64 = 0, offsetX86 = 0, aoffsetX64 = -1, aoffsetX86 = -1;
+					byte origX64 = 0, origX86 = 0, patchX64 = 0, patchX86 = 0;
+					int offsetX64 = 0, offsetX86 = 0, aoffsetX64 = -1, aoffsetX86 = -1;
 
-                    foreach (XElement patchData in patch.Elements("PatchData")) {
-                        byte orig = Convert.ToByte(patchData.Attribute("orig").Value.Replace("0x", ""), 16);
-                        byte patchB = Convert.ToByte(patchData.Attribute("patch").Value.Replace("0x", ""), 16);
-                        int offset = Convert.ToInt32(patchData.Attribute("offset").Value.Replace("0x", ""), 16);
+					foreach (XElement patchData in patch.Elements("PatchData")) {
+						byte orig = Convert.ToByte(patchData.Attribute("orig").Value.Replace("0x", ""), 16);
+						byte patchB = Convert.ToByte(patchData.Attribute("patch").Value.Replace("0x", ""), 16);
+						int offset = Convert.ToInt32(patchData.Attribute("offset").Value.Replace("0x", ""), 16);
 
-                        XAttribute alternativeOffsetAttr = patchData.Attribute("alternativeOffset");
-                        int aoffset = alternativeOffsetAttr == null ? -1 : Convert.ToInt32(alternativeOffsetAttr.Value.Replace("0x", ""), 16);
+						XAttribute alternativeOffsetAttr = patchData.Attribute("alternativeOffset");
+						int aoffset = alternativeOffsetAttr == null ? -1 : Convert.ToInt32(alternativeOffsetAttr.Value.Replace("0x", ""), 16);
 
-                        if (patchData.Attribute("type").Value.Equals("x64")) {
-                            origX64 = orig;
-                            patchX64 = patchB;
-                            offsetX64 = offset;
-                            aoffsetX64 = aoffset;
-                        } else {
-                            origX86 = orig;
-                            patchX86 = patchB;
-                            offsetX86 = offset;
-                            aoffsetX86 = aoffset;
-                        }
-                    }
-                    BytePatches.Add(new BytePatch(pattern, origX64, patchX64, offsetX64, aoffsetX64, origX86, patchX86, offsetX86, aoffsetX86, group));
-                }
+						if (patchData.Attribute("type").Value.Equals("x64")) {
+							origX64 = orig;
+							patchX64 = patchB;
+							offsetX64 = offset;
+							aoffsetX64 = aoffset;
+						} else {
+							origX86 = orig;
+							patchX86 = patchB;
+							offsetX86 = offset;
+							aoffsetX86 = aoffset;
+						}
+					}
+					BytePatches.Add(new BytePatch(pattern, origX64, patchX64, offsetX64, aoffsetX64, origX86, patchX86, offsetX86, aoffsetX86, group));
+				}
 
-                foreach (XElement patchGroup in xmlDoc.Root.Element("GroupedPatches").Elements("GroupedPatch")) {
-                    PatchGroups.Add(new GuiPatchGroupData {
-                        Group = int.Parse(patchGroup.Attribute("group").Value),
-                        Default = bool.Parse(patchGroup.Attribute("default").Value),
-                        Name = patchGroup.Element("Name").Value,
-                        Tooltip = patchGroup.Element("Tooltip").Value
-                    });
-                }
-            }
-        }
+				foreach (XElement patchGroup in xmlDoc.Root.Element("GroupedPatches").Elements("GroupedPatch")) {
+					PatchGroups.Add(new GuiPatchGroupData {
+						Group = int.Parse(patchGroup.Attribute("group").Value),
+						Default = bool.Parse(patchGroup.Attribute("default").Value),
+						Name = patchGroup.Element("Name").Value,
+						Tooltip = patchGroup.Element("Tooltip").Value
+					});
+				}
+			}
+		}
 
-        public bool PatchBytes(ref byte[] raw, bool x64, BytePatchPattern.WriteToLog log) {
-            int patches = 0;
+		public bool PatchBytes(ref byte[] raw, bool x64, BytePatchPattern.WriteToLog log) {
+			int patches = 0;
 
-            foreach (BytePatch patch in BytePatches) {
-                if (DisabledGroups.Contains(patch.group)) {
-                    patches++;
-                    continue;
-                }
-                Tuple<long, byte[]> addrPattern = patch.pattern.FindAddress(raw, x64, log);
-                long addr = addrPattern.Item1;
-                byte[] searchPattern = addrPattern.Item2;
+			foreach (BytePatch patch in BytePatches) {
+				if (DisabledGroups.Contains(patch.group)) {
+					patches++;
+					continue;
+				}
+				Tuple<long, byte[]> addrPattern = patch.pattern.FindAddress(raw, x64, log);
+				long addr = addrPattern.Item1;
+				byte[] searchPattern = addrPattern.Item2;
 
-                int patchOffset = x64 ? patch.offsetX64 : patch.offsetX86;
-                byte patchOrigByte = x64 ? patch.origByteX64 : patch.origByteX86;
-                byte patchPatchByte = x64 ? patch.patchByteX64 : patch.patchByteX86;
+				int patchOffset = x64 ? patch.offsetX64 : patch.offsetX86;
+				byte patchOrigByte = x64 ? patch.origByteX64 : patch.origByteX86;
+				byte patchPatchByte = x64 ? patch.patchByteX64 : patch.patchByteX86;
 
-                if (addr != -1) {
-                    if (patchOffset < searchPattern.Length && searchPattern[patchOffset] != 0xFF)
-                        patchOrigByte = searchPattern[patchOffset]; // The patterns can sometimes start at different places (yes, I'm looking at you, Edge), so the byte in the pattern should be always preferred
+				if (addr != -1) {
+					if (patchOffset < searchPattern.Length && searchPattern[patchOffset] != 0xFF)
+						patchOrigByte = searchPattern[patchOffset]; // The patterns can sometimes start at different places (yes, I'm looking at you, Edge), so the byte in the pattern should be always preferred
 
-                    REDO_CHECKS:
-                    long index = addr + patchOffset;
-                    byte sourceByte = raw[index];
+					REDO_CHECKS:
+					long index = addr + patchOffset;
+					byte sourceByte = raw[index];
 
-                    log("Source byte of patch at " + patchOffset + ": " + sourceByte);
-                    if (sourceByte == patchOrigByte) {
-                        raw[index] = patchPatchByte;
-                        log(index + " => " + patchPatchByte);
-                        patches++;
-                    } else {
-                        int patchAlternativeOffset = x64 ? patch.aoffsetX64 : patch.aoffsetX86;
-                        if (patchOffset != patchAlternativeOffset && patchAlternativeOffset != -1) { // if the first offset didn't work, try the next one
-                            patchOffset = patchAlternativeOffset;
-                            goto REDO_CHECKS;
-                        }
+					log("Source byte of patch at " + patchOffset + ": " + sourceByte);
+					if (sourceByte == patchOrigByte) {
+						raw[index] = patchPatchByte;
+						log(index + " => " + patchPatchByte);
+						patches++;
+					} else {
+						int patchAlternativeOffset = x64 ? patch.aoffsetX64 : patch.aoffsetX86;
+						if (patchOffset != patchAlternativeOffset && patchAlternativeOffset != -1) { // if the first offset didn't work, try the next one
+							patchOffset = patchAlternativeOffset;
+							goto REDO_CHECKS;
+						}
 
-                        log("Source byte unexpected, should be " + patchOrigByte + "!");
-                    }
-                } else {
-                    log("Couldn't find offset for a patch " + patch.pattern.Name);
-                }
-            }
+						log("Source byte unexpected, should be " + patchOrigByte + "!");
+					}
+				} else {
+					log("Couldn't find offset for a patch " + patch.pattern.Name);
+				}
+			}
 
-            return patches == BytePatches.Count;
-        }
-    }
+			return patches == BytePatches.Count;
+		}
+	}
 }
