@@ -26,22 +26,28 @@ namespace ChromeDevExtWarningPatcher
         [STAThread]
         public static void Main(string[] args)
         {
-            CommandLineOptions clOptions = null;
-
-            if (args.Length > 0) {
-                ParserResult<CommandLineOptions> result = Parser.Default.ParseArguments<CommandLineOptions>(args).WithParsed(options => {
-                    clOptions = options;
-                });
-
-                if(result.Tag == ParserResultType.NotParsed) {
-                    HelpText.AutoBuild(result);
-                    return;
-                }
-            } else {
+            if(args.Length == 0)
+            {
                 FreeConsole();
                 bytePatchManager = new BytePatchManager(MessageBox.Show);
                 guiApp = new Application();
                 guiApp.Run(guiWindow = new PatcherGui());
+            } else {
+                MainCmd(args);
+            }
+        }
+
+        public static void MainCmd(string[] args)
+        {
+            CommandLineOptions clOptions = null;
+            ParserResult<CommandLineOptions> result = Parser.Default.ParseArguments<CommandLineOptions>(args).WithParsed(options =>
+            {
+                clOptions = options;
+            });
+
+            if (result.Tag == ParserResultType.NotParsed)
+            {
+                HelpText.AutoBuild(result);
                 return;
             }
 
