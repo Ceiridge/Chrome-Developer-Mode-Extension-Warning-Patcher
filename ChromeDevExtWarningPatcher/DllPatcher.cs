@@ -16,6 +16,7 @@ namespace ChromeDevExtWarningPatcher {
                 throw new IOException("File not found");
 
             byte[] raw = File.ReadAllBytes(dllFile.FullName);
+            log("Patching " + dllFile.FullName + "...");
 
             FileInfo dllFileBackup = new FileInfo(dllFile.FullName + ".bck");
             if (!dllFileBackup.Exists) {

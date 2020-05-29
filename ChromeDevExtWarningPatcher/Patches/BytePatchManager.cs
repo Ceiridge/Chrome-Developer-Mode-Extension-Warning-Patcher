@@ -134,11 +134,11 @@ namespace ChromeDevExtWarningPatcher.Patches {
                 byte patchOrigByte = x64 ? patch.origByteX64 : patch.origByteX86;
                 byte patchPatchByte = x64 ? patch.patchByteX64 : patch.patchByteX86;
 
-                if (patchOffset < searchPattern.Length && searchPattern[patchOffset] != 0xFF)
-                    patchOrigByte = searchPattern[patchOffset]; // The patterns can sometimes start at different places (yes, I'm looking at you, Edge), so the byte in the pattern should be always preferred
-
                 if (addr != -1) {
-                REDO_CHECKS:
+                    if (patchOffset < searchPattern.Length && searchPattern[patchOffset] != 0xFF)
+                        patchOrigByte = searchPattern[patchOffset]; // The patterns can sometimes start at different places (yes, I'm looking at you, Edge), so the byte in the pattern should be always preferred
+
+                    REDO_CHECKS:
                     long index = addr + patchOffset;
                     byte sourceByte = raw[index];
 
