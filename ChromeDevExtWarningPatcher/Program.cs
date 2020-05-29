@@ -1,19 +1,17 @@
-﻿using ChromeDevExtWarningPatcher.Patches;
-using System;
-using System.Windows;
+﻿using ChromeDevExtWarningPatcher.InstallationFinder.Defaults;
+using ChromeDevExtWarningPatcher.Patches;
 using CommandLine;
 using CommandLine.Text;
-using System.Runtime.InteropServices;
+using System;
 using System.Collections.Generic;
 using System.IO;
-using ChromeDevExtWarningPatcher.InstallationFinder.Defaults;
+using System.Runtime.InteropServices;
 using System.Threading;
+using System.Windows;
 
 // Ugly and uncommented code ahead
-namespace ChromeDevExtWarningPatcher
-{
-    class Program
-    {
+namespace ChromeDevExtWarningPatcher {
+    class Program {
         private static Application guiApp;
         private static Window guiWindow;
         public static BytePatchManager bytePatchManager;
@@ -24,10 +22,8 @@ namespace ChromeDevExtWarningPatcher
         private static extern bool FreeConsole();
 
         [STAThread]
-        public static void Main(string[] args)
-        {
-            if(args.Length == 0)
-            {
+        public static void Main(string[] args) {
+            if (args.Length == 0) {
                 FreeConsole();
                 bytePatchManager = new BytePatchManager(MessageBox.Show);
                 guiApp = new Application();
@@ -37,16 +33,13 @@ namespace ChromeDevExtWarningPatcher
             }
         }
 
-        public static void MainCmd(string[] args)
-        {
+        public static void MainCmd(string[] args) {
             CommandLineOptions clOptions = null;
-            ParserResult<CommandLineOptions> result = Parser.Default.ParseArguments<CommandLineOptions>(args).WithParsed(options =>
-            {
+            ParserResult<CommandLineOptions> result = Parser.Default.ParseArguments<CommandLineOptions>(args).WithParsed(options => {
                 clOptions = options;
             });
 
-            if (result.Tag == ParserResultType.NotParsed)
-            {
+            if (result.Tag == ParserResultType.NotParsed) {
                 HelpText.AutoBuild(result);
                 return;
             }
@@ -58,13 +51,13 @@ namespace ChromeDevExtWarningPatcher
             List<string> applicationPaths = new List<string>();
             List<int> groups = new List<int>(clOptions.Groups);
 
-            if(groups.Count == 0) {
+            if (groups.Count == 0) {
                 Console.WriteLine("Groups need to be defined. Use --help for help.");
                 return;
             }
 
             if (clOptions.CustomPath != null && clOptions.CustomPath.Length > 0) {
-                if(!Directory.Exists(clOptions.CustomPath)) {
+                if (!Directory.Exists(clOptions.CustomPath)) {
                     Console.WriteLine("CustomPath not found");
                     return;
                 }

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Windows.Controls;
+﻿using System.Windows.Controls;
 using System.Windows.Media;
 
 namespace ChromeDevExtWarningPatcher {
@@ -19,7 +18,7 @@ namespace ChromeDevExtWarningPatcher {
             IsChecked = patchGroupData.Default;
         }
 
-        public CustomCheckBox(string text) : this(text, null, -1) {}
+        public CustomCheckBox(string text) : this(text, null, -1) { }
     }
 
     struct GuiPatchGroupData {

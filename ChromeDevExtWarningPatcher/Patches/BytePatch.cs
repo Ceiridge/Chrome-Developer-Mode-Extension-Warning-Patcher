@@ -1,9 +1,7 @@
 ﻿using ChromeDevExtWarningPatcher.Patches;
 
-namespace ChromeDevExtWarningPatcher
-{
-    public class BytePatch
-    {
+namespace ChromeDevExtWarningPatcher {
+    public class BytePatch {
         public byte origByteX64, patchByteX64;
         public int offsetX64, aoffsetX64;
         public BytePatchPattern pattern;
@@ -13,8 +11,7 @@ namespace ChromeDevExtWarningPatcher
 
         public int group;
 
-        public BytePatch(BytePatchPattern pattern, byte origByteX64, byte patchByteX64, int offsetX64, int aoffsetX64, byte origByteX86, byte patchByteX86, int offsetX86, int aoffsetX86, int group)
-        {
+        public BytePatch(BytePatchPattern pattern, byte origByteX64, byte patchByteX64, int offsetX64, int aoffsetX64, byte origByteX86, byte patchByteX86, int offsetX86, int aoffsetX86, int group) {
             this.pattern = pattern;
             this.origByteX64 = origByteX64;
             this.patchByteX64 = patchByteX64;

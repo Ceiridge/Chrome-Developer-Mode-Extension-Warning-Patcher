@@ -35,7 +35,7 @@ namespace ChromeDevExtWarningPatcher.Patches {
                     File.WriteAllText(xmlFile, xmlStr);
                 }
             } catch (Exception ex) {
-                if(File.Exists(xmlFile)) {
+                if (File.Exists(xmlFile)) {
                     xmlDoc = XDocument.Parse(File.ReadAllText(xmlFile));
                     log("An error occurred trying to fetch the new patterns. The old cached version will be used instead. Expect patch errors.\n\n" + ex.Message, "Warning");
                 } else {
@@ -45,9 +45,9 @@ namespace ChromeDevExtWarningPatcher.Patches {
             }
 
 
-            if(xmlDoc != null) {
+            if (xmlDoc != null) {
                 // Comma culture setter from https://stackoverflow.com/questions/9160059/set-up-dot-instead-of-comma-in-numeric-values
-                CultureInfo customCulture = (CultureInfo) Thread.CurrentThread.CurrentCulture.Clone();                customCulture.NumberFormat.NumberDecimalSeparator = ".";
+                CultureInfo customCulture = (CultureInfo)Thread.CurrentThread.CurrentCulture.Clone(); customCulture.NumberFormat.NumberDecimalSeparator = ".";
                 Thread.CurrentThread.CurrentCulture = customCulture;
 
                 float newVersion = float.Parse(xmlDoc.Root.Attribute("version").Value);
@@ -57,17 +57,17 @@ namespace ChromeDevExtWarningPatcher.Patches {
                     log("A new version of this patcher has been found.\nDownload it at:\nhttps://github.com/Ceiridge/Chrome-Developer-Mode-Extension-Warning-Patcher/releases", "New update available");
                 }
 
-                foreach(XElement pattern in xmlDoc.Root.Element("Patterns").Elements("Pattern")) {
+                foreach (XElement pattern in xmlDoc.Root.Element("Patterns").Elements("Pattern")) {
                     BytePatchPattern patternClass = new BytePatchPattern(pattern.Attribute("name").Value);
 
                     foreach (XElement patternList in pattern.Elements("BytePatternList")) {
                         bool isX64 = patternList.Attribute("type").Value.Equals("x64");
 
-                        foreach(XElement bytePattern in patternList.Elements("BytePattern")) {
+                        foreach (XElement bytePattern in patternList.Elements("BytePattern")) {
                             string[] unparsedBytes = bytePattern.Value.Split(' ');
                             byte[] patternBytesArr = new byte[unparsedBytes.Length];
 
-                            for(int i = 0; i < unparsedBytes.Length; i++) {
+                            for (int i = 0; i < unparsedBytes.Length; i++) {
                                 string unparsedByte = unparsedBytes[i].Equals("?") ? "FF" : unparsedBytes[i];
                                 patternBytesArr[i] = Convert.ToByte(unparsedByte, 16);
                             }
@@ -77,14 +77,14 @@ namespace ChromeDevExtWarningPatcher.Patches {
                     BytePatterns.Add(patternClass.Name, patternClass);
                 }
 
-                foreach(XElement patch in xmlDoc.Root.Element("Patches").Elements("Patch")) {
+                foreach (XElement patch in xmlDoc.Root.Element("Patches").Elements("Patch")) {
                     BytePatchPattern pattern = BytePatterns[patch.Attribute("pattern").Value];
                     int group = int.Parse(patch.Attribute("group").Value);
 
                     byte origX64 = 0, origX86 = 0, patchX64 = 0, patchX86 = 0;
                     int offsetX64 = 0, offsetX86 = 0, aoffsetX64 = -1, aoffsetX86 = -1;
 
-                    foreach(XElement patchData in patch.Elements("PatchData")) {
+                    foreach (XElement patchData in patch.Elements("PatchData")) {
                         byte orig = Convert.ToByte(patchData.Attribute("orig").Value.Replace("0x", ""), 16);
                         byte patchB = Convert.ToByte(patchData.Attribute("patch").Value.Replace("0x", ""), 16);
                         int offset = Convert.ToInt32(patchData.Attribute("offset").Value.Replace("0x", ""), 16);
@@ -107,7 +107,7 @@ namespace ChromeDevExtWarningPatcher.Patches {
                     BytePatches.Add(new BytePatch(pattern, origX64, patchX64, offsetX64, aoffsetX64, origX86, patchX86, offsetX86, aoffsetX86, group));
                 }
 
-                foreach(XElement patchGroup in xmlDoc.Root.Element("GroupedPatches").Elements("GroupedPatch")) {
+                foreach (XElement patchGroup in xmlDoc.Root.Element("GroupedPatches").Elements("GroupedPatch")) {
                     PatchGroups.Add(new GuiPatchGroupData {
                         Group = int.Parse(patchGroup.Attribute("group").Value),
                         Default = bool.Parse(patchGroup.Attribute("default").Value),
@@ -121,7 +121,7 @@ namespace ChromeDevExtWarningPatcher.Patches {
         public bool PatchBytes(ref byte[] raw, bool x64, BytePatchPattern.WriteToLog log) {
             int patches = 0;
 
-            foreach(BytePatch patch in BytePatches) {
+            foreach (BytePatch patch in BytePatches) {
                 if (DisabledGroups.Contains(patch.group)) {
                     patches++;
                     continue;
@@ -137,8 +137,8 @@ namespace ChromeDevExtWarningPatcher.Patches {
                 if (patchOffset < searchPattern.Length && searchPattern[patchOffset] != 0xFF)
                     patchOrigByte = searchPattern[patchOffset]; // The patterns can sometimes start at different places (yes, I'm looking at you, Edge), so the byte in the pattern should be always preferred
 
-                if(addr != -1) {
-REDO_CHECKS:
+                if (addr != -1) {
+                REDO_CHECKS:
                     long index = addr + patchOffset;
                     byte sourceByte = raw[index];
 
@@ -149,7 +149,7 @@ REDO_CHECKS:
                         patches++;
                     } else {
                         int patchAlternativeOffset = x64 ? patch.aoffsetX64 : patch.aoffsetX86;
-                        if(patchOffset != patchAlternativeOffset && patchAlternativeOffset != -1) { // if the first offset didn't work, try the next one
+                        if (patchOffset != patchAlternativeOffset && patchAlternativeOffset != -1) { // if the first offset didn't work, try the next one
                             patchOffset = patchAlternativeOffset;
                             goto REDO_CHECKS;
                         }

@@ -20,9 +20,9 @@ namespace ChromeDevExtWarningPatcher.InstallationFinder {
             List<DirectoryInfo> chromeVersions = new List<DirectoryInfo>(versionsFolder.EnumerateDirectories());
             chromeVersions = chromeVersions.OrderByDescending(dirInfo => GetUnixTime(dirInfo.LastWriteTime)).ToList();
 
-            foreach(DirectoryInfo chromeVersion in chromeVersions) {
-                if(chromeVersion.Name.Contains(".")) {
-                    foreach(FileInfo file in chromeVersion.EnumerateFiles()) {
+            foreach (DirectoryInfo chromeVersion in chromeVersions) {
+                if (chromeVersion.Name.Contains(".")) {
+                    foreach (FileInfo file in chromeVersion.EnumerateFiles()) {
                         if (file.Name.Equals(dllName))
                             return file;
                     }

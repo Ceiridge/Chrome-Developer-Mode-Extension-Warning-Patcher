@@ -23,7 +23,7 @@ namespace ChromeDevExtWarningPatcher {
                 log("Backupped to " + dllFileBackup.FullName);
             }
 
-            if(Program.bytePatchManager.PatchBytes(ref raw, IsImageX64(dllFile.FullName), log)) {
+            if (Program.bytePatchManager.PatchBytes(ref raw, IsImageX64(dllFile.FullName), log)) {
                 File.WriteAllBytes(dllFile.FullName, raw);
                 log("Patched and saved successfully " + dllFile.FullName);
                 return true;

@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using ChromeDevExtWarningPatcher.InstallationFinder.Defaults;
+﻿using ChromeDevExtWarningPatcher.InstallationFinder.Defaults;
+using System.Collections.Generic;
 
 namespace ChromeDevExtWarningPatcher.InstallationFinder {
     class InstallationManager {

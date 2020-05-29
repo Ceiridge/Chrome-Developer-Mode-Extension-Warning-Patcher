@@ -1,6 +1,5 @@
 ﻿using Microsoft.Win32;
 using System;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
@@ -21,14 +20,14 @@ namespace ChromeDevExtWarningPatcher {
             openFile.FilterIndex = 1;
             openFile.CheckFileExists = openFile.CheckPathExists = openFile.AddExtension = true;
 
-            if(openFile.ShowDialog(this) == true) { // No, I am not a noob, I have to do it like this and further below
+            if (openFile.ShowDialog(this) == true) { // No, I am not a noob, I have to do it like this and further below
                 AddChromiumInstallation(openFile.FileName);
             }
         }
 
         private void PatchBtn_Click(object sender, RoutedEventArgs e) {
             Program.bytePatchManager.DisabledGroups.Clear();
-            foreach(CustomCheckBox patchBox in PatchGroupList.Items) {
+            foreach (CustomCheckBox patchBox in PatchGroupList.Items) {
                 if (patchBox.IsChecked == false)
                     Program.bytePatchManager.DisabledGroups.Add(patchBox.Group);
             }
@@ -53,8 +52,7 @@ namespace ChromeDevExtWarningPatcher {
             }
         }
 
-        private void CopyBtn_Click(object sender, RoutedEventArgs e)
-        {
+        private void CopyBtn_Click(object sender, RoutedEventArgs e) {
             Clipboard.SetText(ConsoleBox.GetTotalTextRange().Text);
         }
 
@@ -66,11 +64,11 @@ namespace ChromeDevExtWarningPatcher {
             Log("Patcher gui initialized");
             Log("Searching for Chromium installations...");
 
-            foreach(string path in new InstallationFinder.InstallationManager().FindAllChromiumInstallations()) {
+            foreach (string path in new InstallationFinder.InstallationManager().FindAllChromiumInstallations()) {
                 AddChromiumInstallation(path);
             }
 
-            foreach(GuiPatchGroupData patchGroup in Program.bytePatchManager.PatchGroups) {
+            foreach (GuiPatchGroupData patchGroup in Program.bytePatchManager.PatchGroups) {
                 PatchGroupList.Items.Add(new CustomCheckBox(patchGroup));
             }
         }
@@ -95,10 +93,8 @@ namespace ChromeDevExtWarningPatcher {
         }
     }
 
-    public static class RichTextBoxExtensions
-    {
-        public static TextRange GetTotalTextRange(this RichTextBox richTextBox)
-        {
+    public static class RichTextBoxExtensions {
+        public static TextRange GetTotalTextRange(this RichTextBox richTextBox) {
             return new TextRange(richTextBox.Document.ContentStart, richTextBox.Document.ContentEnd);
         }
     }
