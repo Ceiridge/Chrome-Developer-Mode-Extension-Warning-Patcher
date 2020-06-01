@@ -1,0 +1,35 @@
+# The comments aren't made by me (Ceiridge), but by some nice author that made the default github actions workflow template :)
+name: Build And Release
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: windows-2019
+
+    steps:
+    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
+
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v1
+      with:
+        vs-version: 16.6
+
+    - name: Build the project
+      run: |
+        dir
+        cd %GITHUB_WORKSPACE%
+        dir
+        msbuild ChromeDevExtWarningPatcher.sln -p:Configuration:Release
+
+    # Test: Check if the file is there
+    - name: List release folders
+      run: |
+        cd %GITHUB_WORKSPACE%
+        cd ChromeDevExtWarningPatcher
+        cd bin
+        cd Release
+        dir
