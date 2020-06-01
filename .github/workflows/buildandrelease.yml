@@ -16,6 +16,7 @@ jobs:
     - name: Build the project with MSBuild
       shell: cmd
       run: |
+        "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\MSBuild.exe" -t:restore
         "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\MSBuild.exe" ChromeDevExtWarningPatcher.sln -p:Configuration=Release
 
     # Test: Check if the file is there
