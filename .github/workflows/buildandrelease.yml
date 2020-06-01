@@ -1,7 +1,7 @@
 # The comments aren't made by me (Ceiridge), but by some nice author that made the default github actions workflow template :)
 name: Build And Release
 
-on: [push, pull_request]
+on: [push]
 
 jobs:
   build:
@@ -40,8 +40,10 @@ jobs:
 
     - name: Upload Release files
       uses: actions/upload-release-asset@v1.0.2
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ChromeDevExtWarningPatcher.zip
+        asset_path: ${{ github.workspace }}\ChromeDevExtWarningPatcher\bin\Release\ChromeDevExtWarningPatcher.zip
         asset_name: ChromeDevExtWarningPatcher.zip
         asset_content_type: application/zip
