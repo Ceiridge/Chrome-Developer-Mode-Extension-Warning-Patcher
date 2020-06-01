@@ -23,8 +23,8 @@ jobs:
       shell: powershell
       run: |
         cd ChromeDevExtWarningPatcher\bin\Release;
-        dir;
         Compress-Archive -DestinationPath ChromeDevExtWarningPatcher.zip -Path ChromeDevExtWarningPatcher.exe,CommandLine.dll;
+        dir;
 
     - name: Create a Release
       uses: actions/create-release@v1
@@ -42,6 +42,6 @@ jobs:
       uses: actions/upload-release-asset@v1.0.2
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./ChromeDevExtWarningPatcher.zip
+        asset_path: ChromeDevExtWarningPatcher.zip
         asset_name: ChromeDevExtWarningPatcher.zip
         asset_content_type: application/zip
