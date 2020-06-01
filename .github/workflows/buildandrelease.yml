@@ -1,0 +1,49 @@
+# The comments aren't made by me (Ceiridge), but by some nice author that made the default github actions workflow template :)
+name: Build And Release
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: windows-2019
+
+    steps:
+    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
+
+    - name: Build the project with MSBuild
+      shell: cmd
+      run: |
+        "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\MSBuild.exe" -t:restore
+        "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\MSBuild.exe" ChromeDevExtWarningPatcher.sln -p:Configuration=Release
+
+    - name: Zip the builds
+      shell: powershell
+      run: |
+        cd ChromeDevExtWarningPatcher\bin\Release;
+        Compress-Archive -DestinationPath ChromeDevExtWarningPatcher.zip -Path ChromeDevExtWarningPatcher.exe,CommandLine.dll;
+        dir;
+
+    - name: Create a Release
+      uses: actions/create-release@v1
+      id: create_release
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ci${{ github.sha }}
+        release_name: Prerelease for ${{ github.sha }} in ${{ github.ref }}
+        body: Automatically created prerelease by the Build And Release CI
+        draft: false
+        prerelease: true
+
+    - name: Upload Release files
+      uses: actions/upload-release-asset@v1.0.2
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ${{ github.workspace }}\ChromeDevExtWarningPatcher\bin\Release\ChromeDevExtWarningPatcher.zip
+        asset_name: ChromeDevExtWarningPatcher.zip
+        asset_content_type: application/zip
