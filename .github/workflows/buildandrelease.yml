@@ -16,17 +16,11 @@ jobs:
     - name: Build the project with MSBuild
       shell: cmd
       run: |
-        dir
-        cd $Env:GITHUB_WORKSPACE
-        dir
-        "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\MSBuild.exe" ChromeDevExtWarningPatcher.sln -p:Configuration:Release
+        "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\MSBuild.exe" ChromeDevExtWarningPatcher.sln -p:Configuration=Release
 
     # Test: Check if the file is there
     - name: List release folders
       shell: cmd
       run: |
-        cd %GITHUB_WORKSPACE%
-        cd ChromeDevExtWarningPatcher
-        cd bin
-        cd Release
+        cd ChromeDevExtWarningPatcher\bin\Release
         dir
