@@ -14,6 +14,7 @@ jobs:
         submodules: true
 
     - name: Build the project with MSBuild
+      shell: cmd
       run: |
         dir
         cd $Env:GITHUB_WORKSPACE
@@ -22,6 +23,7 @@ jobs:
 
     # Test: Check if the file is there
     - name: List release folders
+      shell: cmd
       run: |
         cd %GITHUB_WORKSPACE%
         cd ChromeDevExtWarningPatcher
