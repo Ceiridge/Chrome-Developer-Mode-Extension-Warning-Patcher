@@ -32,7 +32,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: cilatestprerelease
+        tag_name: ci${{ github.sha }}
         release_name: Prerelease for ${{ github.sha }} in ${{ github.ref }}
         body: Automatically created prerelease by the Build And Release CI
         draft: false
