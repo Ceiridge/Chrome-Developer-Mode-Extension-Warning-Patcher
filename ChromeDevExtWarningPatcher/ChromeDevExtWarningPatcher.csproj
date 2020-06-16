@@ -84,6 +84,7 @@
     <Compile Include="CommandLineOptions.cs" />
     <Compile Include="CustomCheckBox.cs" />
     <Compile Include="InstallationFinder\Defaults\CustomPath.cs" />
+    <Compile Include="InstallationFinder\Defaults\Yandex.cs" />
     <Compile Include="Patches\BytePatch.cs" />
     <Compile Include="DllPatcher.cs" />
     <Compile Include="InstallationFinder\Defaults\Brave.cs" />

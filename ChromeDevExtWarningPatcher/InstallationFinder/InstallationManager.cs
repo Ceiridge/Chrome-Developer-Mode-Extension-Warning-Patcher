@@ -10,6 +10,7 @@ namespace ChromeDevExtWarningPatcher.InstallationFinder {
 			installationFinders.Add(new Chrome());
 			installationFinders.Add(new Brave());
 			installationFinders.Add(new Edge());
+			installationFinders.Add(new Yandex());
 		}
 
 		public List<string> FindAllChromiumInstallations() {
