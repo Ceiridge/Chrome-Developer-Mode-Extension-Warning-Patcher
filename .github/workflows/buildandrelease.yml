@@ -25,7 +25,6 @@ jobs:
         Compress-Archive -DestinationPath ChromeDevExtWarningPatcher.zip -Path ChromeDevExtWarningPatcher.exe,CommandLine.dll;
         dir;
 
-    - name: Release build
     - uses: "Ceiridge/action-automatic-releases@v1.0.0" # actually made by marvinpinto
       if: ${{ github.event_name == 'push' && endsWith(github.ref, '/master') } # don't release on pull requests
       with:
