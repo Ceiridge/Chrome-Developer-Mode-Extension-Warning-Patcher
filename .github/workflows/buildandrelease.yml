@@ -34,3 +34,8 @@ jobs:
         title: "Prerelease Build"
         files: |
           ChromeDevExtWarningPatcher/bin/Release/ChromeDevExtWarningPatcher.zip
+
+    - uses: actions/upload-artifact@v2
+      with:
+        name: built-binaries
+        path: ChromeDevExtWarningPatcher/bin/Release/
