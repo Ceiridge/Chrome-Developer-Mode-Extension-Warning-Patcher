@@ -1,6 +1,6 @@
 name: Build And Release
 
-on: [push]
+on: [push, pull_request]
 
 jobs:
   build:
@@ -33,4 +33,4 @@ jobs:
         prerelease: true
         title: "Prerelease Build"
         files: |
-          ChromeDevExtWarningPatcher\bin\Release\ChromeDevExtWarningPatcher.zip
+          ChromeDevExtWarningPatcher/bin/Release/ChromeDevExtWarningPatcher.zip
