@@ -26,7 +26,7 @@ jobs:
         dir;
 
     - uses: "Ceiridge/action-automatic-releases@v1.0.0" # actually made by marvinpinto
-      if: ${{ github.event_name == 'push' && endsWith(github.ref, '/master') } # don't release on pull requests
+      if: ${{ github.event_name == 'push' && endsWith(github.ref, '/master') }} # don't release on pull requests
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
         automatic_release_tag: latest
