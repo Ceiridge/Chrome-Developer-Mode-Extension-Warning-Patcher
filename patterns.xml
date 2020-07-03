@@ -80,6 +80,13 @@
 				<BytePattern>84 C0 0F 84 ? ? ? ? 48 8D 15 ? ? ? ? 48 8D 5C 24 ? 48 89 D9 E8 ? ? ? ? 48 89 D9</BytePattern> <!-- Chr 83 -->
 			</BytePatternList>
 		</Pattern>
+
+		<Pattern name="Disable SwReporter Upload">
+			<!-- use the chrome.dll pdb file from the Chromium symbol server and find this: https://source.chromium.org/chromium/chromium/src/+/master:chrome/browser/safe_browsing/chrome_cleaner/reporter_runner_win.cc;l=1040;drc=38afb378e9c9dbcc3eb355f3720f990f0160601e?originalUrl=https:%2F%2Fcs.chromium.org%2F -->
+			<BytePatternList type="x64">
+				<BytePattern>84 C0 74 ? 48 8B 06 48 89 F1 FF 90 ? ? ? ? 48 85 C0 74 ? 48 89 C7 48 8D 15 ? ? ? ?</BytePattern> <!-- Chr 81; test al, al -->
+			</BytePatternList>
+		</Pattern>
 	</Patterns>
 
 
@@ -115,6 +122,10 @@
 		<Patch pattern="Remove Send To Your Devices 2" group="4">
 			<PatchData type="x64" offset="0x00" orig="0x84" patch="0x38"></PatchData> <!-- test => cmp; this forces the ZeroFlag to be 1 => it will skip the insertion of the menu option -->
 		</Patch>
+
+		<Patch pattern="Disable SwReporter Upload" group="5">
+			<PatchData type="x64" offset="0x00" orig="0x84" patch="0x38"></PatchData> <!-- test => cmp; this forces the ZeroFlag to be 1 => it will jump -->
+		</Patch>
 	</Patches>
 
 
@@ -142,6 +153,11 @@
 		<GroupedPatch group="4" default="false">
 			<Name>Remove send to self</Name>
 			<Tooltip>This patch removes the context menu option "Send To Your Devices" when using Google's Sync (may only work on Chrome)</Tooltip>
+		</GroupedPatch>
+
+		<GroupedPatch group="5" default="false">
+			<Name>Disable SoftwareReporter Upload</Name>
+			<Tooltip>This patch disables Chrome's software reporter's upload feature. It hasn't been tested yet, so maybe it doesn't work</Tooltip>
 		</GroupedPatch>
 	</GroupedPatches>
 </Defaults>
