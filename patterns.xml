@@ -156,7 +156,7 @@
 		</GroupedPatch>
 
 		<GroupedPatch group="5" default="false">
-			<Name>Disable SoftwareReporter Upload</Name>
+			<Name>Disable SoftwareReporter</Name>
 			<Tooltip>This patch disables Chrome's software reporter's upload feature. It hasn't been tested yet, so maybe it doesn't work</Tooltip>
 		</GroupedPatch>
 	</GroupedPatches>
