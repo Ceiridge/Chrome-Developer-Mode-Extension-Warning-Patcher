@@ -29,6 +29,7 @@
 		<Pattern name="Remove Debug Warning">
 			<!-- MaybeAddInfoBar; "MaybeAddInfoBar" in the function -->
 			<BytePatternList type="x64">
+				<BytePattern>41 57 41 56 41 54 56 57 53 48 81 EC 98 00 00 00 48 8B 05 ? ? ? ? 48 31 E0 48 89 84 24 ? ? ? ? 80 79 ? 00 0F 85 ? ? ? ? 48 89 CE</BytePattern>  <!-- Chr 84 -->
 				<BytePattern>41 57 41 56 41 54 56 57 53 48 81 EC ? ? ? ? 49 89 CC 48 8B 05 ? ? ? ? 48 31 E0 48 89 84 24 ? ? ? ? 48 8D 4A ?</BytePattern> <!-- Chr 81 -->
 				<BytePattern>41 57 41 56 56 57 53 48 81 EC ? ? ? ? 48 89 CE 48 8B 05 ? ? ? ? 48 31 E0 48 89 84 24 ? ? ? ? 48 8D 4A 08</BytePattern> <!-- Chr 79 -->
 	
