@@ -30,7 +30,7 @@ ChromeDevExtWarningPatcher.exe
 
   -w, --noWait       Disable the almost-pointless wait after finishing
 
-  --customPath       Instead of automatically detecting and patching all chrome.dll files, define a custom Application-folder path
+  --customPath       Instead of automatically detecting and patching all chrome.exe files, define a custom Application-folder path
                      (see README) (string in quotes is recommended)
 
   --help             Display this help screen.
@@ -57,10 +57,9 @@ Read the [patterns.xml](https://github.com/Ceiridge/Chrome-Developer-Mode-Extens
 - Disable Elision (Force showing WWW and HTTPS in the url bar/omnibar)
 - Remove crash warning (Remove the "Chromium crashed" popup)
 - Remove send to self (Remove the menu option "Send To Your Devices" when using Google Sync)
-- Disable SoftwareReporter (Disable Chrome's spyware: SwReporter)
 
 ## Contributing
-Clone this repository with `git clone --recursive https://github.com/Ceiridge/Chrome-Developer-Mode-Extension-Warning-Patcher.git` and open the `.sln` file with Visual Studio 2017, 2019 or newer.
+Clone this repository with `git clone --recursive https://github.com/Ceiridge/Chrome-Developer-Mode-Extension-Warning-Patcher.git` and open the `.sln` file with Visual Studio 2019 or newer.
 
 ## Message to Chromium contributors
 This project is not meant for malicious use, especially because patching requires Administrator rights. If an attacker wants to get rid of that notification, they will always be able to do it somehow, since they have access to the computer and to other methods anyway. For example, you could just install a crx-file and allow it with group policies. This makes no sense, because it punishes developers with annoying popups, but crx files that are already packed - and not on the store - can strangely be installed easily.

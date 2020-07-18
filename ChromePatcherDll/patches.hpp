@@ -18,6 +18,7 @@ namespace ChromePatch {
 		std::vector<Patch> patches{};
 
 		ReadPatchResult ReadPatchFile();
+		void ApplyPatches();
 	private:
 		std::wstring MultibyteToWide(const std::string& str);
 		std::string ReadString(std::ifstream& stream);

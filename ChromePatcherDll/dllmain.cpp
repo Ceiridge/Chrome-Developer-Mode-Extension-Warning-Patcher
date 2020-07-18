@@ -77,9 +77,17 @@ BOOL APIENTRY ThreadMain(LPVOID lpModule) {
 	else {
 		try {
 			ChromePatch::ReadPatchResult readResult = ChromePatch::patches.ReadPatchFile();
-			
+			boolean patchable = false;
+
 			if (readResult.UsingWrongVersion) {
-				MessageBox(NULL, L"Your Chromium version is newer than the patch definition's version! Please reuse the patcher to prevent bugs!", L"Outdated patch definitions!", MB_OK | MB_ICONWARNING | MB_TOPMOST | MB_SETFOREGROUND);
+				patchable = MessageBox(NULL, L"Your Chromium version is newer than the patch definition's version! Please reuse the patcher to prevent bugs! Do you want to patch anyway?", L"Outdated patch definitions!", MB_YESNO | MB_ICONWARNING | MB_TOPMOST | MB_SETFOREGROUND) == IDYES;
+			}
+			else {
+				patchable = true;
+			}
+
+			if (patchable) {
+
 			}
 		}
 		catch (const std::exception& ex) {
