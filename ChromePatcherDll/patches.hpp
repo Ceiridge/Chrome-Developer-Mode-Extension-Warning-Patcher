@@ -5,13 +5,18 @@ namespace ChromePatch {
 		bool UsingWrongVersion{};
 	};
 
-	struct Patch {
+	struct PatchPattern {
 		std::vector<byte> pattern{};
+		int searchOffset{};
+	};
+
+	struct Patch {
+		std::vector<PatchPattern> patterns{};
 		byte origByte{}, patchByte{};
 		int offset{};
 		bool isSig{};
-		int searchOffset{};
-		bool successfulPatch{};
+		int sigOffset{};
+		bool finishedPatch{}, successfulPatch{};
 	};
 
 	class Patches {

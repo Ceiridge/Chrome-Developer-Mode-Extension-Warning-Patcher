@@ -74,7 +74,7 @@ BOOL APIENTRY ThreadMain(LPVOID lpModule) {
 			std::cerr << "Couldn't enumerate modules" << std::endl;
 		}
 
-		Sleep(5);
+		Sleep(1);
 		attempts++;
 	}
 	CloseHandle(proc);
