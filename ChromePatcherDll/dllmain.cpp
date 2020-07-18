@@ -9,15 +9,23 @@
 HANDLE mainThreadHandle;
 HMODULE dllModule;
 
+BOOL APIENTRY ExitMainThread(LPVOID lpModule) {
+	CloseHandle(mainThreadHandle);
+	FreeLibraryAndExitThread(dllModule, 0);
+}
+
 BOOL APIENTRY ThreadMain(LPVOID lpModule) {
 	// Taken from https://stackoverflow.com/questions/15543571/allocconsole-not-displaying-cout
-#ifdef _DEBUG
-	FILE* fDummy = nullptr;
+//#ifdef _DEBUG
+	FILE* fout = nullptr;
+	FILE* ferr = nullptr;
+	FILE* fin = nullptr;
 	HANDLE hConOut = NULL, hConIn = NULL;
+
 	if (AllocConsole()) {
-		freopen_s(&fDummy, "CONOUT$", "w", stdout);
-		freopen_s(&fDummy, "CONOUT$", "w", stderr);
-		freopen_s(&fDummy, "CONIN$", "r", stdin);
+		freopen_s(&fout, "CONOUT$", "w", stdout);
+		freopen_s(&ferr, "CONOUT$", "w", stderr);
+		freopen_s(&fin, "CONIN$", "r", stdin);
 		std::cout.clear();
 		std::clog.clear();
 		std::cerr.clear();
@@ -34,7 +42,7 @@ BOOL APIENTRY ThreadMain(LPVOID lpModule) {
 		std::wcerr.clear();
 		std::wcin.clear();
 	}
-#endif
+//#endif
 
 	HANDLE proc = GetCurrentProcess();
 
@@ -87,7 +95,7 @@ BOOL APIENTRY ThreadMain(LPVOID lpModule) {
 			}
 
 			if (patchable) {
-
+				ChromePatch::patches.ApplyPatches();
 			}
 		}
 		catch (const std::exception& ex) {
@@ -96,27 +104,40 @@ BOOL APIENTRY ThreadMain(LPVOID lpModule) {
 	}
 
 	std::cout << "Unloading patcher dll" << std::endl;
+	Sleep(5000); // Give the user some time to read
 
-#ifdef _DEBUG
-	if(fDummy != nullptr)
-		fclose(fDummy);
+//#ifdef _DEBUG
+	if (fout != nullptr)
+		fclose(fout);
+	if (ferr != nullptr)
+		fclose(ferr);
+	if (fin != nullptr)
+		fclose(fin);
 	if (hConOut != NULL)
 		CloseHandle(hConOut);
 	if (hConIn != NULL)
 		CloseHandle(hConIn);
 	FreeConsole();
-#endif
+//#endif
 
-	CloseHandle(mainThreadHandle);
-	FreeLibraryAndExitThread(dllModule, 0);
+	ExitMainThread(lpModule);
+	return TRUE;
 }
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved) {
 	switch (ul_reason_for_call) {
-		case DLL_PROCESS_ATTACH:
+		case DLL_PROCESS_ATTACH: {
 			dllModule = hModule;
+
+			std::wstring cmdLine = GetCommandLine();
+			if (cmdLine.find(L"--type=") != std::wstring::npos) { // if it's not the parent process, exit
+				mainThreadHandle = CreateThread(NULL, NULL, (LPTHREAD_START_ROUTINE)ExitMainThread, hModule, NULL, NULL);
+				break;
+			}
+
 			mainThreadHandle = CreateThread(NULL, NULL, (LPTHREAD_START_ROUTINE)ThreadMain, hModule, NULL, NULL);
 			break;
+		}
 		case DLL_THREAD_ATTACH:
 		case DLL_THREAD_DETACH:
 		case DLL_PROCESS_DETACH:

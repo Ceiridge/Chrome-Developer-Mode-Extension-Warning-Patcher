@@ -7,8 +7,11 @@ namespace ChromePatch {
 
 	struct Patch {
 		std::vector<byte> pattern{};
-		byte origByte, patchByte;
-		int offset;
+		byte origByte{}, patchByte{};
+		int offset{};
+		bool isSig{};
+		int searchOffset{};
+		bool successfulPatch{};
 	};
 
 	class Patches {
