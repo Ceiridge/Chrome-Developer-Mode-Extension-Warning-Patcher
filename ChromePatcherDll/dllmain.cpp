@@ -10,6 +10,32 @@ HANDLE mainThreadHandle;
 HMODULE dllModule;
 
 BOOL APIENTRY ThreadMain(LPVOID lpModule) {
+	// Taken from https://stackoverflow.com/questions/15543571/allocconsole-not-displaying-cout
+#ifdef _DEBUG
+	FILE* fDummy = nullptr;
+	HANDLE hConOut = NULL, hConIn = NULL;
+	if (AllocConsole()) {
+		freopen_s(&fDummy, "CONOUT$", "w", stdout);
+		freopen_s(&fDummy, "CONOUT$", "w", stderr);
+		freopen_s(&fDummy, "CONIN$", "r", stdin);
+		std::cout.clear();
+		std::clog.clear();
+		std::cerr.clear();
+		std::cin.clear();
+
+		// std::wcout, std::wclog, std::wcerr, std::wcin
+		hConOut = CreateFile(L"CONOUT$", GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+		hConIn = CreateFile(L"CONIN$", GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+		SetStdHandle(STD_OUTPUT_HANDLE, hConOut);
+		SetStdHandle(STD_ERROR_HANDLE, hConOut);
+		SetStdHandle(STD_INPUT_HANDLE, hConIn);
+		std::wcout.clear();
+		std::wclog.clear();
+		std::wcerr.clear();
+		std::wcin.clear();
+	}
+#endif
+
 	HANDLE proc = GetCurrentProcess();
 
 	bool hasFoundChrome = false;
@@ -30,6 +56,7 @@ BOOL APIENTRY ThreadMain(LPVOID lpModule) {
 						std::wcout << L"Found chrome.dll module: " << modulePath << L" with handle: " << mod << std::endl;
 						
 						ChromePatch::patches.chromeDll = mod;
+						ChromePatch::patches.chromeDllPath = modulePath;
 						hasFoundChrome = true;
 					}
 				}
@@ -48,8 +75,29 @@ BOOL APIENTRY ThreadMain(LPVOID lpModule) {
 		std::cerr << "Couldn't find the chrome.dll, exiting" << std::endl;
 	}
 	else {
-
+		try {
+			ChromePatch::ReadPatchResult readResult = ChromePatch::patches.ReadPatchFile();
+			
+			if (readResult.UsingWrongVersion) {
+				MessageBox(NULL, L"Your Chromium version is newer than the patch definition's version! Please reuse the patcher to prevent bugs!", L"Outdated patch definitions!", MB_OK | MB_ICONWARNING | MB_TOPMOST | MB_SETFOREGROUND);
+			}
+		}
+		catch (const std::exception& ex) {
+			std::cerr << "Error: " << ex.what() << std::endl;
+		}
 	}
+
+	std::cout << "Unloading patcher dll" << std::endl;
+
+#ifdef _DEBUG
+	if(fDummy != nullptr)
+		fclose(fDummy);
+	if (hConOut != NULL)
+		CloseHandle(hConOut);
+	if (hConIn != NULL)
+		CloseHandle(hConIn);
+	FreeConsole();
+#endif
 
 	CloseHandle(mainThreadHandle);
 	FreeLibraryAndExitThread(dllModule, 0);
