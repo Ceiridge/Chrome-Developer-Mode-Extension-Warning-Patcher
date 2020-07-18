@@ -3,15 +3,60 @@
 #include <iostream>
 #include <regex>
 #include <string>
+#include <vector>
+#include <tlhelp32.h>
 
 #include "patches.hpp"
 
 HANDLE mainThreadHandle;
 HMODULE dllModule;
+std::vector<DWORD> suspendedThreads;
 
 BOOL APIENTRY ExitMainThread(LPVOID lpModule) {
 	CloseHandle(mainThreadHandle);
 	FreeLibraryAndExitThread(dllModule, 0);
+}
+
+// Partially taken from https://stackoverflow.com/questions/16684245/can-i-suspend-a-process-except-one-thread
+void SuspendOtherThreads() {
+	DWORD pid = GetCurrentProcessId();
+	HANDLE snap = CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0);
+	DWORD mine = GetCurrentThreadId();
+
+	if (snap != INVALID_HANDLE_VALUE) {
+		THREADENTRY32 te;
+		te.dwSize = sizeof(te);
+
+		if (Thread32First(snap, &te)) {
+			do {
+				if (te.dwSize >= FIELD_OFFSET(THREADENTRY32, th32OwnerProcessID) + sizeof(te.th32OwnerProcessID)) {
+					if (te.th32ThreadID != mine && te.th32OwnerProcessID == pid)
+					{
+						HANDLE thread = OpenThread(THREAD_ALL_ACCESS, FALSE, te.th32ThreadID);
+						if (thread && thread != INVALID_HANDLE_VALUE) {
+							SuspendThread(thread);
+							CloseHandle(thread);
+							suspendedThreads.push_back(te.th32ThreadID);
+						}
+					}
+				}
+				te.dwSize = sizeof(te);
+			} while (Thread32Next(snap, &te));
+		}
+		CloseHandle(snap);
+	}
+}
+
+void ResumeOtherThreads() {
+	for (DWORD tId : suspendedThreads) {
+		HANDLE thread = OpenThread(THREAD_ALL_ACCESS, FALSE, tId);
+		if (thread && thread != INVALID_HANDLE_VALUE) {
+			ResumeThread(thread);
+			CloseHandle(thread);
+		}
+	}
+
+	suspendedThreads.clear();
 }
 
 BOOL APIENTRY ThreadMain(LPVOID lpModule) {
@@ -43,14 +88,14 @@ BOOL APIENTRY ThreadMain(LPVOID lpModule) {
 		std::wcin.clear();
 	}
 //#endif
-
+	SuspendOtherThreads();
 	HANDLE proc = GetCurrentProcess();
 
 	bool hasFoundChrome = false;
 	int attempts = 0;
 	std::wregex chromeDllRegex(L"\\\\Application\\\\(?:\\d+?\\.?)+\\\\[a-zA-Z0-9-]+\\.dll");
 
-	while (!hasFoundChrome && attempts < 6000) { // give it 6000 attempts to find the chrome.dll module
+	while (!hasFoundChrome && attempts < 30000) { // give it some attempts to find the chrome.dll module
 		HMODULE modules[1024];
 		DWORD cbNeeded;
 
@@ -88,7 +133,7 @@ BOOL APIENTRY ThreadMain(LPVOID lpModule) {
 			boolean patchable = false;
 
 			if (readResult.UsingWrongVersion) {
-				patchable = MessageBox(NULL, L"Your Chromium version is newer than the patch definition's version! Please reuse the patcher to prevent bugs! Do you want to patch anyway?", L"Outdated patch definitions!", MB_YESNO | MB_ICONWARNING | MB_TOPMOST | MB_SETFOREGROUND) == IDYES;
+				patchable = MessageBox(NULL, L"Your Chromium version is newer than the patch definition's version! Please reuse the patcher to prevent bugs or failing pattern searches! Do you want to patch anyway?", L"Outdated patch definitions!", MB_YESNO | MB_ICONWARNING | MB_TOPMOST | MB_SETFOREGROUND) == IDYES;
 			}
 			else {
 				patchable = true;
@@ -103,7 +148,8 @@ BOOL APIENTRY ThreadMain(LPVOID lpModule) {
 		}
 	}
 
-	std::cout << "Unloading patcher dll" << std::endl;
+	std::cout << "Unloading patcher dll and resuming threads" << std::endl;
+	ResumeOtherThreads();
 	Sleep(5000); // Give the user some time to read
 
 //#ifdef _DEBUG
