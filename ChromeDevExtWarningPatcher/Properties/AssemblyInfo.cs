@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyDescription("Patches Chromium and disables the developer extension warning among others")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Chromium Developer Extension Warning Patcher")]
+[assembly: AssemblyProduct("https://github.com/Ceiridge/Chrome-Developer-Mode-Extension-Warning-Patcher")]
 [assembly: AssemblyCopyright("GNU General Public License 3, Ceiridge")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
