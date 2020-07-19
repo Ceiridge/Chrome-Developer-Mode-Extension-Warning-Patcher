@@ -11,7 +11,7 @@ typedef NTSTATUS(*PNtFsControlFile)(HANDLE FileHandle, HANDLE Event, PIO_APC_ROU
 PNtFsControlFile NtFsControlFile = NULL;
 
 namespace ChromePatch::Oplock {
-	Oplock::Oplock(HANDLE file, std::function<void()> callback) {
+	Oplock::Oplock(HANDLE file, std::function<void(Oplock*)> callback) {
 		this->file = file;
 		this->callback = callback;
 		this->CreateApc();
@@ -64,7 +64,7 @@ namespace ChromePatch::Oplock {
 		CreateApc();
 
 		if (this->callback != nullptr) {
-			this->callback();
+			this->callback(this);
 		}
 	}
 

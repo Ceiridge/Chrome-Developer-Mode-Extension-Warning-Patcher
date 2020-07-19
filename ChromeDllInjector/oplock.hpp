@@ -4,7 +4,7 @@ namespace ChromePatch::Oplock {
 	class Oplock {
 	public:
 		// Callback can be NULL
-		Oplock(HANDLE file, std::function<void()> callback);
+		Oplock(HANDLE file, std::function<void(Oplock*)> callback);
 		~Oplock();
 
 		bool LockFile();
@@ -12,7 +12,7 @@ namespace ChromePatch::Oplock {
 		bool UnlockFile();
 	private:
 		HANDLE file{};
-		std::function<void()> callback{};
+		std::function<void(Oplock*)> callback{};
 
 		bool broken{};
 		Apc::ApcEntry* apc;
