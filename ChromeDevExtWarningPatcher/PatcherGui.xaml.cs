@@ -1,5 +1,7 @@
-﻿using Microsoft.Win32;
+﻿using ChromeDevExtWarningPatcher.InstallationFinder;
+using Microsoft.Win32;
 using System;
+using System.IO;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
@@ -21,7 +23,19 @@ namespace ChromeDevExtWarningPatcher {
 			openFile.CheckFileExists = openFile.CheckPathExists = openFile.AddExtension = true;
 
 			if (openFile.ShowDialog(this) == true) { // No, I am not a noob, I have to do it like this and further below
-				AddChromiumInstallation(openFile.FileName);
+				string chromeDllPath = openFile.FileName;
+
+				openFile = new OpenFileDialog();
+				openFile.Title = "Select a chrome.exe";
+				openFile.Filter = "Browser executable file (*.exe)|*.exe|All files (*.*)|*.*";
+				openFile.FilterIndex = 1;
+				openFile.CheckFileExists = openFile.CheckPathExists = openFile.AddExtension = true;
+				openFile.InitialDirectory = Directory.GetParent(Path.GetDirectoryName(chromeDllPath)).FullName;
+
+				if (openFile.ShowDialog(this) == true) {
+					string chromeExePath = openFile.FileName;
+					AddChromiumInstallation(new InstallationPaths(chromeDllPath, chromeExePath));
+				}
 			}
 		}
 
@@ -64,8 +78,8 @@ namespace ChromeDevExtWarningPatcher {
 			Log("Patcher gui initialized");
 			Log("Searching for Chromium installations...");
 
-			foreach (string path in new InstallationFinder.InstallationManager().FindAllChromiumInstallations()) {
-				AddChromiumInstallation(path);
+			foreach (InstallationPaths paths in new InstallationFinder.InstallationManager().FindAllChromiumInstallations()) {
+				AddChromiumInstallation(paths);
 			}
 
 			foreach (GuiPatchGroupData patchGroup in Program.bytePatchManager.PatchGroups) {
@@ -83,13 +97,13 @@ namespace ChromeDevExtWarningPatcher {
 			}));
 		}
 
-		private void AddChromiumInstallation(string chromeDll) {
-			CustomCheckBox installationBox = new CustomCheckBox(chromeDll);
+		private void AddChromiumInstallation(InstallationPaths chromePaths) {
+			CustomCheckBox installationBox = new CustomCheckBox(chromePaths.ChromeDllPath);
 			installationBox.IsChecked = true;
-			installationBox.ToolTip = chromeDll;
+			installationBox.ToolTip = chromePaths.ChromeDllPath + " & " + chromePaths.ChromeExePath;
 
 			InstallationList.Items.Add(installationBox);
-			Log("Added Chromium installation at " + chromeDll);
+			Log("Added Chromium installation at " + chromePaths.ChromeDllPath);
 		}
 	}
 

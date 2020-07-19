@@ -13,11 +13,11 @@ namespace ChromeDevExtWarningPatcher.InstallationFinder {
 			installationFinders.Add(new Yandex());
 		}
 
-		public List<string> FindAllChromiumInstallations() {
-			List<string> installations = new List<string>();
+		public List<InstallationPaths> FindAllChromiumInstallations() {
+			List<InstallationPaths> installations = new List<InstallationPaths>();
 
 			foreach (Installation installation in installationFinders) {
-				installations.AddRange(installation.FindDllFiles());
+				installations.AddRange(installation.FindInstallationPaths());
 			}
 
 			return installations;

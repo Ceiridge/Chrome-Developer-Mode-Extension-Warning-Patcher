@@ -1,4 +1,5 @@
-﻿using ChromeDevExtWarningPatcher.InstallationFinder.Defaults;
+﻿using ChromeDevExtWarningPatcher.InstallationFinder;
+using ChromeDevExtWarningPatcher.InstallationFinder.Defaults;
 using ChromeDevExtWarningPatcher.Patches;
 using CommandLine;
 using CommandLine.Text;
@@ -16,7 +17,7 @@ namespace ChromeDevExtWarningPatcher {
 		private static Window guiWindow;
 		public static BytePatchManager bytePatchManager;
 
-		public const bool DEBUG = false;
+		public const bool DEBUG = true;
 
 		[DllImport("kernel32.dll", SetLastError = true, ExactSpelling = true)]
 		private static extern bool FreeConsole();
@@ -48,7 +49,7 @@ namespace ChromeDevExtWarningPatcher {
 				return;
 			bytePatchManager = new BytePatchManager(CustomConsoleWrite);
 
-			List<string> applicationPaths = new List<string>();
+			List<InstallationPaths> applicationPaths = new List<InstallationPaths>();
 			List<int> groups = new List<int>(clOptions.Groups);
 
 			if (groups.Count == 0) {
@@ -62,7 +63,7 @@ namespace ChromeDevExtWarningPatcher {
 					return;
 				}
 
-				applicationPaths.AddRange(new CustomPath(clOptions.CustomPath).FindDllFiles());
+				applicationPaths.AddRange(new CustomPath(clOptions.CustomPath).FindInstallationPaths());
 			} else {
 				applicationPaths.AddRange(new InstallationFinder.InstallationManager().FindAllChromiumInstallations());
 			}
@@ -73,14 +74,14 @@ namespace ChromeDevExtWarningPatcher {
 			}
 
 			if (applicationPaths.Count == 0)
-				Console.WriteLine("Error: No patchable dll file found!");
+				Console.WriteLine("Error: No patchable browser files found!");
 
-			foreach (string path in applicationPaths) {
+			foreach (InstallationPaths paths in applicationPaths) {
 				try {
-					DllPatcher patcher = new DllPatcher(path);
-					patcher.Patch(Console.WriteLine);
+					//DllPatcher patcher = new DllPatcher(path); // TODO: !
+					//patcher.Patch(Console.WriteLine);
 				} catch (Exception ex) {
-					Console.WriteLine("Error while patching " + path + ":" + ex.Message);
+					Console.WriteLine("Error while installing patch at " + paths.ChromeExePath + ":" + ex.Message);
 				}
 			}
 

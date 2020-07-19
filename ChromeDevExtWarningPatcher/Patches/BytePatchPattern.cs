@@ -4,7 +4,6 @@ using System.Collections.Generic;
 namespace ChromeDevExtWarningPatcher.Patches {
 	public class BytePatchPattern {
 		public string Name;
-		public List<byte[]> AlternativePatternsX86 = new List<byte[]>();
 		public List<byte[]> AlternativePatternsX64 = new List<byte[]>();
 
 		public BytePatchPattern(string name) {
@@ -12,8 +11,8 @@ namespace ChromeDevExtWarningPatcher.Patches {
 		}
 
 		public delegate void WriteToLog(string str);
-		public Tuple<long, byte[]> FindAddress(byte[] raw, bool x64, WriteToLog log) { // This returns the offset and pattern
-			foreach (byte[] pattern in (x64 ? AlternativePatternsX64 : AlternativePatternsX86)) {
+		/*public Tuple<long, byte[]> FindAddress(byte[] raw, bool x64, WriteToLog log) { // This returns the offset and pattern
+			foreach (byte[] pattern in AlternativePatternsX64) {
 				int patternIndex = 0, patternOffset = 0;
 
 				for (int i = 0; i < raw.Length; i++) {
@@ -34,6 +33,6 @@ namespace ChromeDevExtWarningPatcher.Patches {
 			}
 
 			return new Tuple<long, byte[]>(-1L, null);
-		}
+		}*/
 	}
 }

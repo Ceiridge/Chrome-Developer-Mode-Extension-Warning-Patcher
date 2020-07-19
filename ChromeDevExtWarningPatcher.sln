@@ -5,7 +5,9 @@ VisualStudioVersion = 16.0.30114.105
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChromeDevExtWarningPatcher", "ChromeDevExtWarningPatcher\ChromeDevExtWarningPatcher.csproj", "{0254DB23-B64D-4D54-8FF8-F4D570E95AD4}"
 	ProjectSection(ProjectDependencies) = postProject
+		{BA6B041F-E0E9-45EC-86D8-BC5D1D864AE5} = {BA6B041F-E0E9-45EC-86D8-BC5D1D864AE5}
 		{29D94F79-97B1-4801-8A65-4A8BECBF2D46} = {29D94F79-97B1-4801-8A65-4A8BECBF2D46}
+		{180314CF-AF7D-4A49-8B44-3A1FF681B90B} = {180314CF-AF7D-4A49-8B44-3A1FF681B90B}
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommandLine", "lib\commandlineparser_commandline\src\CommandLine\CommandLine.csproj", "{29D94F79-97B1-4801-8A65-4A8BECBF2D46}"

@@ -60,19 +60,15 @@ namespace ChromeDevExtWarningPatcher.Patches {
 				foreach (XElement pattern in xmlDoc.Root.Element("Patterns").Elements("Pattern")) {
 					BytePatchPattern patternClass = new BytePatchPattern(pattern.Attribute("name").Value);
 
-					foreach (XElement patternList in pattern.Elements("BytePatternList")) {
-						bool isX64 = patternList.Attribute("type").Value.Equals("x64");
+					foreach (XElement bytePattern in pattern.Elements("BytePattern")) {
+						string[] unparsedBytes = bytePattern.Value.Split(' ');
+						byte[] patternBytesArr = new byte[unparsedBytes.Length];
 
-						foreach (XElement bytePattern in patternList.Elements("BytePattern")) {
-							string[] unparsedBytes = bytePattern.Value.Split(' ');
-							byte[] patternBytesArr = new byte[unparsedBytes.Length];
-
-							for (int i = 0; i < unparsedBytes.Length; i++) {
-								string unparsedByte = unparsedBytes[i].Equals("?") ? "FF" : unparsedBytes[i];
-								patternBytesArr[i] = Convert.ToByte(unparsedByte, 16);
-							}
-							(isX64 ? patternClass.AlternativePatternsX64 : patternClass.AlternativePatternsX86).Add(patternBytesArr);
+						for (int i = 0; i < unparsedBytes.Length; i++) {
+							string unparsedByte = unparsedBytes[i].Equals("?") ? "FF" : unparsedBytes[i];
+							patternBytesArr[i] = Convert.ToByte(unparsedByte, 16);
 						}
+						patternClass.AlternativePatternsX64.Add(patternBytesArr);
 					}
 					BytePatterns.Add(patternClass.Name, patternClass);
 				}
@@ -81,30 +77,16 @@ namespace ChromeDevExtWarningPatcher.Patches {
 					BytePatchPattern pattern = BytePatterns[patch.Attribute("pattern").Value];
 					int group = int.Parse(patch.Attribute("group").Value);
 
-					byte origX64 = 0, origX86 = 0, patchX64 = 0, patchX86 = 0;
-					int offsetX64 = 0, offsetX86 = 0, aoffsetX64 = -1, aoffsetX86 = -1;
+					byte origX64 = 0, patchX64 = 0;
+					int offsetX64 = 0;
 
 					foreach (XElement patchData in patch.Elements("PatchData")) {
-						byte orig = Convert.ToByte(patchData.Attribute("orig").Value.Replace("0x", ""), 16);
-						byte patchB = Convert.ToByte(patchData.Attribute("patch").Value.Replace("0x", ""), 16);
-						int offset = Convert.ToInt32(patchData.Attribute("offset").Value.Replace("0x", ""), 16);
-
-						XAttribute alternativeOffsetAttr = patchData.Attribute("alternativeOffset");
-						int aoffset = alternativeOffsetAttr == null ? -1 : Convert.ToInt32(alternativeOffsetAttr.Value.Replace("0x", ""), 16);
-
-						if (patchData.Attribute("type").Value.Equals("x64")) {
-							origX64 = orig;
-							patchX64 = patchB;
-							offsetX64 = offset;
-							aoffsetX64 = aoffset;
-						} else {
-							origX86 = orig;
-							patchX86 = patchB;
-							offsetX86 = offset;
-							aoffsetX86 = aoffset;
-						}
+						origX64 = Convert.ToByte(patchData.Attribute("orig").Value.Replace("0x", ""), 16);
+						patchX64 = Convert.ToByte(patchData.Attribute("patch").Value.Replace("0x", ""), 16);
+						offsetX64 = Convert.ToInt32(patchData.Attribute("offset").Value.Replace("0x", ""), 16);
+						break;
 					}
-					BytePatches.Add(new BytePatch(pattern, origX64, patchX64, offsetX64, aoffsetX64, origX86, patchX86, offsetX86, aoffsetX86, group));
+					BytePatches.Add(new BytePatch(pattern, origX64, patchX64, offsetX64, group));
 				}
 
 				foreach (XElement patchGroup in xmlDoc.Root.Element("GroupedPatches").Elements("GroupedPatch")) {
@@ -119,7 +101,7 @@ namespace ChromeDevExtWarningPatcher.Patches {
 		}
 
 		public bool PatchBytes(ref byte[] raw, bool x64, BytePatchPattern.WriteToLog log) {
-			int patches = 0;
+			/*int patches = 0;
 
 			foreach (BytePatch patch in BytePatches) {
 				if (DisabledGroups.Contains(patch.group)) {
@@ -161,7 +143,8 @@ namespace ChromeDevExtWarningPatcher.Patches {
 				}
 			}
 
-			return patches == BytePatches.Count;
+			return patches == BytePatches.Count;*/
+			return false;
 		}
 	}
 }

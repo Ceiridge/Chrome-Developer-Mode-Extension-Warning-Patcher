@@ -1,0 +1,17 @@
+﻿using System.IO;
+
+namespace ChromeDevExtWarningPatcher.InstallationFinder {
+	struct InstallationPaths {
+		public string ChromeDllPath, ChromeExePath;
+
+		public InstallationPaths(string chromeDllPath, string chromeExePath) {
+			ChromeDllPath = chromeDllPath;
+			ChromeExePath = chromeExePath;
+		}
+
+		public InstallationPaths(FileInfo chromeDll, FileInfo chromeExe) {
+			ChromeDllPath = chromeDll.FullName;
+			ChromeExePath = chromeExe.FullName;
+		}
+	}
+}

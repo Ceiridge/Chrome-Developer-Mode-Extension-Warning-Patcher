@@ -9,11 +9,11 @@ namespace ChromeDevExtWarningPatcher.InstallationFinder.Defaults {
 			Path = path;
 		}
 
-		public override List<string> FindDllFiles() {
-			List<string> dllFiles = new List<string>();
+		public override List<InstallationPaths> FindInstallationPaths() {
+			List<InstallationPaths> dllFiles = new List<InstallationPaths>();
 
-			AddDllToList(dllFiles, GetLatestDll(new DirectoryInfo(Path), "chrome.dll"));
-			AddDllToList(dllFiles, GetLatestDll(new DirectoryInfo(Path), "msedge.dll"));
+			AddDllAndExeToList(dllFiles, GetLatestDllAndExe(new DirectoryInfo(Path), "chrome.dll", "chrome.exe"));
+			AddDllAndExeToList(dllFiles, GetLatestDllAndExe(new DirectoryInfo(Path), "msedge.dll", "msedge.exe"));
 
 			return dllFiles;
 		}
