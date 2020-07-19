@@ -1,12 +1,4 @@
-#include <Windows.h>
-#include <winternl.h>
-#include <iostream>
-#include <vector>
-#include <string>
-#include <strsafe.h>
-#include <functional>
-#include <map>
-
+#include "stdafx.h"
 #include "apc.hpp"
 #include "oplock.hpp"
 

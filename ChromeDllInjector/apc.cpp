@@ -1,8 +1,4 @@
-#include <Windows.h>
-#include <winternl.h>
-#include <functional>
-#include <vector>
-
+#include "stdafx.h"
 #include "apc.hpp"
 
 // Some ideas/code taken from https://github.com/ladislav-zezula/FileTest
