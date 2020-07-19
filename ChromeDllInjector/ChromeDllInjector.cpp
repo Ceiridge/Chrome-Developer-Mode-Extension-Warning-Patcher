@@ -4,13 +4,23 @@
 #include <vector>
 #include <string>
 #include <strsafe.h>
+#include <functional>
 
 #include "apc.hpp"
+#include "oplock.hpp"
 
 std::vector<HANDLE> chromeDllHandles;
+ChromePatch::Oplock::Oplock* oplockTemp;
 
-typedef NTSTATUS(*PNtFsControlFile)(HANDLE FileHandle, HANDLE Event, PIO_APC_ROUTINE ApcRoutine,PVOID ApcContext, PIO_STATUS_BLOCK IoStatusBlock, ULONG FsControlCode, PVOID InputBuffer, ULONG InputBufferLength, PVOID OutputBuffer, ULONG OutputBufferLength);
-PNtFsControlFile NtFsControlFile;
+void OplockCallback() {
+	MessageBox(NULL, L"Broken!", std::to_wstring(oplockTemp->IsBroken()).c_str(), MB_OK);
+	oplockTemp->UnlockFile();
+
+	//delete oplockTemp;
+	//oplockTemp = new ChromePatch::Oplock::Oplock(chromeDllHandles[0], std::bind(&OplockCallback));
+	Sleep(100);
+	oplockTemp->LockFile();
+}
 
 // Has to be a somewhat-UNC path
 void OplockFile(std::wstring filePath) {
@@ -29,27 +39,14 @@ void OplockFile(std::wstring filePath) {
 		chromeDllHandles.push_back(file);
 		std::wcout << L"Handle for " << filePath << L": " << file << std::endl;
 		
-		ChromePatch::Apc::ApcEntry apc;
-		if (NtFsControlFile(file, apc.event, NULL, NULL, &apc.ioStatus, FSCTL_REQUEST_OPLOCK_LEVEL_1, NULL, 0, NULL, 0) == STATUS_PENDING) {
-			std::cout << "Controlling file" << std::endl;
-
-			apc.param = FSCTL_REQUEST_OPLOCK_LEVEL_1;
-			apc.InsertEntry();
-		}
-		else {
-			std::cout << "Error trying to control file" << std::endl;
-			apc.FreeEntry();
-		}
+		oplockTemp = new ChromePatch::Oplock::Oplock(file, std::bind(&OplockCallback));
+		oplockTemp->LockFile();
 	}
 }
 
 int wmain(int argc, wchar_t* argv[], wchar_t* envp[]) {
-	if (!(NtFsControlFile = reinterpret_cast<PNtFsControlFile>(GetProcAddress(GetModuleHandle(L"ntdll.dll"), "NtFsControlFile")))) {
-		std::cerr << "Couldn't find NtFsControlFile" << std::endl;
-		return 1;
-	}
-
 	ChromePatch::Apc::InitApc();
+
 	Sleep(100000);
 	return 0;
 }

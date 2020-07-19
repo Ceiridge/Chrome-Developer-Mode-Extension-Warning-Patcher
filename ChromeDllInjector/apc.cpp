@@ -1,5 +1,6 @@
 #include <Windows.h>
 #include <winternl.h>
+#include <functional>
 
 #include "apc.hpp"
 
@@ -34,7 +35,7 @@ namespace ChromePatch::Apc {
 
 					// Insert the APC entry to the wait list
 					WaitHandles[dwWaitCount] = apc->event;
-					_apcList[dwWaitCount++] = apc;
+ 					_apcList[dwWaitCount++] = apc;
 				}
 			}
 			LeaveCriticalSection(&lock);
@@ -70,7 +71,10 @@ namespace ChromePatch::Apc {
 				// Send the APC to the main dialog
 				// Note that the main dialog is responsible for freeing the APC
 				//PostMessage(pApc->hWndPage, WM_APC, 0, (LPARAM)pApc);
-				MessageBox(NULL, L"AAAA", L"ASDASD", MB_OK);
+				
+				if (apc->callback != nullptr) {
+					apc->callback();
+				}
 			}
 		}
 
@@ -98,6 +102,8 @@ namespace ChromePatch::Apc {
 	}
 
 	void InitApc() {
+		InitializeCriticalSection(&lock);
+		InitializeListHead(&apcList);
 		alertEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
 		apcThread = CreateThread(NULL, 0, ApcThread, NULL, 0, NULL);
 	}
@@ -111,10 +117,11 @@ namespace ChromePatch::Apc {
 	}
 
 
-	ApcEntry::ApcEntry() { // Manually zero these vars
+	ApcEntry::ApcEntry(std::function<void()> callback) { // Manually zero these vars
 		this->bAsyncComplete = NULL;
 		this->bIncrementPos = NULL;
 		this->bHasIoStatus = NULL;
+		this->callback = callback;
 	}
 	ApcEntry::~ApcEntry() {}
 

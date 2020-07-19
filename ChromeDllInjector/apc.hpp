@@ -1,5 +1,6 @@
 #pragma once
 
+// Some ntdll/list features
 #define InitializeListHead(ListHead) (\
     (ListHead)->Flink = (ListHead)->Blink = (ListHead))
 #define RemoveEntryList(Entry) {\
@@ -20,6 +21,12 @@
     _EX_Blink->Flink = (Entry);\
     _EX_ListHead->Blink = (Entry);\
     }
+#define APC_TYPE_NONE               0
+#define APC_TYPE_READ_WRITE         1
+#define APC_TYPE_LOCK_UNLOCK        2
+#define APC_TYPE_FSCTL              3
+#define APC_TYPE_IOCTL              4
+
 
 namespace ChromePatch::Apc {
 	inline int apcCount = 0;
@@ -42,8 +49,10 @@ namespace ChromePatch::Apc {
 		HANDLE event{};
 		//HWND page{};
 		ULONG type{}, param{}, bufLen{}, bAsyncComplete : 1, bIncrementPos : 1, bHasIoStatus : 1;
+		std::function<void()> callback{};
 
-		ApcEntry();
+		// Callback can be NULL
+		ApcEntry(std::function<void()> callback);
 		~ApcEntry();
 
 		bool CreateEntry(UINT type);
