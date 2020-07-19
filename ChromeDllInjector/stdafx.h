@@ -8,3 +8,5 @@
 #include <strsafe.h>
 #include <functional>
 #include <map>
+#include <psapi.h>
+#include <fstream>

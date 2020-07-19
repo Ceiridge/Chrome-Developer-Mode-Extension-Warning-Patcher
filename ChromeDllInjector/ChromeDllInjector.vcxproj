@@ -155,10 +155,12 @@
   <ItemGroup>
     <ClCompile Include="apc.cpp" />
     <ClCompile Include="ChromeDllInjector.cpp" />
+    <ClCompile Include="injector.cpp" />
     <ClCompile Include="oplock.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="apc.hpp" />
+    <ClInclude Include="injector.hpp" />
     <ClInclude Include="oplock.hpp" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="stdafx.h" />

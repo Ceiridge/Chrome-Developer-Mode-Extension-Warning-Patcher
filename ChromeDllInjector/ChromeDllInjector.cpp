@@ -1,15 +1,18 @@
 #include "stdafx.h"
 #include "apc.hpp"
 #include "oplock.hpp"
+#include "injector.hpp"
 
 std::map<HANDLE, ChromePatch::Oplock::Oplock*> chromeDllHandles;
 
 void OplockCallback(ChromePatch::Oplock::Oplock* oplock) {
-	//MessageBox(NULL, L"Broken!", std::to_wstring(oplockTemp->IsBroken()).c_str(), MB_OK);
-	
+	ChromePatch::Inject::InjectIntoChromeProcesses();
+
 	oplock->UnlockFile();
 	Sleep(1000);
-	oplock->LockFile();
+	while (!oplock->LockFile()) {
+		Sleep(1000);
+	}
 }
 
 // Has to be a somewhat-UNC path
@@ -40,8 +43,44 @@ void OplockFile(std::wstring filePath) {
 
 int wmain(int argc, wchar_t* argv[], wchar_t* envp[]) {
 	ChromePatch::Apc::InitApc();
-	OplockFile(L"\\??\\C:\\Program Files (x86)\\Google\\Chrome\\Application\\84.0.4147.89\\chrome.dll");
+	
+	HKEY hkey;
+	DWORD dispo;
+	if (RegCreateKeyEx(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Ceiridge\\ChromePatcher\\ChromeDlls", NULL, NULL, NULL, KEY_READ | KEY_QUERY_VALUE, NULL, &hkey, &dispo) == ERROR_SUCCESS) {
+		WCHAR valueName[64];
+		DWORD valueNameLength = 64;
+		DWORD valueType;
+		DWORD dwIndex = 0;
+		WCHAR value[1024];
+		DWORD valueLength = 1024;
 
-	Sleep(100000);
+		LSTATUS STATUS;
+		while (STATUS = RegEnumValue(hkey, dwIndex, valueName, &valueNameLength, NULL, &valueType, (LPBYTE)&value, &valueLength) == ERROR_SUCCESS) {
+			if (valueType == REG_SZ) {
+				std::wcout << "New path found: " << value << std::endl;
+
+				std::wstring path = value;
+
+				if (path.find(L"\\Application") != std::wstring::npos) {
+					ChromePatch::Inject::chromePaths.push_back(path);
+					OplockFile(L"\\??\\" + path);
+				}
+			}
+
+			valueLength = 1024;
+			valueNameLength = 64;
+			dwIndex++;
+		}
+
+		RegCloseKey(hkey);
+	}
+	else {
+		std::cerr << "Couldn't open regkey\n";
+		return 1;
+	}
+
+	while (true) {
+		Sleep(10000);
+	}
 	return 0;
 }
