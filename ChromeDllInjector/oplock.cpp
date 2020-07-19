@@ -2,6 +2,7 @@
 #include <winternl.h>
 #include <iostream>
 #include <functional>
+#include <vector>
 
 #include "apc.hpp"
 #include "oplock.hpp"
@@ -16,7 +17,7 @@ namespace ChromePatch::Oplock {
 		this->CreateApc();
 	}
 	Oplock::~Oplock() {
-		//delete this->apc;
+		delete this->apc;
 	}
 
 	bool Oplock::ControlFile(ULONG controlCode) {
@@ -29,14 +30,14 @@ namespace ChromePatch::Oplock {
 
 		apc->CreateEntry(APC_TYPE_FSCTL);
 		if (NtFsControlFile(file, apc->event, NULL, NULL, &apc->ioStatus, controlCode, NULL, 0, NULL, 0) == STATUS_PENDING) {
-			std::cout << "Controlling file" << std::endl;
+			std::cout << "Controlling file " << file << std::endl;
 
 			apc->param = controlCode;
 			apc->InsertEntry();
 			return true;
 		}
 		else {
-			std::cout << "Error trying to control file" << std::endl;
+			std::cout << "Error trying to control file " << file << std::endl;
 			apc->FreeEntry();
 		}
 

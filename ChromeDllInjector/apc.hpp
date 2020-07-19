@@ -29,8 +29,6 @@
 
 
 namespace ChromePatch::Apc {
-	inline int apcCount = 0;
-	inline LIST_ENTRY apcList;
 	inline CRITICAL_SECTION lock;
 
 	inline HANDLE alertEvent, apcThread;
@@ -45,7 +43,7 @@ namespace ChromePatch::Apc {
 		IO_STATUS_BLOCK ioStatus{};
 		LARGE_INTEGER byteOffset{};
 		OVERLAPPED overlapped{};
-		LIST_ENTRY entry{};
+		//LIST_ENTRY entry{};
 		HANDLE event{};
 		//HWND page{};
 		ULONG type{}, param{}, bufLen{}, bAsyncComplete : 1, bIncrementPos : 1, bHasIoStatus : 1;
@@ -59,4 +57,6 @@ namespace ChromePatch::Apc {
 		bool InsertEntry();
 		bool FreeEntry();
 	};
+
+	inline std::vector<ApcEntry*> apcList;
 }

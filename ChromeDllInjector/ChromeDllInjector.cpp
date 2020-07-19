@@ -5,6 +5,7 @@
 #include <string>
 #include <strsafe.h>
 #include <functional>
+#include <vector>
 
 #include "apc.hpp"
 #include "oplock.hpp"
@@ -13,7 +14,7 @@ std::vector<HANDLE> chromeDllHandles;
 ChromePatch::Oplock::Oplock* oplockTemp;
 
 void OplockCallback() {
-	MessageBox(NULL, L"Broken!", std::to_wstring(oplockTemp->IsBroken()).c_str(), MB_OK);
+	//MessageBox(NULL, L"Broken!", std::to_wstring(oplockTemp->IsBroken()).c_str(), MB_OK);
 	oplockTemp->UnlockFile();
 
 	//delete oplockTemp;
@@ -35,17 +36,22 @@ void OplockFile(std::wstring filePath) {
 	ZeroMemory(&ioStatus, sizeof(IO_STATUS_BLOCK));
 	allocSize.QuadPart = 0x0;
 
-	if (NT_SUCCESS(NtCreateFile(&file, SYNCHRONIZE | GENERIC_READ, &objAttr, &ioStatus, &allocSize, FILE_ATTRIBUTE_NORMAL, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, FILE_OPEN, 0, NULL, 0))) {
+	NTSTATUS createStatus;
+	if (NT_SUCCESS(createStatus = NtCreateFile(&file, SYNCHRONIZE | GENERIC_READ, &objAttr, &ioStatus, &allocSize, FILE_ATTRIBUTE_NORMAL, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, FILE_OPEN, 0x0, NULL, 0))) {
 		chromeDllHandles.push_back(file);
 		std::wcout << L"Handle for " << filePath << L": " << file << std::endl;
 		
 		oplockTemp = new ChromePatch::Oplock::Oplock(file, std::bind(&OplockCallback));
 		oplockTemp->LockFile();
 	}
+	else {
+		std::wcerr << L"Warning! Couldn't open file" << filePath << L" (" << createStatus << ")" << std::endl;
+	}
 }
 
 int wmain(int argc, wchar_t* argv[], wchar_t* envp[]) {
 	ChromePatch::Apc::InitApc();
+	OplockFile(L"\\??\\C:\\Program Files (x86)\\Google\\Chrome\\Application\\84.0.4147.89\\chrome.dll");
 
 	Sleep(100000);
 	return 0;

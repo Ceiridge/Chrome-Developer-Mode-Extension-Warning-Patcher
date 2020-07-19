@@ -1,6 +1,7 @@
 #include <Windows.h>
 #include <winternl.h>
 #include <functional>
+#include <vector>
 
 #include "apc.hpp"
 
@@ -10,8 +11,8 @@ namespace ChromePatch::Apc {
 	#define ALERT_REASON_UPDATE_WAIT	1
 
 	DWORD WINAPI ApcThread(LPVOID pvParameter) {
-		PLIST_ENTRY pHeadEntry;
-		PLIST_ENTRY pListEntry;
+		//PLIST_ENTRY pHeadEntry;
+		//PLIST_ENTRY pListEntry;
 		ApcEntry* _apcList[MAXIMUM_WAIT_OBJECTS];
 		HANDLE WaitHandles[MAXIMUM_WAIT_OBJECTS];
 		ApcEntry* apc;
@@ -27,7 +28,7 @@ namespace ChromePatch::Apc {
 			// Prepare the list of handles to wait
 			EnterCriticalSection(&lock);
 			{
-				pHeadEntry = &apcList;
+				/*pHeadEntry = &apcList;
 				for (pListEntry = pHeadEntry->Flink; pListEntry != pHeadEntry; pListEntry = pListEntry->Flink)
 				{
 					// Retrieve the APC entry
@@ -36,6 +37,10 @@ namespace ChromePatch::Apc {
 					// Insert the APC entry to the wait list
 					WaitHandles[dwWaitCount] = apc->event;
  					_apcList[dwWaitCount++] = apc;
+				}*/
+				for (ApcEntry* apcEntry : apcList) {
+					WaitHandles[dwWaitCount] = apcEntry->event;
+					_apcList[dwWaitCount++] = apcEntry;
 				}
 			}
 			LeaveCriticalSection(&lock);
@@ -61,10 +66,11 @@ namespace ChromePatch::Apc {
 				// Remove the APC from the list (locked)
 				EnterCriticalSection(&lock);
 				{
-					RemoveEntryList(&apc->entry);
+					/*RemoveEntryList(&apc->entry);
 					apc->entry.Flink = NULL;
 					apc->entry.Blink = NULL;
-					apcCount--;
+					apcCount--;*/
+					apcList.erase(std::remove(apcList.begin(), apcList.end(), apc), apcList.end());
 				}
 				LeaveCriticalSection(&lock);
 
@@ -81,7 +87,7 @@ namespace ChromePatch::Apc {
 		// Now we need to free all the APCs
 		EnterCriticalSection(&lock);
 		{
-			pHeadEntry = &apcList;
+			/*pHeadEntry = &apcList;
 			for (pListEntry = pHeadEntry->Flink; pListEntry != pHeadEntry; )
 			{
 				// Retrieve the APC entry
@@ -90,11 +96,14 @@ namespace ChromePatch::Apc {
 
 				// Remove the APC from the list and free it
 				apc->FreeEntry();
+			}*/
+			for (ApcEntry* apcEntry : apcList) {
+				apcEntry->FreeEntry();
 			}
 
 			// Reset the APC list
-			InitializeListHead(&apcList);
-			apcCount = 0;
+			//InitializeListHead(&apcList);
+			apcList.clear();
 		}
 		LeaveCriticalSection(&lock);
 
@@ -103,7 +112,7 @@ namespace ChromePatch::Apc {
 
 	void InitApc() {
 		InitializeCriticalSection(&lock);
-		InitializeListHead(&apcList);
+		//InitializeListHead(&apcList);
 		alertEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
 		apcThread = CreateThread(NULL, 0, ApcThread, NULL, 0, NULL);
 	}
@@ -126,7 +135,7 @@ namespace ChromePatch::Apc {
 	ApcEntry::~ApcEntry() {}
 
 	bool ApcEntry::CreateEntry(UINT type) {
-		if (apcCount < MAXIMUM_WAIT_OBJECTS - 1) {
+		if (apcList.size() < MAXIMUM_WAIT_OBJECTS - 1) {
 			this->overlapped.hEvent = this->event = CreateEvent(NULL, TRUE, FALSE, NULL);
 			this->type = type;
 			//this->page = 
@@ -140,12 +149,12 @@ namespace ChromePatch::Apc {
 
 	bool ApcEntry::InsertEntry() {
 		if (this->event != NULL) {
-			if (apcCount < MAXIMUM_WAIT_OBJECTS - 1) {
+			if (apcList.size() < MAXIMUM_WAIT_OBJECTS - 1) {
 				this->bAsyncComplete = TRUE;
 
 				EnterCriticalSection(&lock);
-				InsertTailList(&apcList, &this->entry);
-				apcCount++;
+				//InsertTailList(&apcList, &this->entry);
+				apcList.push_back(this);
 				LeaveCriticalSection(&lock);
 
 				AlertApcThread(ALERT_REASON_UPDATE_WAIT);
