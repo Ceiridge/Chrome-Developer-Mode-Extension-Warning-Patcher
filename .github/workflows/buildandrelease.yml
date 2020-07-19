@@ -37,5 +37,10 @@ jobs:
 
     - uses: actions/upload-artifact@v2
       with:
-        name: built-binaries
+        name: built-gui-binaries
         path: ChromeDevExtWarningPatcher/bin/Release/
+
+    - uses: actions/upload-artifact@v2
+      with:
+        name: built-native-binaries
+        path: x64/
