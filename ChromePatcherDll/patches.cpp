@@ -154,7 +154,7 @@ namespace ChromePatch {
 										byte* patchByte = reinterpret_cast<byte*>(patchAddr);
 
 										if (*patchByte == patch.origByte || patch.origByte == 0xFF) {
-											std::cout << "Patching byte " << (int)patch.origByte << " to " << (int)patch.patchByte << " at " << std::hex << patchAddr << std::endl;
+											std::cout << "Patching byte " << (int)*patchByte << " to " << (int)patch.patchByte << " at " << std::hex << patchAddr << std::endl;
 
 											DWORD oldProtect;
 											VirtualProtect(mbi.BaseAddress, mbi.RegionSize, PAGE_EXECUTE_READWRITE, &oldProtect);
