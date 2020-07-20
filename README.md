@@ -65,3 +65,7 @@ Clone this repository with `git clone --recursive https://github.com/Ceiridge/Ch
 This project is not meant for malicious use, especially because patching requires Administrator rights. If an attacker wants to get rid of that notification, they will always be able to do it somehow, since they have access to the computer and to other methods anyway. For example, you could just install a crx-file and allow it with group policies. This makes no sense, because it punishes developers with annoying popups, but crx files that are already packed - and not on the store - can strangely be installed easily.
 
 The idea originates from an answer on StackOverflow that also patched the `chrome.dll` and used to work on old versions.
+
+Used open source libraries:
+- [dahall/taskscheduler](https://github.com/dahall/taskscheduler)
+- [commandlineparser/commandline](https://github.com/commandlineparser/commandline)

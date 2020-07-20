@@ -41,19 +41,21 @@ void OplockFile(std::wstring filePath) {
 	}
 }
 
-#define LOG_FILE_PATH "injector.log"
-
 int wmain(int argc, wchar_t* argv[], wchar_t* envp[]) {
 	FILE* stdoutFile;
 	FILE* stderrFile;
 #ifndef _DEBUG // Hide the injector console and write the output to a file instead
 	FreeConsole();
 
+	char winDir[MAX_PATH];
+	GetWindowsDirectoryA(winDir, MAX_PATH);
+	strcat_s(winDir, "\\Temp\\ChromePatcherInjector.log"); // A relative path can't be used, because it's not writable without admin rights
+
 	FILE* logFile; // Check if the file is writable to
-	if (fopen_s(&logFile, LOG_FILE_PATH, "a") == 0) {
+	if (fopen_s(&logFile, winDir, "a") == 0) {
 		fclose(logFile);
-		freopen_s(&stdoutFile, LOG_FILE_PATH, "a", stdout);
-		freopen_s(&stderrFile, LOG_FILE_PATH, "a", stderr);
+		freopen_s(&stdoutFile, winDir, "a", stdout);
+		freopen_s(&stderrFile, winDir, "a", stderr);
 	}
 #endif
 

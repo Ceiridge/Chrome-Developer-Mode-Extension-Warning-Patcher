@@ -86,7 +86,7 @@ namespace ChromeDevExtWarningPatcher.Patches {
 						origX64 = Convert.ToByte(patchData.Attribute("orig").Value.Replace("0x", ""), 16);
 						patchX64 = Convert.ToByte(patchData.Attribute("patch").Value.Replace("0x", ""), 16);
 						offsetX64 = Convert.ToInt32(patchData.Attribute("offset").Value.Replace("0x", ""), 16);
-						sig = Convert.ToBoolean(patchData.Attribute("sig"));
+						sig = Convert.ToBoolean(patchData.Attribute("sig").Value);
 						if(patchData.Attributes("sigOffset").Any()) {
 							sigOffset = Convert.ToInt32(patchData.Attribute("sigOffset").Value.Replace("0x", ""), 16);
 						}

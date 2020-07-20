@@ -3,11 +3,17 @@ using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Microsoft.Win32.TaskScheduler;
+using System.Security.Principal;
+using System.Net.NetworkInformation;
+using System.Windows.Data;
+using System.Linq;
+using System.Text;
 
 namespace ChromeDevExtWarningPatcher {
 	class PatcherInstaller {
-		private const uint FILE_HEADER = 0xCE161D6E;
-		private const uint PATCH_HEADER = 0x8A7C5000;
+		private static uint FILE_HEADER = BitConverter.ToUInt32(BitConverter.GetBytes(0xCE161D6E).Reverse().ToArray(), 0);
+		private static uint PATCH_HEADER = BitConverter.ToUInt32(BitConverter.GetBytes(0x8A7C5000).Reverse().ToArray(), 0); // fix for wrong endianess
 
 		private List<InstallationPaths> InstallationPaths;
 
@@ -20,7 +26,8 @@ namespace ChromeDevExtWarningPatcher {
 			BinaryWriter writer = new BinaryWriter(stream);
 
 			writer.Write(FILE_HEADER);
-			writer.Write(paths.ChromeDllPath);
+			writer.Write(paths.ChromeDllPath.Length); // Needed, so it takes 4 bytes
+			writer.Write(Encoding.ASCII.GetBytes(paths.ChromeDllPath));
 
 			foreach (BytePatch patch in Program.bytePatchManager.BytePatches) {
 				if (Program.bytePatchManager.DisabledGroups.Contains(patch.group)) {
@@ -58,6 +65,16 @@ namespace ChromeDevExtWarningPatcher {
 
 		public delegate void WriteToLog(string str);
 		public bool Install(WriteToLog log) {
+			using (TaskService ts = new TaskService()) {
+				foreach (Task task in ts.RootFolder.Tasks) {
+					if (task.Name.Equals("ChromeDllInjector")) {
+						if (task.State == TaskState.Running) {
+							task.Stop();
+						}
+					}
+				}
+			}
+
 			using (RegistryKey dllPathKeys = OpenDllKey()) {
 				foreach (string valueName in dllPathKeys.GetValueNames()) {
 					if (valueName.Length > 0) {
@@ -88,17 +105,90 @@ namespace ChromeDevExtWarningPatcher {
 
 			// Write the injector to "Program Files"
 			DirectoryInfo programsFolder = GetProgramsFolder();
+			string injectorPath;
+
 			if(!programsFolder.Exists) {
 				Directory.CreateDirectory(programsFolder.FullName); // Also creates all subdirectories
-				File.WriteAllBytes(Path.Combine(programsFolder.FullName, "ChromeDllInjector.exe"), Properties.Resources.ChromeDllInjector);
+			}
+			File.WriteAllBytes(injectorPath = Path.Combine(programsFolder.FullName, "ChromeDllInjector.exe"), Properties.Resources.ChromeDllInjector);
+			log("Wrote injector to " + injectorPath);
+
+			using (TaskService ts = new TaskService()) {
+				TaskDefinition task = ts.NewTask();
+
+				task.RegistrationInfo.Author = "Ceiridge";
+				task.RegistrationInfo.Description = "A logon task that automatically injects the ChromePatcher.dll into every Chromium process that the user installed the patcher on. This makes removing the Developer Mode Extension Warning possible";
+				task.RegistrationInfo.URI = "https://github.com/Ceiridge/Chrome-Developer-Mode-Extension-Warning-Patcher";
+
+				task.Triggers.Add(new LogonTrigger { });
+				task.Actions.Add(new ExecAction(injectorPath));
+
+				task.Principal.RunLevel = TaskRunLevel.Highest;
+
+				task.Settings.StopIfGoingOnBatteries = task.Settings.DisallowStartIfOnBatteries = false;
+				task.Settings.RestartCount = 3;
+				task.Settings.RestartInterval = new TimeSpan(0, 1, 0);
+				task.Settings.Hidden = true;
+				task.Settings.ExecutionTimeLimit = task.Settings.DeleteExpiredTaskAfter = TimeSpan.Zero;
+
+				Task tsk = ts.RootFolder.RegisterTaskDefinition("ChromeDllInjector", task, TaskCreation.CreateOrUpdate, WindowsIdentity.GetCurrent().Name);
+
+				if (tsk.State != TaskState.Running) {
+					tsk.Run();
+				}
+				log("Created and started task");
 			}
 
-
+			log("Patches installed!");
 			return true;
 		}
 
 		public bool UninstallAll(WriteToLog log) {
+			using (TaskService ts = new TaskService()) {
+				foreach (Task task in ts.RootFolder.Tasks) {
+					if (task.Name.Equals("ChromeDllInjector")) {
+						if (task.State == TaskState.Running) {
+							task.Stop();
+						}
 
+						ts.RootFolder.DeleteTask("ChromeDllInjector");
+						log("Deleted and stopped task");
+					}
+				}
+			}
+
+			using (RegistryKey dllPathKeys = OpenDllKey()) {
+				foreach (string valueName in dllPathKeys.GetValueNames()) {
+					if (valueName.Length > 0) {
+						dllPathKeys.DeleteValue(valueName);
+					}
+				}
+				log("Cleared ChromeDlls registry");
+			}
+
+			foreach (InstallationPaths paths in InstallationPaths) {
+				string appDir = Path.GetDirectoryName(paths.ChromeExePath);
+				string patchesFile = Path.Combine(appDir, "ChromePatches.bin");
+				string dllFile = Path.Combine(appDir, "ChromePatcher.dll");
+
+				if (File.Exists(patchesFile)) {
+					File.Delete(patchesFile);
+				}
+				if(File.Exists(dllFile)) {
+					File.Delete(dllFile);
+				}
+
+				log("Deleted patch files for " + appDir);
+			}
+
+			DirectoryInfo programsFolder = GetProgramsFolder();
+			if(programsFolder.Exists) {
+				programsFolder.Delete(true);
+				log("Deleted " + programsFolder.FullName);
+			}
+
+			log("Patches uninstalled!");
+			return true;
 		}
 	}
 }
