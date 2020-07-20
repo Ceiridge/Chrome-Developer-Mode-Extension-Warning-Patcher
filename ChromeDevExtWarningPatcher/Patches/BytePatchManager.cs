@@ -31,7 +31,7 @@ namespace ChromeDevExtWarningPatcher.Patches {
 
 				using (WebClient web = new WebClient()) {
 					string xmlStr;
-					xmlDoc = XDocument.Parse(xmlStr = web.DownloadString("https://raw.githubusercontent.com/Ceiridge/Chrome-Developer-Mode-Extension-Warning-Patcher/master/patterns.xml")); // Hardcoded defaults xml file; This makes quick fixes possible
+					xmlDoc = XDocument.Parse(xmlStr = web.DownloadString("https://raw.githubusercontent.com/Ceiridge/Chrome-Developer-Mode-Extension-Warning-Patcher/dllpatcher/patterns.xml")); // Hardcoded defaults xml file; This makes quick fixes possible
 
 					File.WriteAllText(xmlFile, xmlStr);
 				}
