@@ -18,6 +18,7 @@ jobs:
         "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\MSBuild.exe" -t:restore
         cd ChromeDevExtWarningPatcher
         "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\MSBuild.exe" -t:restore
+        mklink /J packages ..\packages
 
     - name: Build with MSBuild
       shell: cmd
