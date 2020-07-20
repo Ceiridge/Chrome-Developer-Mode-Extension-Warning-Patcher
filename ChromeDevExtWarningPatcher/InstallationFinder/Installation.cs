@@ -13,10 +13,10 @@ namespace ChromeDevExtWarningPatcher.InstallationFinder {
 
 		public abstract List<InstallationPaths> FindInstallationPaths();
 
-		protected static FileInfo[] GetLatestDllAndExe(DirectoryInfo versionsFolder, string dllName, string exeName) {
+		protected static InstallationPaths GetLatestDllAndExe(DirectoryInfo versionsFolder, string dllName, string exeName) {
 			if (!versionsFolder.Exists)
-				return null;
-			FileInfo[] infos = new FileInfo[2];
+				return new InstallationPaths();
+			InstallationPaths paths = new InstallationPaths();
 
 			List<DirectoryInfo> chromeVersions = new List<DirectoryInfo>(versionsFolder.EnumerateDirectories());
 			chromeVersions = chromeVersions.OrderByDescending(dirInfo => GetUnixTime(dirInfo.LastWriteTime)).ToList();
@@ -25,7 +25,7 @@ namespace ChromeDevExtWarningPatcher.InstallationFinder {
 				if (chromeVersion.Name.Contains(".")) {
 					foreach (FileInfo file in chromeVersion.EnumerateFiles()) {
 						if (file.Name.Equals(dllName)) {
-							infos[0] = file;
+							paths.ChromeDllPath = file.FullName;
 							break;
 						}
 					}
@@ -33,18 +33,18 @@ namespace ChromeDevExtWarningPatcher.InstallationFinder {
 			}
 
 			FileInfo chromeExe = new FileInfo(Path.Combine(versionsFolder.FullName, exeName));
-			if(chromeExe.Exists && infos[0] != null) { // Every installation path also has to have a chrome.exe, otherwise the entire patcher won't work
-				infos[1] = chromeExe;
-				return infos;
+			if (chromeExe.Exists && paths.ChromeDllPath != null) { // Every installation path also has to have a chrome.exe, otherwise the entire patcher won't work
+				paths.ChromeExePath = chromeExe.FullName;
+				return paths;
 			}
 
-			return null;
+			return new InstallationPaths();
 		}
 
-		protected static void AddDllAndExeToList(List<InstallationPaths> pathList, FileInfo[] latestDllAndExe) {
-			if (latestDllAndExe == null || latestDllAndExe.Length != 2)
+		protected static void AddDllAndExeToList(List<InstallationPaths> pathList, InstallationPaths latestDllAndExe) {
+			if (latestDllAndExe.ChromeDllPath == null || latestDllAndExe.ChromeExePath == null)
 				return;
-			pathList.Add(new InstallationPaths(latestDllAndExe[0], latestDllAndExe[1]));
+			pathList.Add(latestDllAndExe);
 		}
 
 		private static double GetUnixTime(DateTime date) {

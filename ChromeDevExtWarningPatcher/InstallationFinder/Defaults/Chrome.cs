@@ -8,6 +8,9 @@ namespace ChromeDevExtWarningPatcher.InstallationFinder.Defaults {
 		public override List<InstallationPaths> FindInstallationPaths() {
 			List<InstallationPaths> dllFiles = new List<InstallationPaths>();
 
+			AddDllAndExeToList(dllFiles, GetLatestDllAndExe(new DirectoryInfo(@"C:\Program Files (x86)\Google\Chrome\Application"), "chrome.dll", "chrome.exe"));
+			AddDllAndExeToList(dllFiles, GetLatestDllAndExe(new DirectoryInfo(@"C:\Program Files (x86)\Google\Chrome Beta\Application"), "chrome.dll", "chrome.exe"));
+
 			AddDllAndExeToList(dllFiles, GetLatestDllAndExe(new DirectoryInfo(@"C:\Program Files\Google\Chrome\Application"), "chrome.dll", "chrome.exe"));
 			AddDllAndExeToList(dllFiles, GetLatestDllAndExe(new DirectoryInfo(@"C:\Program Files\Google\Chrome Beta\Application"), "chrome.dll", "chrome.exe"));
 

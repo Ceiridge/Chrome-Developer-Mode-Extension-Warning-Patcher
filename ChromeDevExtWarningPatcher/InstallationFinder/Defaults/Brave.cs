@@ -8,6 +8,7 @@ namespace ChromeDevExtWarningPatcher.InstallationFinder.Defaults {
 		public override List<InstallationPaths> FindInstallationPaths() {
 			List<InstallationPaths> dllFiles = new List<InstallationPaths>();
 
+			AddDllAndExeToList(dllFiles, GetLatestDllAndExe(new DirectoryInfo(@"C:\Program Files (x86)\BraveSoftware\Brave-Browser\Application"), "chrome.dll", "brave.exe"));
 			AddDllAndExeToList(dllFiles, GetLatestDllAndExe(new DirectoryInfo(@"C:\Program Files\BraveSoftware\Brave-Browser\Application"), "chrome.dll", "brave.exe"));
 
 			return dllFiles;

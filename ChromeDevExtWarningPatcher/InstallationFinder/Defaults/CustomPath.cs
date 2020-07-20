@@ -14,6 +14,8 @@ namespace ChromeDevExtWarningPatcher.InstallationFinder.Defaults {
 
 			AddDllAndExeToList(dllFiles, GetLatestDllAndExe(new DirectoryInfo(Path), "chrome.dll", "chrome.exe"));
 			AddDllAndExeToList(dllFiles, GetLatestDllAndExe(new DirectoryInfo(Path), "msedge.dll", "msedge.exe"));
+			AddDllAndExeToList(dllFiles, GetLatestDllAndExe(new DirectoryInfo(Path), "chrome.dll", "brave.exe"));
+			AddDllAndExeToList(dllFiles, GetLatestDllAndExe(new DirectoryInfo(Path), "browser.dll", "browser.exe"));
 
 			return dllFiles;
 		}

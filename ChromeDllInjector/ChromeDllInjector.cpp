@@ -48,9 +48,7 @@ int wmain(int argc, wchar_t* argv[], wchar_t* envp[]) {
 	DWORD dispo;
 	if (RegCreateKeyEx(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Ceiridge\\ChromePatcher\\ChromeDlls", NULL, NULL, NULL, KEY_READ | KEY_QUERY_VALUE, NULL, &hkey, &dispo) == ERROR_SUCCESS) {
 		WCHAR valueName[64];
-		DWORD valueNameLength = 64;
-		DWORD valueType;
-		DWORD dwIndex = 0;
+		DWORD valueNameLength = 64, valueType, dwIndex = 0;
 		WCHAR value[1024];
 		DWORD valueLength = 1024;
 

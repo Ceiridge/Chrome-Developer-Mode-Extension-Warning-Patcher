@@ -22,14 +22,28 @@ namespace ChromeDevExtWarningPatcher {
 		[DllImport("kernel32.dll", SetLastError = true, ExactSpelling = true)]
 		private static extern bool FreeConsole();
 
+		const string archError = "A 64-bit operating system is required. 32-bit is not supported and won't be in the future.";
 		[STAThread]
 		public static void Main(string[] args) {
+			bool incompatibleArchitecture = !Environment.Is64BitOperatingSystem;
+
 			if (args.Length == 0) {
 				FreeConsole();
+				
+				if(incompatibleArchitecture) {
+					MessageBox.Show(archError, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+					return;
+				}
+
 				bytePatchManager = new BytePatchManager(MessageBox.Show);
 				guiApp = new Application();
 				guiApp.Run(guiWindow = new PatcherGui());
 			} else {
+				if(incompatibleArchitecture) {
+					Console.WriteLine(archError);
+					return;
+				}
+
 				MainCmd(args);
 			}
 		}

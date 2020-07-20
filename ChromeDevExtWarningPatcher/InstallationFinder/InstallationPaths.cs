@@ -13,5 +13,9 @@ namespace ChromeDevExtWarningPatcher.InstallationFinder {
 			ChromeDllPath = chromeDll.FullName;
 			ChromeExePath = chromeExe.FullName;
 		}
+
+		public bool Is64Bit() {
+			return InstallationManager.IsImageX64(ChromeDllPath) && InstallationManager.IsImageX64(ChromeExePath);
+		}
 	}
 }

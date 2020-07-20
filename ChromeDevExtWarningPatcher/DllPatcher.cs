@@ -1,5 +1,5 @@
-﻿using ChromeDevExtWarningPatcher.Patches;
-using System;
+﻿using ChromeDevExtWarningPatcher.InstallationFinder;
+using ChromeDevExtWarningPatcher.Patches;
 using System.IO;
 
 namespace ChromeDevExtWarningPatcher {
@@ -24,7 +24,7 @@ namespace ChromeDevExtWarningPatcher {
 				log("Backupped to " + dllFileBackup.FullName);
 			}
 
-			if (Program.bytePatchManager.PatchBytes(ref raw, IsImageX64(dllFile.FullName), log)) {
+			if (Program.bytePatchManager.PatchBytes(ref raw, InstallationManager.IsImageX64(dllFile.FullName), log)) {
 				File.WriteAllBytes(dllFile.FullName, raw);
 				log("Patched and saved successfully " + dllFile.FullName);
 				return true;
@@ -33,29 +33,6 @@ namespace ChromeDevExtWarningPatcher {
 			}
 
 			return false;
-		}
-
-		// Taken from https://stackoverflow.com/questions/480696/how-to-find-if-a-native-dll-file-is-compiled-as-x64-or-x86
-		private static bool IsImageX64(string dllFilePath) {
-			using (var stream = new FileStream(dllFilePath, FileMode.Open, FileAccess.Read))
-			using (var reader = new BinaryReader(stream)) {
-				//check the MZ signature to ensure it's a valid Portable Executable image
-				if (reader.ReadUInt16() != 23117)
-					throw new BadImageFormatException("Not a valid Portable Executable image", dllFilePath);
-
-				// seek to, and read, e_lfanew then advance the stream to there (start of NT header)
-				stream.Seek(0x3A, SeekOrigin.Current);
-				stream.Seek(reader.ReadUInt32(), SeekOrigin.Begin);
-
-				// Ensure the NT header is valid by checking the "PE\0\0" signature
-				if (reader.ReadUInt32() != 17744)
-					throw new BadImageFormatException("Not a valid Portable Executable image", dllFilePath);
-
-				// seek past the file header, then read the magic number from the optional header
-				stream.Seek(20, SeekOrigin.Current);
-				ushort magicByte = reader.ReadUInt16();
-				return magicByte == 0x20B;
-			}
 		}
 	}
 }

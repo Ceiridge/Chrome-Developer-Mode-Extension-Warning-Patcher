@@ -8,6 +8,7 @@ namespace ChromeDevExtWarningPatcher.InstallationFinder.Defaults {
 		public override List<InstallationPaths> FindInstallationPaths() {
 			List<InstallationPaths> dllFiles = new List<InstallationPaths>();
 
+			AddDllAndExeToList(dllFiles, GetLatestDllAndExe(new DirectoryInfo(@"C:\Program Files (x86)\Microsoft\Edge\Application"), "msedge.dll", "msedge.exe"));
 			AddDllAndExeToList(dllFiles, GetLatestDllAndExe(new DirectoryInfo(@"C:\Program Files\Microsoft\Edge\Application"), "msedge.dll", "msedge.exe"));
 
 			return dllFiles;

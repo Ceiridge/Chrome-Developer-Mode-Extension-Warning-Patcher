@@ -22,7 +22,7 @@ namespace ChromeDevExtWarningPatcher {
 			openFile.FilterIndex = 1;
 			openFile.CheckFileExists = openFile.CheckPathExists = openFile.AddExtension = true;
 
-			if (openFile.ShowDialog(this) == true) { // No, I am not a noob, I have to do it like this and further below
+			if (openFile.ShowDialog(this) == true) { // No, I'm not a noob, I have to do it like this and further below
 				string chromeDllPath = openFile.FileName;
 
 				openFile = new OpenFileDialog();
@@ -34,7 +34,7 @@ namespace ChromeDevExtWarningPatcher {
 
 				if (openFile.ShowDialog(this) == true) {
 					string chromeExePath = openFile.FileName;
-					AddChromiumInstallation(new InstallationPaths(chromeDllPath, chromeExePath));
+					AddChromiumInstallation(new InstallationPaths(chromeDllPath, chromeExePath), false);
 				}
 			}
 		}
@@ -97,7 +97,14 @@ namespace ChromeDevExtWarningPatcher {
 			}));
 		}
 
-		private void AddChromiumInstallation(InstallationPaths chromePaths) {
+		private void AddChromiumInstallation(InstallationPaths chromePaths, bool suppressErrors = true) {
+			if(!chromePaths.Is64Bit()) {
+				if(!suppressErrors) {
+					MessageBox.Show("A 64-bit Chromium installation is required", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+				}
+				return;
+			}
+
 			CustomCheckBox installationBox = new CustomCheckBox(chromePaths.ChromeDllPath);
 			installationBox.IsChecked = true;
 			installationBox.ToolTip = chromePaths.ChromeDllPath + " & " + chromePaths.ChromeExePath;
