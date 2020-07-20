@@ -79,6 +79,8 @@ namespace ChromePatch::Apc {
 		InitializeCriticalSection(&lock);
 		alertEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
 		apcThread = CreateThread(NULL, 0, ApcThread, NULL, 0, NULL);
+
+		std::cout << "APC init" << std::endl;
 	}
 
 	void AlertApcThread(DWORD reason) {

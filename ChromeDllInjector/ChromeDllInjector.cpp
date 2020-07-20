@@ -42,6 +42,24 @@ void OplockFile(std::wstring filePath) {
 }
 
 int wmain(int argc, wchar_t* argv[], wchar_t* envp[]) {
+#ifndef _DEBUG // Hide the injector console and write the output to a file instead
+	FreeConsole();
+
+	FILE* stdoutFile;
+	FILE* stderrFile;
+	freopen_s(&stdoutFile, "injector.log", "a", stdout);
+	freopen_s(&stderrFile, "injector.log", "a", stderr);
+#endif
+
+	HANDLE mutex = OpenMutex(MUTEX_ALL_ACCESS, FALSE, L"ChromeDllInjectorMutex");
+	if (mutex) {
+		std::cerr << "Process " << GetCurrentProcessId() << " wrongfully started (Mutex found!)" << std::endl;
+		return 2;
+	}
+	else {
+		mutex = CreateMutex(0, FALSE, L"ChromeDllInjectorMutex");
+	}
+
 	ChromePatch::Apc::InitApc();
 	
 	HKEY hkey;
