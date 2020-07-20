@@ -15,8 +15,9 @@ jobs:
     - name: Restore the Nuget packages
       shell: cmd
       run: |
-        "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\MSBuild.exe" -t:restore
         cd ChromeDevExtWarningPatcher
+        "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\MSBuild.exe" -t:restore
+        cd ..
         "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\MSBuild.exe" -t:restore
         mklink /J packages ..\packages
 
@@ -51,17 +52,3 @@ jobs:
         title: "Prerelease Build"
         files: |
           ChromeDevExtWarningPatcher/bin/Release/ChromeDevExtWarningPatcher.zip
-
-    - name: Debug with SSH
-      if: ${{ failure() }}
-      run: curl -sL https://gist.githubusercontent.com/retyui/7115bb6acf151351a143ec8f96a7c561/raw/7099b9db76729dc5761da72aa8525f632d8875c9/debug-github-actions.sh | bash
-      env:
-        # After sign up on the https://ngrok.com/
-        # You can find this token here: https://dashboard.ngrok.com/get-started/setup
-        NGROK_TOKEN: ${{ secrets.NGROK_TOKEN }}
-        # This password you will use when authorizing via SSH 
-        USER_PASS: ${{ secrets.SSH_USER_PASS }}
-
-    - name: Don't kill instace
-      if: ${{ failure() }}
-      run: sleep 1h # Prevent to killing instance after failure
