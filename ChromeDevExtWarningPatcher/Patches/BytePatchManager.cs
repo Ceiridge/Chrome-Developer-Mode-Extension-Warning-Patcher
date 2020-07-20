@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Threading;
@@ -10,7 +11,7 @@ using System.Xml.Linq;
 
 namespace ChromeDevExtWarningPatcher.Patches {
 	class BytePatchManager {
-		private List<BytePatch> BytePatches = new List<BytePatch>();
+		public List<BytePatch> BytePatches = new List<BytePatch>();
 		private Dictionary<string, BytePatchPattern> BytePatterns = new Dictionary<string, BytePatchPattern>();
 
 		public List<int> DisabledGroups = new List<int>();
@@ -78,15 +79,21 @@ namespace ChromeDevExtWarningPatcher.Patches {
 					int group = int.Parse(patch.Attribute("group").Value);
 
 					byte origX64 = 0, patchX64 = 0;
-					int offsetX64 = 0;
+					int offsetX64 = 0, sigOffset = 0;
+					bool sig = false;
 
 					foreach (XElement patchData in patch.Elements("PatchData")) {
 						origX64 = Convert.ToByte(patchData.Attribute("orig").Value.Replace("0x", ""), 16);
 						patchX64 = Convert.ToByte(patchData.Attribute("patch").Value.Replace("0x", ""), 16);
 						offsetX64 = Convert.ToInt32(patchData.Attribute("offset").Value.Replace("0x", ""), 16);
+						sig = Convert.ToBoolean(patchData.Attribute("sig"));
+						if(patchData.Attributes("sigOffset").Any()) {
+							sigOffset = Convert.ToInt32(patchData.Attribute("sigOffset").Value.Replace("0x", ""), 16);
+						}
 						break;
 					}
-					BytePatches.Add(new BytePatch(pattern, origX64, patchX64, offsetX64, group));
+
+					BytePatches.Add(new BytePatch(pattern, origX64, patchX64, offsetX64, group, sig, sigOffset));
 				}
 
 				foreach (XElement patchGroup in xmlDoc.Root.Element("GroupedPatches").Elements("GroupedPatch")) {
@@ -98,53 +105,6 @@ namespace ChromeDevExtWarningPatcher.Patches {
 					});
 				}
 			}
-		}
-
-		public bool PatchBytes(ref byte[] raw, bool x64, BytePatchPattern.WriteToLog log) {
-			/*int patches = 0;
-
-			foreach (BytePatch patch in BytePatches) {
-				if (DisabledGroups.Contains(patch.group)) {
-					patches++;
-					continue;
-				}
-				Tuple<long, byte[]> addrPattern = patch.pattern.FindAddress(raw, x64, log);
-				long addr = addrPattern.Item1;
-				byte[] searchPattern = addrPattern.Item2;
-
-				int patchOffset = x64 ? patch.offsetX64 : patch.offsetX86;
-				byte patchOrigByte = x64 ? patch.origByteX64 : patch.origByteX86;
-				byte patchPatchByte = x64 ? patch.patchByteX64 : patch.patchByteX86;
-
-				if (addr != -1) {
-					if (patchOffset < searchPattern.Length && searchPattern[patchOffset] != 0xFF)
-						patchOrigByte = searchPattern[patchOffset]; // The patterns can sometimes start at different places (yes, I'm looking at you, Edge), so the byte in the pattern should be always preferred
-
-					REDO_CHECKS:
-					long index = addr + patchOffset;
-					byte sourceByte = raw[index];
-
-					log("Source byte of patch at " + patchOffset + ": " + sourceByte);
-					if (sourceByte == patchOrigByte) {
-						raw[index] = patchPatchByte;
-						log(index + " => " + patchPatchByte);
-						patches++;
-					} else {
-						int patchAlternativeOffset = x64 ? patch.aoffsetX64 : patch.aoffsetX86;
-						if (patchOffset != patchAlternativeOffset && patchAlternativeOffset != -1) { // if the first offset didn't work, try the next one
-							patchOffset = patchAlternativeOffset;
-							goto REDO_CHECKS;
-						}
-
-						log("Source byte unexpected, should be " + patchOrigByte + "!");
-					}
-				} else {
-					log("Couldn't find offset for a patch " + patch.pattern.Name);
-				}
-			}
-
-			return patches == BytePatches.Count;*/
-			return false;
 		}
 	}
 }

@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows;
 
-// Ugly and uncommented code ahead
+// Uncommented code ahead; Code quality may vary because of two partial recodes
 namespace ChromeDevExtWarningPatcher {
 	class Program {
 		private static Application guiApp;

@@ -1,6 +1,7 @@
 ﻿using ChromeDevExtWarningPatcher.InstallationFinder;
 using Microsoft.Win32;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Windows;
@@ -40,30 +41,59 @@ namespace ChromeDevExtWarningPatcher {
 		}
 
 		private void PatchBtn_Click(object sender, RoutedEventArgs e) {
+			PatchBtn.IsEnabled = UnPatchBtn.IsEnabled = false;
+
 			Program.bytePatchManager.DisabledGroups.Clear();
 			foreach (CustomCheckBox patchBox in PatchGroupList.Items) {
 				if (patchBox.IsChecked == false)
 					Program.bytePatchManager.DisabledGroups.Add(patchBox.Group);
 			}
 
-			foreach (CheckBox installationBox in InstallationList.Items) {
-				if (installationBox.IsChecked == true) {
-					string path = installationBox.Content.ToString();
-
-					new Thread(() => {
-						try {
-							DllPatcher patcher = new DllPatcher(path);
-							if (patcher.Patch(Log)) {
-								installationBox.Dispatcher.Invoke(new Action(() => {
-									installationBox.Foreground = installationBox.BorderBrush = new SolidColorBrush(Color.FromRgb(72, 207, 133));
-								}));
-							}
-						} catch (Exception ex) {
-							Log("Error while patching " + path + ":" + ex.Message);
-						}
-					}).Start();
+			try {
+				List<InstallationPaths> installPaths = new List<InstallationPaths>();
+				foreach (CustomCheckBox installBox in InstallationList.Items) {
+					if (installBox.IsChecked == true) {
+						installPaths.Add(new InstallationPaths(installBox.Content.ToString(), installBox.ToolTip.ToString().Split(new string[] { " & " }, StringSplitOptions.None)[1]));
+					}
 				}
+
+				PatcherInstaller installer = new PatcherInstaller(installPaths);
+				if (installer.Install(Log)) {
+					foreach (CustomCheckBox installBox in InstallationList.Items) {
+						if (installBox.IsChecked == true) {
+							installBox.Foreground = installBox.BorderBrush = new SolidColorBrush(Color.FromRgb(72, 207, 133));
+						}
+					}
+				}
+			} catch (Exception ex) {
+				Log("Error while installing:" + ex.Message);
 			}
+
+			PatchBtn.IsEnabled = UnPatchBtn.IsEnabled = true;
+		}
+
+		private void UnPatchBtn_Click(object sender, RoutedEventArgs e) {
+			PatchBtn.IsEnabled = UnPatchBtn.IsEnabled = false;
+
+			try {
+				List<InstallationPaths> installPaths = new List<InstallationPaths>();
+				foreach (CustomCheckBox installBox in InstallationList.Items) {
+					installPaths.Add(new InstallationPaths(installBox.Content.ToString(), installBox.ToolTip.ToString().Split(new string[] { " & " }, StringSplitOptions.None)[1])); // chromeExePath is always in the ToolTip after " & "
+				}
+
+				PatcherInstaller installer = new PatcherInstaller(installPaths);
+				if (installer.UninstallAll(Log)) {
+					foreach (CustomCheckBox installBox in InstallationList.Items) {
+						if (installBox.IsChecked == true) {
+							installBox.Foreground = installBox.BorderBrush = new SolidColorBrush(Color.FromRgb(72, 207, 133));
+						}
+					}
+				}
+			} catch (Exception ex) {
+				Log("Error while uninstalling:" + ex.Message);
+			}
+
+			PatchBtn.IsEnabled = UnPatchBtn.IsEnabled = true;
 		}
 
 		private void CopyBtn_Click(object sender, RoutedEventArgs e) {
