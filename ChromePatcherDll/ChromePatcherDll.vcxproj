@@ -159,10 +159,12 @@
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="patches.cpp" />
+    <ClCompile Include="threads.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="patches.hpp" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="threads.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="ChromePatcherDll.rc" />

@@ -51,7 +51,7 @@ int wmain(int argc, wchar_t* argv[], wchar_t* envp[]) {
 	freopen_s(&stderrFile, "injector.log", "a", stderr);
 #endif
 
-	HANDLE mutex = OpenMutex(MUTEX_ALL_ACCESS, FALSE, L"ChromeDllInjectorMutex");
+	HANDLE mutex = OpenMutex(MUTEX_ALL_ACCESS, FALSE, L"ChromeDllInjectorMutex"); // Never allow two injectors
 	if (mutex) {
 		std::cerr << "Process " << GetCurrentProcessId() << " wrongfully started (Mutex found!)" << std::endl;
 		return 2;
