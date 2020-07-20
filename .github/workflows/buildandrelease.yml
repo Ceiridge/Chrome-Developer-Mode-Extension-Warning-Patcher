@@ -12,14 +12,15 @@ jobs:
       with:
         submodules: true
 
+    - name: Setup NuGet for use with actions
+      uses: NuGet/setup-nuget@v1.0.2
+      with:
+        nuget-version: '5.x'
+
     - name: Restore the Nuget packages
       shell: cmd
       run: |
-        cd ChromeDevExtWarningPatcher
-        "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\MSBuild.exe" -t:restore
-        cd ..
-        "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\MSBuild.exe" -t:restore
-        mklink /J packages ..\packages
+        nuget restore ChromeDevExtWarningPatcher.sln
 
     - name: Build with MSBuild
       shell: cmd
