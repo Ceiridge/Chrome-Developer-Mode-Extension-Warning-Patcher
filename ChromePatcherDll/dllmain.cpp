@@ -7,29 +7,29 @@
 #include "patches.hpp"
 #include "threads.hpp"
 
+
+
 BOOL APIENTRY ThreadMain(LPVOID lpModule) {
-	// Taken from https://stackoverflow.com/questions/15543571/allocconsole-not-displaying-cout
-//#ifdef _DEBUG
 	FILE* fout = nullptr;
 	FILE* ferr = nullptr;
-	HANDLE hConOut = NULL;
-
+#ifdef _DEBUG
 	if (AllocConsole()) {
 		freopen_s(&fout, "CONOUT$", "w", stdout);
 		freopen_s(&ferr, "CONOUT$", "w", stderr);
-		std::cout.clear();
-		std::clog.clear();
-		std::cerr.clear();
-
-		// std::wcout, std::wclog, std::wcerr, std::wcin
-		hConOut = CreateFile(L"CONOUT$", GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-		SetStdHandle(STD_OUTPUT_HANDLE, hConOut);
-		SetStdHandle(STD_ERROR_HANDLE, hConOut);
-		std::wcout.clear();
-		std::wclog.clear();
-		std::wcerr.clear();
 	}
-//#endif
+#else
+	char winDir[MAX_PATH];
+	GetWindowsDirectoryA(winDir, MAX_PATH);
+	strcat_s(winDir, "\\Temp\\ChromePatcherDll.log"); // A relative path can't be used, because it's not writable without admin rights
+
+	FILE* logFile; // Check if the file is writable to
+	if (fopen_s(&logFile, winDir, "a") == 0) {
+		fclose(logFile);
+		freopen_s(&fout, winDir, "a", stdout);
+		freopen_s(&ferr, winDir, "a", stderr);
+	}
+#endif
+
 	ChromePatch::SuspendOtherThreads();
 	HANDLE proc = GetCurrentProcess();
 
@@ -92,17 +92,15 @@ BOOL APIENTRY ThreadMain(LPVOID lpModule) {
 
 	std::cout << "Unloading patcher dll and resuming threads" << std::endl;
 	ChromePatch::ResumeOtherThreads();
-	Sleep(5000); // Give the user some time to read
 
-//#ifdef _DEBUG
 	if (fout != nullptr)
 		fclose(fout);
 	if (ferr != nullptr)
 		fclose(ferr);
-	if (hConOut != NULL)
-		CloseHandle(hConOut);
+#ifdef _DEBUG
+	Sleep(5000); // Give the user some time to read
 	FreeConsole();
-//#endif
+#endif
 
 	ChromePatch::ExitMainThread(lpModule);
 	return TRUE;

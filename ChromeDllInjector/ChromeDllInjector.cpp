@@ -41,14 +41,20 @@ void OplockFile(std::wstring filePath) {
 	}
 }
 
+#define LOG_FILE_PATH "injector.log"
+
 int wmain(int argc, wchar_t* argv[], wchar_t* envp[]) {
+	FILE* stdoutFile;
+	FILE* stderrFile;
 #ifndef _DEBUG // Hide the injector console and write the output to a file instead
 	FreeConsole();
 
-	FILE* stdoutFile;
-	FILE* stderrFile;
-	freopen_s(&stdoutFile, "injector.log", "a", stdout);
-	freopen_s(&stderrFile, "injector.log", "a", stderr);
+	FILE* logFile; // Check if the file is writable to
+	if (fopen_s(&logFile, LOG_FILE_PATH, "a") == 0) {
+		fclose(logFile);
+		freopen_s(&stdoutFile, LOG_FILE_PATH, "a", stdout);
+		freopen_s(&stderrFile, LOG_FILE_PATH, "a", stderr);
+	}
 #endif
 
 	HANDLE mutex = OpenMutex(MUTEX_ALL_ACCESS, FALSE, L"ChromeDllInjectorMutex"); // Never allow two injectors
