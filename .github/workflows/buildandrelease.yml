@@ -16,6 +16,9 @@ jobs:
       shell: cmd
       run: |
         "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\MSBuild.exe" -t:restore
+        cd ChromeDevExtWarningPatcher
+        "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\MSBuild.exe" -t:restore
+        cd ..
         "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\MSBuild.exe" ChromeDevExtWarningPatcher.sln -p:Configuration=Release
 
     - uses: actions/upload-artifact@v2
