@@ -12,13 +12,16 @@ jobs:
       with:
         submodules: true
 
-    - name: Build the project with MSBuild
+    - name: Restore the Nuget packages
       shell: cmd
       run: |
         "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\MSBuild.exe" -t:restore
         cd ChromeDevExtWarningPatcher
         "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\MSBuild.exe" -t:restore
-        cd ..
+
+    - name: Build with MSBuild
+      shell: cmd
+      run: |
         "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\MSBuild.exe" ChromeDevExtWarningPatcher.sln -p:Configuration=Release
 
     - uses: actions/upload-artifact@v2
