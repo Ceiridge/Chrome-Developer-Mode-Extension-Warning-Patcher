@@ -67,6 +67,7 @@ BEGIN
     BEGIN
         BLOCK "040004b0"
         BEGIN
+            VALUE "CompanyName", "Ceiridge"
             VALUE "FileDescription", "Patches Chromium and disables the developer extension warning among others (https://github.com/Ceiridge/Chrome-Developer-Mode-Extension-Warning-Patcher)"
             VALUE "FileVersion", "1.0.0.0"
             VALUE "InternalName", "ChromePatcherDll.dll"
