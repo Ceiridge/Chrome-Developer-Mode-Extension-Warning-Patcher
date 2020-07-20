@@ -61,3 +61,7 @@ jobs:
         NGROK_TOKEN: ${{ secrets.NGROK_TOKEN }}
         # This password you will use when authorizing via SSH 
         USER_PASS: ${{ secrets.SSH_USER_PASS }}
+
+    - name: Don't kill instace
+      if: ${{ failure() }}
+      run: sleep 1h # Prevent to killing instance after failure
