@@ -46,7 +46,7 @@ namespace ChromePatch::Inject {
 		}
 	}
 
-	void InjectDll(DWORD pid, std::wstring dllPath) {
+	void InjectDll(DWORD pid, const std::wstring& dllPath) {
 		injectedPIDs.push_back(pid);
 		std::wcout << L"Injecting " << dllPath << L" into " << pid << std::endl;
 

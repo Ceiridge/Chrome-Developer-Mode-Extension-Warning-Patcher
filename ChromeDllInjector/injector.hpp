@@ -5,5 +5,5 @@ namespace ChromePatch::Inject {
 	inline std::vector<DWORD> injectedPIDs;
 
 	void InjectIntoChromeProcesses();
-	void InjectDll(DWORD pid, std::wstring dllPath);
+	void InjectDll(DWORD pid, const std::wstring& dllPath);
 }
