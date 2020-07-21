@@ -1,10 +1,4 @@
-#include <Windows.h>
-#include <fstream>
-#include <string>
-#include <vector>
-#include <iostream>
-#include <Psapi.h>
-
+#include "stdafx.h"
 #include "patches.hpp"
 
 namespace ChromePatch {

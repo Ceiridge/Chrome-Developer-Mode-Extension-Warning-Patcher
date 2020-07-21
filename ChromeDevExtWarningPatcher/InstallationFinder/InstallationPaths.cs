@@ -10,7 +10,7 @@ namespace ChromeDevExtWarningPatcher.InstallationFinder {
 		}
 
 		public InstallationPaths(FileInfo chromeDll, FileInfo chromeExe) {
-			ChromeDllPath = chromeDll.FullName;
+			ChromeDllPath = chromeDll.FullName;  
 			ChromeExePath = chromeExe.FullName;
 		}
 

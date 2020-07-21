@@ -1,7 +1,4 @@
-#include <Windows.h>
-#include <tlhelp32.h>
-#include <vector>
-
+#include "stdafx.h"
 #include "threads.hpp"
 
 namespace ChromePatch {

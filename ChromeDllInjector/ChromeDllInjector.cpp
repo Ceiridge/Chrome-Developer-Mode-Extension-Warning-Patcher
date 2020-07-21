@@ -30,22 +30,29 @@ void OplockFile(std::wstring filePath) {
 }
 
 int wmain(int argc, wchar_t* argv[], wchar_t* envp[]) {
-	FILE* stdoutFile;
-	FILE* stderrFile;
+	FILE* fout = nullptr;
+	FILE* ferr = nullptr;
 #ifndef _DEBUG // Hide the injector console and write the output to a file instead
 	FreeConsole();
 
 	char winDir[MAX_PATH];
 	GetWindowsDirectoryA(winDir, MAX_PATH);
 	strcat_s(winDir, "\\Temp\\ChromePatcherInjector.log"); // A relative path can't be used, because it's not writable without admin rights
+	char winDirErr[MAX_PATH];
+	GetWindowsDirectoryA(winDirErr, MAX_PATH);
+	strcat_s(winDirErr, "\\Temp\\ChromePatcherInjectorErr.log"); // A relative path can't be used, because it's not writable without admin rights
 
-	FILE* logFile; // Check if the file is writable to
-	if (fopen_s(&logFile, winDir, "a") == 0) {
-		fclose(logFile);
-		freopen_s(&stdoutFile, winDir, "a", stdout);
-		freopen_s(&stderrFile, winDir, "a", stderr);
+	if (fopen_s(&fout, winDir, "a") == 0) {
+		fclose(fout);
+		freopen_s(&fout, winDir, "a", stdout);
+	}
+	if (fopen_s(&ferr, winDirErr, "a") == 0) {
+		fclose(ferr);
+		freopen_s(&ferr, winDirErr, "a", stderr);
 	}
 #endif
+	std::cout << std::time(0) << std::endl; // Log time for debug purposes
+	std::cerr << std::time(0) << std::endl;
 
 	HANDLE mutex = OpenMutex(MUTEX_ALL_ACCESS, FALSE, L"ChromeDllInjectorMutex"); // Never allow two injectors
 	if (mutex) {

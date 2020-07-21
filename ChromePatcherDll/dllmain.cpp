@@ -1,12 +1,6 @@
-#include <Windows.h>
-#include <Psapi.h>
-#include <iostream>
-#include <regex>
-#include <string>
-
+#include "stdafx.h"
 #include "patches.hpp"
 #include "threads.hpp"
-
 
 
 BOOL APIENTRY ThreadMain(LPVOID lpModule) {
@@ -21,14 +15,21 @@ BOOL APIENTRY ThreadMain(LPVOID lpModule) {
 	char winDir[MAX_PATH];
 	GetWindowsDirectoryA(winDir, MAX_PATH);
 	strcat_s(winDir, "\\Temp\\ChromePatcherDll.log"); // A relative path can't be used, because it's not writable without admin rights
+	char winDirErr[MAX_PATH];
+	GetWindowsDirectoryA(winDirErr, MAX_PATH);
+	strcat_s(winDirErr, "\\Temp\\ChromePatcherDllErr.log"); // A relative path can't be used, because it's not writable without admin rights
 
-	FILE* logFile; // Check if the file is writable to
-	if (fopen_s(&logFile, winDir, "a") == 0) {
-		fclose(logFile);
+	if (fopen_s(&fout, winDir, "a") == 0) {
+		fclose(fout);
 		freopen_s(&fout, winDir, "a", stdout);
-		freopen_s(&ferr, winDir, "a", stderr);
+	}
+	if (fopen_s(&ferr, winDirErr, "a") == 0) {
+		fclose(ferr);
+		freopen_s(&ferr, winDirErr, "a", stderr);
 	}
 #endif
+	std::cout << std::time(0) << std::endl; // Log time for debug purposes
+	std::cerr << std::time(0) << std::endl;
 
 	std::wstring mutexStr = std::wstring(L"ChromeDllMutex") + std::to_wstring(GetCurrentProcessId());
 	HANDLE mutex = OpenMutex(MUTEX_ALL_ACCESS, FALSE, mutexStr.c_str()); // Never allow the dll to be injected twice
