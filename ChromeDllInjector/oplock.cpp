@@ -74,7 +74,7 @@ namespace ChromePatch::Oplock {
 					if (this->filePath.length() > 0) {
 						DWORD _fileFlags;
 						if (GetHandleInformation(this->file, &_fileFlags)) { // If the handle isn't broken
-							CloseHandle(this->file);
+							NtClose(this->file);
 						}
 						this->CreateFileHandle(this->filePath);
 						this->ignoreNextUnlock = true; // A new handle automatically removed old oplocks apparently
