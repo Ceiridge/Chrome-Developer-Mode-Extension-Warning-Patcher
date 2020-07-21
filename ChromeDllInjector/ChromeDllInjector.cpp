@@ -8,7 +8,9 @@ std::map<HANDLE, ChromePatch::Oplock::Oplock*> chromeDllHandles;
 void OplockCallback(ChromePatch::Oplock::Oplock* oplock) {
 	ChromePatch::Inject::InjectIntoChromeProcesses();
 
-	oplock->UnlockFile();
+	while (!oplock->UnlockFile()) {
+		Sleep(1000);
+	}
 	Sleep(1000);
 	while (!oplock->LockFile()) {
 		Sleep(1000);
