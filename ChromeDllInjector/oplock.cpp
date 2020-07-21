@@ -32,7 +32,7 @@ namespace ChromePatch::Oplock {
 			return true;
 		}
 		else {
-			std::cout << "Error trying to control file " << file << std::endl;
+			std::cout << "Error trying to control file " << file << " with " << controlCode << std::endl;
 			apc->FreeEntry();
 		}
 
