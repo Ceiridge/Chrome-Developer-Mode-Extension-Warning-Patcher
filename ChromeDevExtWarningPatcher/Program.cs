@@ -90,13 +90,11 @@ namespace ChromeDevExtWarningPatcher {
 			if (applicationPaths.Count == 0)
 				Console.WriteLine("Error: No patchable browser files found!");
 
-			foreach (InstallationPaths paths in applicationPaths) {
-				try {
-					//DllPatcher patcher = new DllPatcher(path); // TODO: !
-					//patcher.Patch(Console.WriteLine);
-				} catch (Exception ex) {
-					Console.WriteLine("Error while installing patch at " + paths.ChromeExePath + ":" + ex.Message);
-				}
+			try {
+				PatcherInstaller installer = new PatcherInstaller(applicationPaths);
+				installer.Install(Console.WriteLine);
+			} catch (Exception ex) {
+				Console.WriteLine("Error while installing patches: " + ex.Message);
 			}
 
 			if (!clOptions.NoWait)

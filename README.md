@@ -22,7 +22,7 @@ See below for the custom paths (commandline option).
 ![Gui Screenshot](https://raw.githubusercontent.com/Ceiridge/Chrome-Developer-Mode-Extension-Warning-Patcher/master/media/guiscreenshot.png)
 
 ## Commandline Options
-All commandline options are **optional** and not required. If none are given, the gui will start.
+All commandline options are **optional** and not required. If none are given, the gui will start. **Warning**: The command line cannot uninstall the entire patcher and if you run it with customPath, all other installations will be removed!
 
 ```
 ChromeDevExtWarningPatcher.exe 

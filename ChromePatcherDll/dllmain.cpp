@@ -33,6 +33,7 @@ BOOL APIENTRY ThreadMain(LPVOID lpModule) {
 	std::wstring mutexStr = std::wstring(L"ChromeDllMutex") + std::to_wstring(GetCurrentProcessId());
 	HANDLE mutex = OpenMutex(MUTEX_ALL_ACCESS, FALSE, mutexStr.c_str()); // Never allow the dll to be injected twice
 	if (mutex) {
+		ChromePatch::ExitMainThread(lpModule);
 		return TRUE;
 	}
 	else {
