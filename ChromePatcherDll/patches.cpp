@@ -146,9 +146,11 @@ namespace ChromePatch {
 								__try {
 									if (pattern.searchOffset == pattern.pattern.size()) {
 										uintptr_t patchAddr = addr - pattern.searchOffset + patch.offset + 1;
+										std::cout << "Reading address " << std::hex << patchAddr << std::endl;
 
 										if (patch.isSig) { // rip 
-											patchAddr += (std::int32_t&)patchAddr + 4 + patch.sigOffset;
+											patchAddr += *(reinterpret_cast<std::int32_t*>(patchAddr)) + 4 + patch.sigOffset;
+											std::cout << "New aftersig address: " << std::hex << patchAddr << std::endl;
 										}
 
 										byte* patchByte = reinterpret_cast<byte*>(patchAddr);
