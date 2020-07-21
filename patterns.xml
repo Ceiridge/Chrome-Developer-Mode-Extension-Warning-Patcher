@@ -15,7 +15,7 @@
 	<Patterns>
 		<Pattern name="Remove Extension Warning">
 			<!-- ShouldIncludeExtension; "ProxyOverriddenBubble.UserSelection" 2nd function in the vtable -->
-			<BytePattern>56 48 83 EC 20 48 89 D6 48 89 D1 E8 ? ? ? ? 89 C1</BytePattern> <!-- Chr 79 -->
+			<BytePattern>56 48 83 EC 20 48 89 D6 48 89 D1 E8 ? ? ? ? 89 C1</BytePattern> <!-- Chr 79-84 -->
 
 			<BytePattern>56 48 83 EC ? 48 89 D6 48 89 D1 E8 ? ? ? ? 83 F8 ? 74 ?</BytePattern> <!-- Edg 81 -->
 		</Pattern>
@@ -23,16 +23,13 @@
 		<Pattern name="Remove Debug Warning">
 			<!-- MaybeAddInfoBar; "MaybeAddInfoBar" in the function -->
 			<BytePattern>41 57 41 56 41 54 56 57 53 48 81 EC 98 00 00 00 48 8B 05 ? ? ? ? 48 31 E0 48 89 84 24 ? ? ? ? 80 79 ? 00 0F 85 ? ? ? ? 48 89 CE</BytePattern>  <!-- Chr 84 -->
-			<BytePattern>41 57 41 56 41 54 56 57 53 48 81 EC ? ? ? ? 49 89 CC 48 8B 05 ? ? ? ? 48 31 E0 48 89 84 24 ? ? ? ? 48 8D 4A ?</BytePattern> <!-- Chr 81 -->
-			<BytePattern>41 57 41 56 56 57 53 48 81 EC ? ? ? ? 48 89 CE 48 8B 05 ? ? ? ? 48 31 E0 48 89 84 24 ? ? ? ? 48 8D 4A 08</BytePattern> <!-- Chr 79 -->
 
 			<BytePattern>41 57 41 56 56 57 53 48 81 EC ? ? ? ? 49 89 CF 48 8B 05 ? ? ? ? 48 31 E0 48 89 84 24 ? ? ? ? 48 8D 4A ?</BytePattern> <!-- Edg 81 -->
 		</Pattern>
 	
 		<Pattern name="Remove Elision">
 			<!-- ShouldPreventElision; "jknemblkbdhdcpllfgbfekkdciegfboi" or "omnibox.prevent_url_elisions" in the function or "https://support.google.com/chrome/?p=unauthenticated" 3rd function in the vtable OR IN EDGE: "https://to-be-replaced.invalid/chrome/?p=unauthenticated" or "https://permanently-removed.invalid/chrome/?p=unauthenticated" -->
-			<BytePattern>56 57 55 53 48 83 EC ? 48 8B 05 ? ? ? ? 48 31 E0 48 89 44 24 ? E8 ? ? ? ? 48 85 C0 0F 84 ? ? ? ? 48 89 C6</BytePattern> <!-- Chr 83, but maybe also works for Edge? -->
-			<BytePattern>56 57 53 48 83 EC 40 48 8B 05 ? ? ? ? 48 31 E0 48 89 44 24 ? E8 ? ? ? ? 48 85 C0 74 61</BytePattern> <!-- Chr 79 -->
+			<BytePattern>56 57 55 53 48 83 EC ? 48 8B 05 ? ? ? ? 48 31 E0 48 89 44 24 ? E8 ? ? ? ? 48 85 C0 0F 84 ? ? ? ? 48 89 C6</BytePattern> <!-- Chr 83, but maybe also works for Edge?-84 -->
 
 			<BytePattern>56 57 53 48 83 EC ? 48 8B 05 ? ? ? ? 48 31 E0 48 89 44 24 ? E8 ? ? ? ? 48 85 C0 74 ? 48 89 C1</BytePattern> <!-- Edg 81 -->
 			<BytePattern>41 57 41 56 41 54 56 57 55 53 48 83 EC ? 48 8B 05 ? ? ? ? 48 31 E0 48 89 44 24 ? E8 ? ? ? ? 48 85 C0</BytePattern> <!-- Edg 83 -->

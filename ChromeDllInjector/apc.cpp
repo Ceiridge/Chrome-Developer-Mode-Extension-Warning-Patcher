@@ -104,7 +104,7 @@ namespace ChromePatch::Apc {
 		if (apcList.size() < MAXIMUM_WAIT_OBJECTS - 1) {
 			this->overlapped.hEvent = this->event = CreateEvent(NULL, TRUE, FALSE, NULL);
 			this->type = type;
-			//this->page = 
+
 			if (this->event != NULL) {
 				return true;
 			}
