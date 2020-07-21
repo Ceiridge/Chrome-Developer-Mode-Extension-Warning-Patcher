@@ -17,29 +17,28 @@
 			<!-- ShouldIncludeExtension; "ProxyOverriddenBubble.UserSelection" 2nd function in the vtable -->
 			<BytePattern>56 48 83 EC 20 48 89 D6 48 89 D1 E8 ? ? ? ? 89 C1</BytePattern> <!-- Chr 79-84 -->
 
-			<BytePattern>56 48 83 EC ? 48 89 D6 48 89 D1 E8 ? ? ? ? 83 F8 ? 74 ?</BytePattern> <!-- Edg 81 -->
+			<BytePattern>56 48 83 EC ? 48 89 D6 48 89 D1 E8 ? ? ? ? 83 F8 ? 74 ?</BytePattern> <!-- Edg 81-84 -->
 		</Pattern>
 	
 		<Pattern name="Remove Debug Warning">
 			<!-- MaybeAddInfoBar; "MaybeAddInfoBar" in the function -->
 			<BytePattern>41 57 41 56 41 54 56 57 53 48 81 EC 98 00 00 00 48 8B 05 ? ? ? ? 48 31 E0 48 89 84 24 ? ? ? ? 80 79 ? 00 0F 85 ? ? ? ? 48 89 CE</BytePattern>  <!-- Chr 84 -->
 
-			<BytePattern>41 57 41 56 56 57 53 48 81 EC ? ? ? ? 49 89 CF 48 8B 05 ? ? ? ? 48 31 E0 48 89 84 24 ? ? ? ? 48 8D 4A ?</BytePattern> <!-- Edg 81 -->
+			<BytePattern>41 57 41 56 56 57 53 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 31 E0 48 89 84 24 ? ? ? ? 80 79 ? ? 74 ? 48 8B 8C 24 ? ? ? ? 48 31 E1 E8 ? ? ? ? 90 48 81 C4 ? ? ? ? 5B 5F 5E 41 5E 41 5F C3 48 89 CE 48 83 C2 ?</BytePattern> <!-- Edg 84 -->
 		</Pattern>
 	
 		<Pattern name="Remove Elision">
 			<!-- ShouldPreventElision; "jknemblkbdhdcpllfgbfekkdciegfboi" or "omnibox.prevent_url_elisions" in the function or "https://support.google.com/chrome/?p=unauthenticated" 3rd function in the vtable OR IN EDGE: "https://to-be-replaced.invalid/chrome/?p=unauthenticated" or "https://permanently-removed.invalid/chrome/?p=unauthenticated" -->
 			<BytePattern>56 57 55 53 48 83 EC ? 48 8B 05 ? ? ? ? 48 31 E0 48 89 44 24 ? E8 ? ? ? ? 48 85 C0 0F 84 ? ? ? ? 48 89 C6</BytePattern> <!-- Chr 83, but maybe also works for Edge?-84 -->
 
-			<BytePattern>56 57 53 48 83 EC ? 48 8B 05 ? ? ? ? 48 31 E0 48 89 44 24 ? E8 ? ? ? ? 48 85 C0 74 ? 48 89 C1</BytePattern> <!-- Edg 81 -->
-			<BytePattern>41 57 41 56 41 54 56 57 55 53 48 83 EC ? 48 8B 05 ? ? ? ? 48 31 E0 48 89 44 24 ? E8 ? ? ? ? 48 85 C0</BytePattern> <!-- Edg 83 -->
+			<BytePattern>56 48 83 EC ? 48 89 CE 48 8D 0D ? ? ? ? 31 D2 E8 ? ? ? ? 84 C0 75 ? 48 89 F1</BytePattern> <!-- Edg 84 -->
 		</Pattern>
 
 		<Pattern name="Remove Crash Warning">
 			<!-- session_crashed_bubble_view.cc:Show; "SessionCrashed.Bubble" brings you to RecordBubbleHistogramValue (find references) => search for the function where it is called at least twice and is called each with the arg 0, a variable (either 3 or 1) or 3 or 1 directly (200 IQ required to understand this sentence) -->
 			<BytePattern>41 57 41 56 56 57 55 53 48 83 EC ? 41 89 D6 48 89 CE 84 D2</BytePattern> <!-- Chr 84 -->
 
-			<BytePattern>41 57 41 56 56 57 55 53 48 83 EC ? 41 89 D7 48 89 CE 48 8B 05 ? ? ? ? 48 31 E0 48 89 44 24 ? 84 D2</BytePattern> <!-- Edg 81 -->
+			<BytePattern>41 57 41 56 56 57 55 53 48 83 EC ? 41 89 D6 48 89 CE 48 8B 05 ? ? ? ? 48 31 E0 48 89 44 24 ? 84 D2</BytePattern> <!-- Edg 84 -->
 		</Pattern>
 
 		<Pattern name="Remove Send To Your Devices">
@@ -121,7 +120,7 @@
 
 		<GroupedPatch group="4" default="false">
 			<Name>Remove send to self</Name>
-			<Tooltip>This patch removes the context menu option "Send To Your Devices" when using Google's Sync (may only work on Chrome)</Tooltip>
+			<Tooltip>This patch removes the context menu option "Send To Your Devices" when using Google's Sync (Chrome only)</Tooltip>
 		</GroupedPatch>
 
 		<!--
