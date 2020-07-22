@@ -11,7 +11,7 @@
 	Create a new issue if a pattern stops working with any browser.
 -->
 
-<Defaults version="4.0">
+<Defaults version="4.1">
 	<Patterns>
 		<Pattern name="Remove Extension Warning">
 			<!-- ShouldIncludeExtension; "ProxyOverriddenBubble.UserSelection" 2nd function in the vtable -->
