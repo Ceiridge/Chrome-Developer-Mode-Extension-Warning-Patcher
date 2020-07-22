@@ -90,6 +90,8 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <PrecompiledHeader>Create</PrecompiledHeader>
+      <AdditionalIncludeDirectories>..\ChromePatcherDll;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -108,6 +110,7 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader>Create</PrecompiledHeader>
+      <AdditionalIncludeDirectories>..\ChromePatcherDll;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -125,6 +128,8 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <PrecompiledHeader>Create</PrecompiledHeader>
+      <AdditionalIncludeDirectories>..\ChromePatcherDll;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -143,6 +148,7 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader>Create</PrecompiledHeader>
+      <AdditionalIncludeDirectories>..\ChromePatcherDll;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -153,20 +159,19 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="apc.cpp" />
     <ClCompile Include="ChromeDllInjector.cpp" />
-    <ClCompile Include="injector.cpp" />
-    <ClCompile Include="oplock.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="apc.hpp" />
-    <ClInclude Include="injector.hpp" />
-    <ClInclude Include="oplock.hpp" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="ChromeDllInjector.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ChromePatcherDll\ChromePatcherDll.vcxproj">
+      <Project>{ba6b041f-e0e9-45ec-86d8-bc5d1d864ae5}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

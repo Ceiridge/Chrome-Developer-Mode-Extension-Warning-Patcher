@@ -2,6 +2,32 @@
 #include "patches.hpp"
 #include "threads.hpp"
 
+HMODULE module;
+HHOOK hook;
+
+_declspec(dllexport) LRESULT CALLBACK CBTProc(int nCode, WPARAM wParam, LPARAM lParam) {
+	return CallNextHookEx(hook, nCode, wParam, lParam);
+}
+
+_declspec(dllexport) bool InstallWinHook() {
+	if (hook) {
+		return false;
+	}
+
+	return hook = SetWindowsHookEx(WH_CBT, CBTProc, module, 0); // Global windows hook -> Windows injects the dll everywhere automatically
+}
+
+_declspec(dllexport) bool UnInstallWinHook() {
+	if (!hook) {
+		return false;
+	}
+
+	if (UnhookWindowsHookEx(hook)) {
+		hook = NULL;
+		return true;
+	}
+	return false;
+}
 
 BOOL APIENTRY ThreadMain(LPVOID lpModule) {
 	FILE* fout = nullptr;
@@ -34,7 +60,6 @@ BOOL APIENTRY ThreadMain(LPVOID lpModule) {
 	std::wstring mutexStr = std::wstring(L"ChromeDllMutex") + std::to_wstring(GetCurrentProcessId());
 	HANDLE mutex = OpenMutex(MUTEX_ALL_ACCESS, FALSE, mutexStr.c_str()); // Never allow the dll to be injected twice
 	if (mutex) {
-		ChromePatch::ExitMainThread(lpModule);
 		return TRUE;
 	}
 	else {
@@ -113,7 +138,6 @@ BOOL APIENTRY ThreadMain(LPVOID lpModule) {
 	FreeConsole();
 #endif
 
-	ChromePatch::ExitMainThread(lpModule);
 	return TRUE;
 }
 
@@ -121,17 +145,61 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 	switch (ul_reason_for_call) {
 		case DLL_PROCESS_ATTACH: {
 			std::wstring cmdLine = GetCommandLine();
-			if (cmdLine.find(L"--type=") != std::wstring::npos) { // if it's not the parent process, exit
-				ChromePatch::mainThreadHandle = CreateThread(NULL, NULL, (LPTHREAD_START_ROUTINE)ChromePatch::ExitMainThread, hModule, NULL, NULL);
-				break;
+			module = hModule;
+
+			WCHAR _exePath[1024];
+			GetModuleFileNameW(NULL, _exePath, 1024);
+			std::wstring exePath(_exePath);
+
+			if (exePath.find(L"ChromeDllInjector.exe") != std::wstring::npos || cmdLine.find(L"--type=") != std::wstring::npos) { // Ignore the injector's process, but stay loaded & ignore Chrome's subprocesses
+				return TRUE;
+			}
+
+			HKEY hkey;
+			DWORD dispo;
+			bool isChromeExe = false;
+			if (RegCreateKeyEx(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Ceiridge\\ChromePatcher\\ChromeExes", NULL, NULL, NULL, KEY_READ | KEY_QUERY_VALUE, NULL, &hkey, &dispo) == ERROR_SUCCESS) { // Only continue with the DLL in Chrome processes
+				WCHAR valueName[64];
+				DWORD valueNameLength = 64, valueType, dwIndex = 0;
+				WCHAR value[1024];
+				DWORD valueLength = 1024;
+
+				LSTATUS STATUS;
+				while (STATUS = RegEnumValue(hkey, dwIndex, valueName, &valueNameLength, NULL, &valueType, (LPBYTE)&value, &valueLength) == ERROR_SUCCESS) {
+					if (valueType == REG_SZ) {
+						std::wstring path = value;
+
+						if (path.compare(exePath) == 0) {
+							isChromeExe = true;
+							break;
+						}
+					}
+
+					valueLength = 1024;
+					valueNameLength = 64;
+					dwIndex++;
+				}
+
+				RegCloseKey(hkey);
+			}
+			else {
+				std::cerr << "Couldn't open regkey\n";
+				return TRUE;
+			}
+
+			if (!isChromeExe) {
+				return TRUE;
 			}
 
 			ChromePatch::mainThreadHandle = CreateThread(NULL, NULL, (LPTHREAD_START_ROUTINE)ThreadMain, hModule, NULL, NULL);
 			break;
 		}
 		case DLL_THREAD_ATTACH:
+			break;
 		case DLL_THREAD_DETACH:
+			break;
 		case DLL_PROCESS_DETACH:
+			UnInstallWinHook();
 			break;
 	}
 

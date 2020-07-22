@@ -1,33 +1,5 @@
 #include "stdafx.h"
-#include "apc.hpp"
-#include "oplock.hpp"
-#include "injector.hpp"
-
-std::vector<ChromePatch::Oplock::Oplock*> chromeDllLocks;
-
-void OplockCallback(ChromePatch::Oplock::Oplock* oplock) {
-	ChromePatch::Inject::InjectIntoChromeProcesses();
-
-	while (!oplock->UnlockFile()) {
-		Sleep(1000);
-	}
-	Sleep(1000);
-	while (!oplock->LockFile()) {
-		Sleep(1000);
-	}
-}
-
-// Has to be a somewhat-UNC path
-void OplockFile(std::wstring filePath) {
-	try {
-		ChromePatch::Oplock::Oplock* oplock;
-		chromeDllLocks.push_back(oplock = new ChromePatch::Oplock::Oplock(filePath, &OplockCallback));
-		oplock->LockFile();
-	}
-	catch (std::exception& ex) {
-		std::cerr << "Error: " << ex.what() << std::endl;
-	}
-}
+#include "dllmain.hpp"
 
 int wmain(int argc, wchar_t* argv[], wchar_t* envp[]) {
 	FILE* fout = nullptr;
@@ -63,39 +35,11 @@ int wmain(int argc, wchar_t* argv[], wchar_t* envp[]) {
 		mutex = CreateMutex(0, FALSE, L"ChromeDllInjectorMutex");
 	}
 
-	ChromePatch::Apc::InitApc();
-	
-	HKEY hkey;
-	DWORD dispo;
-	if (RegCreateKeyEx(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Ceiridge\\ChromePatcher\\ChromeDlls", NULL, NULL, NULL, KEY_READ | KEY_QUERY_VALUE, NULL, &hkey, &dispo) == ERROR_SUCCESS) {
-		WCHAR valueName[64];
-		DWORD valueNameLength = 64, valueType, dwIndex = 0;
-		WCHAR value[1024];
-		DWORD valueLength = 1024;
-
-		LSTATUS STATUS;
-		while (STATUS = RegEnumValue(hkey, dwIndex, valueName, &valueNameLength, NULL, &valueType, (LPBYTE)&value, &valueLength) == ERROR_SUCCESS) {
-			if (valueType == REG_SZ) {
-				std::wcout << "New path found: " << value << std::endl;
-
-				std::wstring path = value;
-
-				if (path.find(L"\\Application") != std::wstring::npos) {
-					ChromePatch::Inject::chromePaths.push_back(path);
-					OplockFile(L"\\??\\" + path);
-				}
-			}
-
-			valueLength = 1024;
-			valueNameLength = 64;
-			dwIndex++;
-		}
-
-		RegCloseKey(hkey);
+	if (!InstallWinHook()) {
+		std::cerr << "Couldn't set winhook" << std::endl;
 	}
 	else {
-		std::cerr << "Couldn't open regkey\n";
-		return 1;
+		std::cout << "Set winhook" << std::endl;
 	}
 
 	while (true) {

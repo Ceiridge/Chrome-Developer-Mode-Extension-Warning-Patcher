@@ -43,9 +43,4 @@ namespace ChromePatch {
 
 		suspendedThreads.clear();
 	}
-
-	BOOL APIENTRY ExitMainThread(LPVOID lpModule) {
-		CloseHandle(mainThreadHandle);
-		FreeLibraryAndExitThread((HMODULE)lpModule, 0);
-	}
 }

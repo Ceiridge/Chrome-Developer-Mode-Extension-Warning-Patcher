@@ -38,6 +38,9 @@
     <ClInclude Include="stdafx.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
+    <ClInclude Include="dllmain.hpp">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="ChromePatcherDll.rc">

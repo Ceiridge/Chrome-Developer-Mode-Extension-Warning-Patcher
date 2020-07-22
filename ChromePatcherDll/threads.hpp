@@ -6,5 +6,4 @@ namespace ChromePatch {
 
 	void SuspendOtherThreads();
 	void ResumeOtherThreads();
-	BOOL APIENTRY ExitMainThread(LPVOID lpModule);
 }
