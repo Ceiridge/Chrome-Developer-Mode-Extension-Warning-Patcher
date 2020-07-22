@@ -13,7 +13,7 @@ namespace ChromePatch {
 	struct Patch {
 		std::vector<PatchPattern> patterns{};
 		byte origByte{}, patchByte{};
-		int offset{};
+		std::vector<int> offsets{};
 		bool isSig{};
 		int sigOffset{};
 		bool finishedPatch{}, successfulPatch{};

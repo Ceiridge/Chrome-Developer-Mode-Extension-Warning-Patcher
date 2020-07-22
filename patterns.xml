@@ -64,34 +64,52 @@
 	<!-- Everything should be in hex here -->
 	<Patches>
 		<Patch pattern="Remove Extension Warning" group="0">
-			<PatchData type="x64" offset="0x16" orig="0xFF" patch="0xFF" sig="false"></PatchData> <!-- 0x04 is an enum value, 0xFF breaks the check -->
+			<PatchData type="x64" orig="0x04" patch="0xFF" sig="false">
+				<Offset>0x16</Offset>
+				<Offset>0x12</Offset> <!-- Alternative for Edge -->
+			</PatchData> <!-- 0x04 is an enum value, 0xFF breaks the check -->
 		</Patch>
 		<Patch pattern="Remove Extension Warning" group="0">
-			<PatchData type="x64" offset="0x23" orig="0xFF" patch="0xFF" sig="false"></PatchData> <!-- 0x08 is an enum value, 0xFF breaks the check -->
+			<PatchData type="x64" offset="0x08" orig="0xFF" patch="0xFF" sig="false">
+				<Offset>0x23</Offset>
+				<Offset>0x1F</Offset> <!-- Alternative for Edge -->
+			</PatchData> <!-- 0x08 is an enum value, 0xFF breaks the check -->
 		</Patch>
 
 		<Patch pattern="Remove Debug Warning" group="1">
-			<PatchData type="x64" offset="0x00" orig="0x41" patch="0xC3" sig="false"></PatchData> <!-- 0xC3 = ret -->
+			<PatchData type="x64" orig="0x41" patch="0xC3" sig="false">
+				<Offset>0x00</Offset>
+			</PatchData> <!-- 0xC3 = ret -->
 		</Patch>
 
 		<Patch pattern="Remove Elision" group="2">
-			<PatchData type="x64" offset="0x00" orig="0x56" patch="0xC3" sig="false"></PatchData> <!-- 0xC3 = ret -->
+			<PatchData type="x64" orig="0x56" patch="0xC3" sig="false">
+				<Offset>0x00</Offset>
+			</PatchData> <!-- 0xC3 = ret -->
 		</Patch>
 
 		<Patch pattern="Remove Crash Warning" group="3">
-			<PatchData type="x64" offset="0x00" orig="0x41" patch="0xC3" sig="false" sigOffset="0x0"></PatchData> <!-- 0xC3 = ret -->
+			<PatchData type="x64" orig="0x41" patch="0xC3" sig="false" sigOffset="0x0">
+				<Offset>0x00</Offset>
+			</PatchData> <!-- 0xC3 = ret -->
 		</Patch>
 
 		<Patch pattern="Remove Send To Your Devices" group="4">
-			<PatchData type="x64" offset="0x01" orig="0x84" patch="0x38" sig="true" sigOffset="0x7FF"></PatchData> <!-- test => cmp; this forces the ZeroFlag to be 1 => it will skip the insertion of the menu option -->
+			<PatchData type="x64" orig="0x84" patch="0x38" sig="true" sigOffset="0x7FF">
+				<Offset>0x01</Offset> <!-- call instruction -->
+			</PatchData> <!-- test => cmp; this forces the ZeroFlag to be 1 => it will skip the insertion of the menu option -->
 		</Patch>
 		<Patch pattern="Remove Send To Your Devices 2" group="4">
-			<PatchData type="x64" offset="0x00" orig="0x84" patch="0x38" sig="false"></PatchData> <!-- test => cmp; this forces the ZeroFlag to be 1 => it will skip the insertion of the menu option -->
+			<PatchData type="x64" orig="0x84" patch="0x38" sig="false">
+				<Offset>0x00</Offset>
+			</PatchData> <!-- test => cmp; this forces the ZeroFlag to be 1 => it will skip the insertion of the menu option -->
 		</Patch>
 
 		<!--
 		<Patch pattern="Disable SwReporter Upload" group="5">
-			<PatchData type="x64" offset="0x00" orig="0x84" patch="0x38"></PatchData> COMM test => cmp; this forces the ZeroFlag to be 1 => it will jump ECOMM
+			<PatchData type="x64" orig="0x84" patch="0x38" sig="false">
+				<Offset>0x00</Offset>
+			</PatchData> COMM test => cmp; this forces the ZeroFlag to be 1 => it will jump ECOMM
 		</Patch>
 		-->
 	</Patches>

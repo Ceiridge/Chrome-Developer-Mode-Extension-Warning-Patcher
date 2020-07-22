@@ -79,13 +79,17 @@ namespace ChromeDevExtWarningPatcher.Patches {
 					int group = int.Parse(patch.Attribute("group").Value);
 
 					byte origX64 = 0, patchX64 = 0;
-					int offsetX64 = 0, sigOffset = 0;
+					List<int> offsetsX64 = new List<int>();
+					int sigOffset = 0;
 					bool sig = false;
+
+					foreach(XElement offsetElement in patch.Elements("Offset")) {
+						offsetsX64.Add(Convert.ToInt32(offsetElement.Value.Replace("0x", ""), 16));
+					}
 
 					foreach (XElement patchData in patch.Elements("PatchData")) {
 						origX64 = Convert.ToByte(patchData.Attribute("orig").Value.Replace("0x", ""), 16);
 						patchX64 = Convert.ToByte(patchData.Attribute("patch").Value.Replace("0x", ""), 16);
-						offsetX64 = Convert.ToInt32(patchData.Attribute("offset").Value.Replace("0x", ""), 16);
 						sig = Convert.ToBoolean(patchData.Attribute("sig").Value);
 						if(patchData.Attributes("sigOffset").Any()) {
 							sigOffset = Convert.ToInt32(patchData.Attribute("sigOffset").Value.Replace("0x", ""), 16);
@@ -93,7 +97,7 @@ namespace ChromeDevExtWarningPatcher.Patches {
 						break;
 					}
 
-					BytePatches.Add(new BytePatch(pattern, origX64, patchX64, offsetX64, group, sig, sigOffset));
+					BytePatches.Add(new BytePatch(pattern, origX64, patchX64, offsetsX64, group, sig, sigOffset));
 				}
 
 				foreach (XElement patchGroup in xmlDoc.Root.Element("GroupedPatches").Elements("GroupedPatch")) {

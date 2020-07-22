@@ -66,14 +66,13 @@ BOOL APIENTRY ThreadMain(LPVOID lpModule) {
 		mutex = CreateMutex(0, FALSE, mutexStr.c_str()); // Mutex closes automatically after the process exits
 	}
 
-	ChromePatch::SuspendOtherThreads();
 	HANDLE proc = GetCurrentProcess();
 
 	bool hasFoundChrome = false;
 	int attempts = 0;
 	std::wregex chromeDllRegex(L"\\\\Application\\\\(?:\\d+?\\.?)+\\\\[a-zA-Z0-9-]+\\.dll");
 
-	while (!hasFoundChrome && attempts < 30000) { // give it some attempts to find the chrome.dll module
+	while (!hasFoundChrome && attempts < 30000) { // Give it some attempts to find the chrome.dll module
 		HMODULE modules[1024];
 		DWORD cbNeeded;
 
@@ -83,6 +82,7 @@ BOOL APIENTRY ThreadMain(LPVOID lpModule) {
 				TCHAR modulePath[1024];
 
 				if (GetModuleFileName(mod, modulePath, ARRAYSIZE(modulePath))) { // analyze the module's file path with regex
+					std::wcout << L"a.dll : " << modulePath << L" with handle: " << mod << std::endl;
 					if (std::regex_search(modulePath, chromeDllRegex)) {
 						std::wcout << L"Found chrome.dll module: " << modulePath << L" with handle: " << mod << std::endl;
 						
@@ -100,6 +100,7 @@ BOOL APIENTRY ThreadMain(LPVOID lpModule) {
 		Sleep(1);
 		attempts++;
 	}
+	ChromePatch::SuspendOtherThreads();
 	CloseHandle(proc);
 
 	if (!hasFoundChrome) {

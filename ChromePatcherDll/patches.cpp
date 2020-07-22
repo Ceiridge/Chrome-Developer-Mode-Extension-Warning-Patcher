@@ -54,18 +54,26 @@ namespace ChromePatch {
 				patterns.push_back(PatchPattern{ pattern });
 			}
 
-			int offset, sigOffset;
+			int offsetCount;
+			std::vector<int> offsets;
+			file.read(reinterpret_cast<char*>(&offsetCount), sizeof(offsetCount));
+			for (int i = 0; i < offsetCount; i++) {
+				int offset;
+				file.read(reinterpret_cast<char*>(&offset), sizeof(offset));
+				offsets.push_back(offset);
+			}
+
+			int sigOffset;
 			byte origByte, patchByte, isSig;
-			file.read(reinterpret_cast<char*>(&offset), sizeof(offset)); // perfectly beautiful code right here
-			file.read(reinterpret_cast<char*>(&origByte), sizeof(origByte));
+			file.read(reinterpret_cast<char*>(&origByte), sizeof(origByte)); // perfectly beautiful code right here
 			file.read(reinterpret_cast<char*>(&patchByte), sizeof(patchByte));
 			file.read(reinterpret_cast<char*>(&isSig), sizeof(isSig));
 			file.read(reinterpret_cast<char*>(&sigOffset), sizeof(sigOffset));
 
-			Patch patch{ patterns, origByte, patchByte, offset, isSig > 0, sigOffset };
+			Patch patch{ patterns, origByte, patchByte, offsets, isSig > 0, sigOffset };
 			patches.push_back(patch);
 			
-			std::cout << "Loaded patch: " << patterns[0].pattern.size() << " " << (int)origByte << " " << (int)patchByte << " " << offset << std::endl;
+			std::cout << "Loaded patch: " << patterns[0].pattern.size() << " " << (int)origByte << " " << (int)patchByte << " " << offsets[0] << std::endl;
 		}
 
 		file.close();
@@ -139,7 +147,9 @@ namespace ChromePatch {
 
 								__try {
 									if (pattern.searchOffset == pattern.pattern.size()) {
-										uintptr_t patchAddr = addr - pattern.searchOffset + patch.offset + 1;
+										int offset = 0;
+									RETRY_OFFSET_LABEL:
+										uintptr_t patchAddr = addr - pattern.searchOffset + patch.offsets[offset] + 1;
 										std::cout << "Reading address " << std::hex << patchAddr << std::endl;
 
 										if (patch.isSig) { // rip 
@@ -159,6 +169,11 @@ namespace ChromePatch {
 											patch.successfulPatch = true;
 										}
 										else {
+											offset++;
+											if (offset != patch.offsets.size()) {
+												goto RETRY_OFFSET_LABEL;
+											}
+
 											std::cerr << "Byte (" << (int)*patchByte << ") not original (" << (int)patch.origByte << ") at " << std::hex << patchAddr << std::endl;
 										}
 
@@ -187,7 +202,7 @@ namespace ChromePatch {
 	END_PATCH_SEARCH_LABEL:
 		for (Patch& patch : patches) {
 			if (!patch.successfulPatch) {
-				std::cerr << "Couldn't patch " << patch.patterns[0].pattern.size() << " " << patch.offset << std::endl;
+				std::cerr << "Couldn't patch " << patch.patterns[0].pattern.size() << " " << patch.offsets[0] << std::endl;
 			}
 		}
 
