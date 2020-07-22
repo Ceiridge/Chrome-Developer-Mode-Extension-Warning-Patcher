@@ -149,7 +149,7 @@ namespace ChromePatch {
 									if (pattern.searchOffset == pattern.pattern.size()) {
 										int offset = 0;
 									RETRY_OFFSET_LABEL:
-										uintptr_t patchAddr = addr - pattern.searchOffset + patch.offsets[offset] + 1;
+										uintptr_t patchAddr = addr - pattern.searchOffset + patch.offsets.at(offset) + 1;
 										std::cout << "Reading address " << std::hex << patchAddr << std::endl;
 
 										if (patch.isSig) { // rip 

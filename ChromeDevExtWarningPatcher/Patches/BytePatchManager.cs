@@ -83,11 +83,11 @@ namespace ChromeDevExtWarningPatcher.Patches {
 					int sigOffset = 0;
 					bool sig = false;
 
-					foreach(XElement offsetElement in patch.Elements("Offset")) {
-						offsetsX64.Add(Convert.ToInt32(offsetElement.Value.Replace("0x", ""), 16));
-					}
-
 					foreach (XElement patchData in patch.Elements("PatchData")) {
+						foreach (XElement offsetElement in patchData.Elements("Offset")) {
+							offsetsX64.Add(Convert.ToInt32(offsetElement.Value.Replace("0x", ""), 16));
+						}
+
 						origX64 = Convert.ToByte(patchData.Attribute("orig").Value.Replace("0x", ""), 16);
 						patchX64 = Convert.ToByte(patchData.Attribute("patch").Value.Replace("0x", ""), 16);
 						sig = Convert.ToBoolean(patchData.Attribute("sig").Value);

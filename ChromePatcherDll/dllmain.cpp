@@ -82,7 +82,6 @@ BOOL APIENTRY ThreadMain(LPVOID lpModule) {
 				TCHAR modulePath[1024];
 
 				if (GetModuleFileName(mod, modulePath, ARRAYSIZE(modulePath))) { // analyze the module's file path with regex
-					std::wcout << L"a.dll : " << modulePath << L" with handle: " << mod << std::endl;
 					if (std::regex_search(modulePath, chromeDllRegex)) {
 						std::wcout << L"Found chrome.dll module: " << modulePath << L" with handle: " << mod << std::endl;
 						
