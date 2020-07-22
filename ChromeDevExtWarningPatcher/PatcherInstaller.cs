@@ -72,13 +72,11 @@ namespace ChromeDevExtWarningPatcher {
 			while (true) {
 				try {
 					Thread.Sleep(10);
-					File.Delete(path);
-					return true;
-				} catch (Exception e) {
-					if (e.GetType().IsInstanceOfType(typeof(FileNotFoundException))) { // Stop trying if the file doesn't exist
-						return false;
+					if (File.Exists(path)) {
+						File.Delete(path);
 					}
-				}
+					return true;
+				} catch (Exception e) {}
 			}
 		}
 
@@ -93,6 +91,7 @@ namespace ChromeDevExtWarningPatcher {
 					}
 				}
 			}
+			Thread.Sleep(1000); // Give Windows some time to unload all patch dlls
 
 			using (RegistryKey dllPathKeys = OpenExesKey()) {
 				foreach (string valueName in dllPathKeys.GetValueNames()) {
@@ -177,7 +176,7 @@ namespace ChromeDevExtWarningPatcher {
 					}
 				}
 			}
-			Thread.Sleep(10000); // Give Windows some time to unload all patch dlls
+			Thread.Sleep(1000); // Give Windows some time to unload all patch dlls
 
 			using (RegistryKey dllPathKeys = OpenExesKey()) {
 				foreach (string valueName in dllPathKeys.GetValueNames()) {
