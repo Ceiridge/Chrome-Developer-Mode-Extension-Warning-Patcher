@@ -49,7 +49,16 @@
 		</Pattern>
 		<Pattern name="Remove Send To Your Devices 2">
 			<!-- use the chrome.dll pdb file from the Chromium symbol server and find this: https://source.chromium.org/chromium/chromium/src/+/master:chrome/browser/renderer_context_menu/render_view_context_menu.cc;l=1451;drc=908685dd073609453a5c781050f8af741499c14a?originalUrl=https:%2F%2Fcs.chromium.org%2F -->
+			<!-- WARNING! This seems to be TabModel::Build in the newer Chrome versions, so you might get confused. The new PageItems patterns seems to be in Remove Send To Your Devices 4 now -->
 			<BytePattern>84 C0 0F 84 ? ? ? ? 48 8D 15 ? ? ? ? 48 8D 5C 24 ? 48 89 D9 E8 ? ? ? ? 48 89 D9</BytePattern> <!-- Chr 83-84 -->
+		</Pattern>
+		<Pattern name="Remove Send To Your Devices 3">
+			<!-- ?UpdateContextMenu@OmniboxViewViews; Search for xrefs for ?ShouldOfferFeature@send_tab_to_self and find it with an test al, al afterwards  -->
+			<BytePattern>84 C0 0F 84 ? ? ? ? 48 8D 15 ? ? ? ? 48 8D 7C 24 ? 48 89 F9 E8 ? ? ? ? 31 DB</BytePattern> <!-- Chr 84 -->
+		</Pattern>
+		<Pattern name="Remove Send To Your Devices 4">
+			<!-- ?AppendPageItems@RenderViewContextMenu; Search for xrefs for ?ShouldOfferFeature@send_tab_to_self and find it with an test al, al afterwards  -->
+			<BytePattern>E8 ? ? ? ? 48 8B 8E ? ? ? ? 48 8B 01 BA ? ? ? ? FF 50 08 84 C0 74 1C</BytePattern> <!-- Chr 84, sig -->
 		</Pattern>
 
 		<!-- 
@@ -102,6 +111,16 @@
 		<Patch pattern="Remove Send To Your Devices 2" group="4">
 			<PatchData type="x64" orig="0x84" patch="0x38" sig="false">
 				<Offset>0x00</Offset>
+			</PatchData> <!-- test => cmp; this forces the ZeroFlag to be 1 => it will skip the insertion of the menu option -->
+		</Patch>
+		<Patch pattern="Remove Send To Your Devices 3" group="4">
+			<PatchData type="x64" orig="0x84" patch="0x38" sig="false">
+				<Offset>0x00</Offset>
+			</PatchData> <!-- test => cmp; this forces the ZeroFlag to be 1 => it will skip the insertion of the menu option -->
+		</Patch>
+		<Patch pattern="Remove Send To Your Devices 4" group="4">
+			<PatchData type="x64" orig="0x84" patch="0x38" sig="true" sigOffset="0xD8">
+				<Offset>0x01</Offset> <!-- call instruction -->
 			</PatchData> <!-- test => cmp; this forces the ZeroFlag to be 1 => it will skip the insertion of the menu option -->
 		</Patch>
 
