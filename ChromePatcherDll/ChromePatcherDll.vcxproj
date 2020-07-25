@@ -162,6 +162,7 @@
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="patches.cpp" />
     <ClCompile Include="threads.cpp" />
+    <ClCompile Include="winhook.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="dllmain.hpp" />
@@ -169,6 +170,7 @@
     <ClInclude Include="resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="threads.hpp" />
+    <ClInclude Include="winhook.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="ChromePatcherDll.rc" />

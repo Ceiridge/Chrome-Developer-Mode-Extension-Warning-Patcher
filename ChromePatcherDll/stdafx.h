@@ -8,3 +8,5 @@
 #include <fstream>
 #include <ctime>
 #include <TlHelp32.h>
+
+inline HMODULE module;

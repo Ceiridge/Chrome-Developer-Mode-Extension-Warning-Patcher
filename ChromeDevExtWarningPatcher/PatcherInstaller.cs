@@ -10,11 +10,17 @@ using System.Windows.Data;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using System.Runtime.InteropServices;
 
 namespace ChromeDevExtWarningPatcher {
 	class PatcherInstaller {
 		private static uint FILE_HEADER = BitConverter.ToUInt32(BitConverter.GetBytes(0xCE161D6E).Reverse().ToArray(), 0);
 		private static uint PATCH_HEADER = BitConverter.ToUInt32(BitConverter.GetBytes(0x8A7C5000).Reverse().ToArray(), 0); // fix for wrong endianess
+
+		[DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+		private static extern bool SendNotifyMessage(IntPtr hWnd, uint Msg, UIntPtr wParam,
+   IntPtr lParam);
+
 
 		private List<InstallationPaths> InstallationPaths;
 
@@ -71,12 +77,14 @@ namespace ChromeDevExtWarningPatcher {
 		private static bool TryDeletePatcherDll(string path) {
 			while (true) {
 				try {
-					Thread.Sleep(10);
+					Thread.Sleep(100);
 					if (File.Exists(path)) {
 						File.Delete(path);
 					}
 					return true;
-				} catch (Exception e) {}
+				} catch (Exception e) {
+					SendNotifyMessage(new IntPtr(0xFFFF), 0x0, UIntPtr.Zero, IntPtr.Zero); // HWND_BROADCAST a WM_NULL to make sure every injected dll unloads
+				}
 			}
 		}
 

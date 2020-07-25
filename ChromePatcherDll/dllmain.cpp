@@ -1,33 +1,8 @@
 #include "stdafx.h"
 #include "patches.hpp"
 #include "threads.hpp"
+#include "winhook.hpp"
 
-HMODULE module;
-HHOOK hook;
-
-_declspec(dllexport) LRESULT CALLBACK CBTProc(int nCode, WPARAM wParam, LPARAM lParam) {
-	return CallNextHookEx(hook, nCode, wParam, lParam);
-}
-
-_declspec(dllexport) bool InstallWinHook() {
-	if (hook) {
-		return false;
-	}
-
-	return hook = SetWindowsHookEx(WH_CBT, CBTProc, module, 0); // Global windows hook -> Windows injects the dll everywhere automatically
-}
-
-_declspec(dllexport) bool UnInstallWinHook() {
-	if (!hook) {
-		return false;
-	}
-
-	if (UnhookWindowsHookEx(hook)) {
-		hook = NULL;
-		return true;
-	}
-	return false;
-}
 
 BOOL APIENTRY ThreadMain(LPVOID lpModule) {
 	FILE* fout = nullptr;
@@ -141,6 +116,7 @@ BOOL APIENTRY ThreadMain(LPVOID lpModule) {
 	return TRUE;
 }
 
+
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved) {
 	switch (ul_reason_for_call) {
 		case DLL_PROCESS_ATTACH: {
@@ -151,7 +127,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 			GetModuleFileNameW(NULL, _exePath, 1024);
 			std::wstring exePath(_exePath);
 
-			if (exePath.find(L"ChromeDllInjector.exe") != std::wstring::npos || cmdLine.find(L"--type=") != std::wstring::npos) { // Ignore the injector's process, but stay loaded & ignore Chrome's subprocesses
+			if (exePath.find(L"ChromeDllInjector.exe") != std::wstring::npos || cmdLine.find(L"--type=") != std::wstring::npos) { // Ignore the injector's process, but stay loaded &  Ignore Chrome's subprocesses
 				return TRUE;
 			}
 
