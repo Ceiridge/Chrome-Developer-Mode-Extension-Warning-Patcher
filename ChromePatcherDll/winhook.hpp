@@ -2,6 +2,6 @@
 
 inline HHOOK hook;
 
-_declspec(dllexport) LRESULT CALLBACK CBTProc(int nCode, WPARAM wParam, LPARAM lParam);
-_declspec(dllexport) bool InstallWinHook();
-_declspec(dllexport) bool UnInstallWinHook();
+extern "C" _declspec(dllexport) LRESULT CALLBACK CBTProc(int nCode, WPARAM wParam, LPARAM lParam);
+extern "C" _declspec(dllexport) bool InstallWinHook();
+extern "C" _declspec(dllexport) bool UnInstallWinHook();

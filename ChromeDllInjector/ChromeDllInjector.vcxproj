@@ -168,11 +168,6 @@
   <ItemGroup>
     <ResourceCompile Include="ChromeDllInjector.rc" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\ChromePatcherDll\ChromePatcherDll.vcxproj">
-      <Project>{ba6b041f-e0e9-45ec-86d8-bc5d1d864ae5}</Project>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

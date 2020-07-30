@@ -74,16 +74,14 @@ namespace ChromeDevExtWarningPatcher {
 			return new DirectoryInfo(Path.Combine(Environment.ExpandEnvironmentVariables("%ProgramW6432%"), "Ceiridge", "ChromeDllInjector"));
 		}
 
-		private static bool TryDeletePatcherDll(string path) {
-			while (true) {
-				try {
-					Thread.Sleep(100);
-					if (File.Exists(path)) {
-						File.Delete(path);
+		private static void TryDeletePatcherDlls(DirectoryInfo folder) {
+			foreach(FileInfo file in folder.EnumerateFiles()) {
+				if (file.Name.EndsWith(".dll") && file.Name.Contains("ChromePatcherDll_")) {
+					try {
+						file.Delete();
+					} catch (Exception) {
+						// Ignore
 					}
-					return true;
-				} catch (Exception e) {
-					SendNotifyMessage(new IntPtr(0xFFFF), 0x0, UIntPtr.Zero, IntPtr.Zero); // HWND_BROADCAST a WM_NULL to make sure every injected dll unloads
 				}
 			}
 		}
@@ -99,6 +97,7 @@ namespace ChromeDevExtWarningPatcher {
 					}
 				}
 			}
+			SendNotifyMessage(new IntPtr(0xFFFF), 0x0, UIntPtr.Zero, IntPtr.Zero); // HWND_BROADCAST a WM_NULL to make sure every injected dll unloads
 			Thread.Sleep(1000); // Give Windows some time to unload all patch dlls
 
 			using (RegistryKey dllPathKeys = OpenExesKey()) {
@@ -128,7 +127,7 @@ namespace ChromeDevExtWarningPatcher {
 			// Write the injector to "Program Files"
 			DirectoryInfo programsFolder = GetProgramsFolder();
 			string injectorPath;
-			string patcherDllPath = Path.Combine(programsFolder.FullName, "ChromePatcherDll.dll");
+			string patcherDllPath = Path.Combine(programsFolder.FullName, "ChromePatcherDll_" + Installation.GetUnixTime() + ".dll"); // Unique dll to prevent file locks
 
 			if (!programsFolder.Exists) {
 				Directory.CreateDirectory(programsFolder.FullName); // Also creates all subdirectories
@@ -136,7 +135,7 @@ namespace ChromeDevExtWarningPatcher {
 			File.WriteAllBytes(injectorPath = Path.Combine(programsFolder.FullName, "ChromeDllInjector.exe"), Properties.Resources.ChromeDllInjector);
 			log("Wrote injector to " + injectorPath);
 
-			TryDeletePatcherDll(patcherDllPath);
+			TryDeletePatcherDlls(programsFolder);
 			File.WriteAllBytes(patcherDllPath, Properties.Resources.ChromePatcherDll);
 			log("Wrote patcher dll to " + patcherDllPath);
 
@@ -184,6 +183,7 @@ namespace ChromeDevExtWarningPatcher {
 					}
 				}
 			}
+			SendNotifyMessage(new IntPtr(0xFFFF), 0x0, UIntPtr.Zero, IntPtr.Zero); // HWND_BROADCAST a WM_NULL to make sure every injected dll unloads
 			Thread.Sleep(1000); // Give Windows some time to unload all patch dlls
 
 			using (RegistryKey dllPathKeys = OpenExesKey()) {
@@ -208,8 +208,8 @@ namespace ChromeDevExtWarningPatcher {
 
 			DirectoryInfo programsFolder = GetProgramsFolder();
 			if(programsFolder.Exists) {
-				TryDeletePatcherDll(Path.Combine(programsFolder.FullName, "ChromePatcherDll.dll"));
-				programsFolder.Delete(true);
+				TryDeletePatcherDlls(programsFolder);
+				File.Delete(Path.Combine(programsFolder.FullName, "ChromeDllInjector.exe"));
 				log("Deleted " + programsFolder.FullName);
 			}
 

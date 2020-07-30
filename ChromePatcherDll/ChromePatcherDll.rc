@@ -52,7 +52,7 @@ END
 
 VS_VERSION_INFO VERSIONINFO
  FILEVERSION 3,0,0,0
- PRODUCTVERSION 4,2,0,0
+ PRODUCTVERSION 4,3,0,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -74,7 +74,7 @@ BEGIN
             VALUE "LegalCopyright", "GNU General Public License 3, Ceiridge"
             VALUE "OriginalFilename", "ChromePatcherDll.dll"
             VALUE "ProductName", "Chromium Developer Extension Warning Patcher"
-            VALUE "ProductVersion", "4.2.0.0"
+            VALUE "ProductVersion", "4.3.0.0"
         END
     END
     BLOCK "VarFileInfo"

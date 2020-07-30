@@ -47,8 +47,11 @@ namespace ChromeDevExtWarningPatcher.InstallationFinder {
 			pathList.Add(latestDllAndExe);
 		}
 
-		private static double GetUnixTime(DateTime date) {
-			return (DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
+		public static double GetUnixTime(DateTime date) {
+			return (date.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
+		}
+		public static double GetUnixTime() {
+			return GetUnixTime(DateTime.UtcNow);
 		}
 	}
 }

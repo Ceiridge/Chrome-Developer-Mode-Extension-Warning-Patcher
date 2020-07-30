@@ -15,6 +15,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ChromePatcherDll", "ChromePatcherDll\ChromePatcherDll.vcxproj", "{BA6B041F-E0E9-45EC-86D8-BC5D1D864AE5}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ChromeDllInjector", "ChromeDllInjector\ChromeDllInjector.vcxproj", "{180314CF-AF7D-4A49-8B44-3A1FF681B90B}"
+	ProjectSection(ProjectDependencies) = postProject
+		{BA6B041F-E0E9-45EC-86D8-BC5D1D864AE5} = {BA6B041F-E0E9-45EC-86D8-BC5D1D864AE5}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
