@@ -68,4 +68,7 @@ The idea originates from an answer on StackOverflow that also patched the `chrom
 
 Used open source libraries:
 - [dahall/taskscheduler](https://github.com/dahall/taskscheduler)
+- [dahall/Vanara](https://github.com/dahall/Vanara)
+- [haf/DotNetZip.Semverd](https://github.com/haf/DotNetZip.Semverd)
 - [commandlineparser/commandline](https://github.com/commandlineparser/commandline)
+- Some Microsoft NuGet Packages

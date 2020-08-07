@@ -24,9 +24,6 @@
     <ClCompile Include="threads.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="winhook.cpp">
-      <Filter>Quelldateien</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="patches.hpp">
@@ -42,9 +39,6 @@
       <Filter>Headerdateien</Filter>
     </ClInclude>
     <ClInclude Include="dllmain.hpp">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
-    <ClInclude Include="winhook.hpp">
       <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>

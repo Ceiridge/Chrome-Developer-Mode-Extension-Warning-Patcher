@@ -1,16 +1,16 @@
 ﻿using ChromeDevExtWarningPatcher.InstallationFinder;
+using Ionic.Zip;
 using Microsoft.Win32;
+using Microsoft.Win32.TaskScheduler;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using Microsoft.Win32.TaskScheduler;
-using System.Security.Principal;
-using System.Net.NetworkInformation;
-using System.Windows.Data;
+using System.IO.Compression;
 using System.Linq;
+using System.Runtime.InteropServices;
+using System.Security.Principal;
 using System.Text;
 using System.Threading;
-using System.Runtime.InteropServices;
 
 namespace ChromeDevExtWarningPatcher {
 	class PatcherInstaller {
@@ -50,7 +50,7 @@ namespace ChromeDevExtWarningPatcher {
 				}
 
 				writer.Write(patch.offsets.Count);
-				foreach(int offset in patch.offsets) {
+				foreach (int offset in patch.offsets) {
 					writer.Write(offset);
 				}
 
@@ -69,13 +69,13 @@ namespace ChromeDevExtWarningPatcher {
 		private static RegistryKey OpenExesKey() {
 			return Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Ceiridge\ChromePatcher\ChromeExes");
 		}
-		
+
 		private static DirectoryInfo GetProgramsFolder() {
 			return new DirectoryInfo(Path.Combine(Environment.ExpandEnvironmentVariables("%ProgramW6432%"), "Ceiridge", "ChromeDllInjector"));
 		}
 
 		private static void TryDeletePatcherDlls(DirectoryInfo folder) {
-			foreach(FileInfo file in folder.EnumerateFiles()) {
+			foreach (FileInfo file in folder.EnumerateFiles()) {
 				if (file.Name.EndsWith(".dll") && file.Name.Contains("ChromePatcherDll_")) {
 					try {
 						file.Delete();
@@ -83,6 +83,27 @@ namespace ChromeDevExtWarningPatcher {
 						// Ignore
 					}
 				}
+			}
+		}
+
+		// This is needed to ignore deletion errors
+		private static void DeleteFolderRecursively(DirectoryInfo folder) {
+			foreach(FileInfo file in folder.EnumerateFiles()) {
+				try {
+					file.Delete();
+				} catch(Exception) {
+					// Ignore
+				}
+			}
+
+			foreach(DirectoryInfo directory in folder.EnumerateDirectories()) {
+				DeleteFolderRecursively(directory);
+			}
+
+			try {
+				folder.Delete(false);
+			} catch (Exception) {
+				// Ignore
 			}
 		}
 
@@ -126,14 +147,18 @@ namespace ChromeDevExtWarningPatcher {
 
 			// Write the injector to "Program Files"
 			DirectoryInfo programsFolder = GetProgramsFolder();
-			string injectorPath;
 			string patcherDllPath = Path.Combine(programsFolder.FullName, "ChromePatcherDll_" + Installation.GetUnixTime() + ".dll"); // Unique dll to prevent file locks
 
 			if (!programsFolder.Exists) {
 				Directory.CreateDirectory(programsFolder.FullName); // Also creates all subdirectories
 			}
-			File.WriteAllBytes(injectorPath = Path.Combine(programsFolder.FullName, "ChromeDllInjector.exe"), Properties.Resources.ChromeDllInjector);
-			log("Wrote injector to " + injectorPath);
+
+			using(ZipFile zip = ZipFile.Read(new MemoryStream(Properties.Resources.ChromeDllInjector))) {
+				foreach(ZipEntry entry in zip) {
+					entry.Extract(programsFolder.FullName, ExtractExistingFileAction.OverwriteSilently);
+				}
+			}
+			log("Extracted injector zip");
 
 			TryDeletePatcherDlls(programsFolder);
 			File.WriteAllBytes(patcherDllPath, Properties.Resources.ChromePatcherDll);
@@ -147,7 +172,7 @@ namespace ChromeDevExtWarningPatcher {
 				task.RegistrationInfo.URI = "https://github.com/Ceiridge/Chrome-Developer-Mode-Extension-Warning-Patcher";
 
 				task.Triggers.Add(new LogonTrigger { });
-				task.Actions.Add(new ExecAction(injectorPath));
+				task.Actions.Add(new ExecAction(Path.Combine(programsFolder.FullName, "ChromeDllInjector.exe")));
 
 				task.Principal.RunLevel = TaskRunLevel.Highest;
 				task.Principal.LogonType = TaskLogonType.InteractiveToken;
@@ -207,10 +232,10 @@ namespace ChromeDevExtWarningPatcher {
 			}
 
 			DirectoryInfo programsFolder = GetProgramsFolder();
-			if(programsFolder.Exists) {
+			if (programsFolder.Exists) {
 				TryDeletePatcherDlls(programsFolder);
-				File.Delete(Path.Combine(programsFolder.FullName, "ChromeDllInjector.exe"));
-				log("Deleted " + programsFolder.FullName);
+				DeleteFolderRecursively(programsFolder);
+				log("(Mostly) deleted " + programsFolder.FullName);
 			}
 
 			log("Patcher uninstalled!");

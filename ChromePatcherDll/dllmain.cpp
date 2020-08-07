@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #include "patches.hpp"
 #include "threads.hpp"
-#include "winhook.hpp"
 
+// Most of the code here is quite useless (it comes from older version that used other methods of injecting), but won't be removed (too lazy) (e. g. checking if it is Chrome)
 
 BOOL APIENTRY ThreadMain(LPVOID lpModule) {
 	FILE* fout = nullptr;
@@ -128,7 +128,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 			GetModuleFileNameW(NULL, _exePath, 1024);
 			std::wstring exePath(_exePath);
 
-			if (exePath.find(L"ChromeDllInjector.exe") != std::wstring::npos || cmdLine.find(L"--type=") != std::wstring::npos) { // Ignore the injector's process, but stay loaded &  Ignore Chrome's subprocesses
+			if (exePath.find(L"ChromeDllInjector.exe") != std::wstring::npos || cmdLine.find(L"--type=") != std::wstring::npos) { // Ignore the injector's process, but stay loaded & Ignore Chrome's subprocesses
 				return TRUE;
 			}
 
@@ -176,7 +176,6 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 		case DLL_THREAD_DETACH:
 			break;
 		case DLL_PROCESS_DETACH:
-			UnInstallWinHook();
 			break;
 	}
 

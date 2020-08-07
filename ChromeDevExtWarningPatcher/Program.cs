@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows;
 
-// Uncommented code ahead; Code quality may vary because of two partial recodes
+// Uncommented code ahead; Code quality may vary because of three partial recodes
 namespace ChromeDevExtWarningPatcher {
 	class Program {
 		private static Application guiApp;
@@ -22,7 +22,7 @@ namespace ChromeDevExtWarningPatcher {
 		[DllImport("kernel32.dll", SetLastError = true, ExactSpelling = true)]
 		private static extern bool FreeConsole();
 
-		const string archError = "A 64-bit operating system is required. 32-bit is not supported and won't be in the future.";
+		private const string archError = "A 64-bit operating system is required. 32-bit is not supported and won't be in the future.";
 		[STAThread]
 		public static void Main(string[] args) {
 			bool incompatibleArchitecture = !Environment.Is64BitOperatingSystem;
