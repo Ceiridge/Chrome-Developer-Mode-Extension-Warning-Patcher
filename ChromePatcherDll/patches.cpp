@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "patches.hpp"
 
+#define ReadVar(variable) file.read(reinterpret_cast<char*>(&variable), sizeof(variable)); // Makes everything easier to read
+
 namespace ChromePatch {
 	ReadPatchResult Patches::ReadPatchFile() {
 		static const unsigned int FILE_HEADER = 0xCE161D6E;
@@ -39,15 +41,15 @@ namespace ChromePatch {
 
 			std::vector<PatchPattern> patterns;
 			int patternsSize;
-			file.read(reinterpret_cast<char*>(&patternsSize), sizeof(patternsSize));
+			ReadVar(patternsSize);
 			for (int i = 0; i < patternsSize; i++) {
 				int patternLength;
-				file.read(reinterpret_cast<char*>(&patternLength), sizeof(patternLength));
+				ReadVar(patternLength);
 				std::vector<byte> pattern;
 
 				for (int i = 0; i < patternLength; i++) {
 					byte patternByte;
-					file.read(reinterpret_cast<char*>(&patternByte), sizeof(patternByte));
+					ReadVar(patternByte);
 					pattern.push_back(patternByte);
 				}
 
@@ -55,20 +57,20 @@ namespace ChromePatch {
 			}
 
 			int offsetCount;
+			ReadVar(offsetCount);
 			std::vector<int> offsets;
-			file.read(reinterpret_cast<char*>(&offsetCount), sizeof(offsetCount));
 			for (int i = 0; i < offsetCount; i++) {
 				int offset;
-				file.read(reinterpret_cast<char*>(&offset), sizeof(offset));
+				ReadVar(offset);
 				offsets.push_back(offset);
 			}
 
 			int sigOffset;
 			byte origByte, patchByte, isSig;
-			file.read(reinterpret_cast<char*>(&origByte), sizeof(origByte)); // perfectly beautiful code right here
-			file.read(reinterpret_cast<char*>(&patchByte), sizeof(patchByte));
-			file.read(reinterpret_cast<char*>(&isSig), sizeof(isSig));
-			file.read(reinterpret_cast<char*>(&sigOffset), sizeof(sigOffset));
+			ReadVar(origByte);
+			ReadVar(patchByte);
+			ReadVar(isSig);
+			ReadVar(sigOffset);
 
 			Patch patch{ patterns, origByte, patchByte, offsets, isSig > 0, sigOffset };
 			patches.push_back(patch);
@@ -97,18 +99,18 @@ namespace ChromePatch {
 		return std::wstring();
 	}
 
-	std::string Patches::ReadString(std::ifstream& stream) {
+	std::string Patches::ReadString(std::ifstream& file) {
 		int length;
-		stream.read(reinterpret_cast<char*>(&length), sizeof(length));
+		ReadVar(length);
 
 		std::string str(length, '\0');
-		stream.read(str.data(), length);
+		file.read(str.data(), length);
 		return str;
 	}
 
-	unsigned int Patches::ReadUInteger(std::ifstream& stream) {
+	unsigned int Patches::ReadUInteger(std::ifstream& file) {
 		unsigned int integer;
-		stream.read(reinterpret_cast<char*>(&integer), sizeof(integer));
+		ReadVar(integer);
 
 		return _byteswap_ulong(integer);
 	}
