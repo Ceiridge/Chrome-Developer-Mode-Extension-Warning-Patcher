@@ -8,15 +8,11 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Threading;
 using Vanara.PInvoke;
 
 namespace ChromeDllInjector {
 	class Program {
-		[DllImport("user32.dll")]
-		private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
-
 		private static readonly List<string> ChromeExeFilePaths = new List<string>();
 		private static Injector Injector;
 
@@ -78,7 +74,7 @@ namespace ChromeDllInjector {
 
 		// Init functions to make the code cleaner
 		private static void RedirectConsole() {
-			ShowWindow(Kernel32.GetConsoleWindow().DangerousGetHandle(), 0); // Hide the console window
+			Kernel32.FreeConsole(); // Hide the console window
 
 			StreamWriter writer;
 			Console.SetOut(writer = new StreamWriter(new FileStream(Environment.GetFolderPath(Environment.SpecialFolder.Windows) + @"\Temp\ChromePatcherInjector.log", FileMode.Append, FileAccess.Write, FileShare.Read))); // Redirect to C:\Windows\Temp\ChromePatcherInjector.log
