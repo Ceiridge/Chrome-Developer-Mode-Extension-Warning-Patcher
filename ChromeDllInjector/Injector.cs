@@ -34,13 +34,15 @@ namespace ChromeDllInjector {
 					return;
 				}
 
-				Kernel32.SafeHTHREAD thread = Kernel32.CreateRemoteThread(proc, null, 0, loadLib, alloc, 0, out uint threadId);
-
+				Kernel32.SafeHTHREAD thread = Kernel32.CreateRemoteThread(proc, null, 0, loadLib, alloc, 0, out _);
 				if (!thread.IsNull && !thread.IsInvalid) {
 					Console.WriteLine("Injected!");
-					Kernel32.WaitForSingleObject(thread, Kernel32.INFINITE);
+
+					Kernel32.WaitForSingleObject(thread, Kernel32.INFINITE); // Wait until the dll is injected, so the path can be freed later
 					thread.Close();
 				}
+
+				Kernel32.VirtualFreeEx(proc, alloc, 0, Kernel32.MEM_ALLOCATION_TYPE.MEM_RELEASE); // Free path from the target's memory (alloc's existence is ensured above)
 			}
 
 			proc.Close();

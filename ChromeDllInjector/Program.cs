@@ -37,7 +37,7 @@ namespace ChromeDllInjector {
 			kernelSession.Source.Kernel.ProcessStart += Kernel_ProcessStart;
 
 			new Thread(delegate () { // Required because of blocking Process() below
-				Thread.Sleep(100); // Wait a bit to make sure the ETW started processing
+				Thread.Sleep(50); // Wait a bit to make sure the ETW started processing
 
 				AdvApi32.EVENT_TRACE_PROPERTIES properties = new AdvApi32.EVENT_TRACE_PROPERTIES {
 					Wnode = new AdvApi32.WNODE_HEADER {
