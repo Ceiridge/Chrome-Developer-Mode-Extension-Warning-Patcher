@@ -23,11 +23,21 @@ jobs:
         nuget restore ChromeDevExtWarningPatcher.sln
 
     - name: Write code sign file
+      id: write_file
       if: ${{ github.event_name == 'push' && endsWith(github.ref, '/master') }} # never write code sign file on pull requests
       uses: Ceiridge/base64-to-file@master
       with:
-        fileName: 'Chrome-Developer-Mode-Extension-Warning-Patcher/codesign.pfx'
+        fileName: 'codesign.pfx'
         encodedString: ${{ secrets.CODE_SIGN_PFX }}
+
+    - name: Copy code sign file
+      if: ${{ github.event_name == 'push' && endsWith(github.ref, '/master') }} # never write code sign file on pull requests
+      shell: cmd
+      env:
+        PFXLOC: ${{ steps.write_file.outputs.filePath }}
+      run: |
+        copy /Y %PFXLOC% ./codesign.pfx
+        dir
 
     - name: Add signtool to PATH
       shell: cmd
