@@ -150,4 +150,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>cmd.exe /c ..\..\..\signall.bat</PostBuildEvent>
+  </PropertyGroup>
 </Project>

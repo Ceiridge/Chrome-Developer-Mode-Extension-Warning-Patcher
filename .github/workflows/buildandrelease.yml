@@ -22,6 +22,18 @@ jobs:
       run: |
         nuget restore ChromeDevExtWarningPatcher.sln
 
+    - name: Write code sign file
+      if: ${{ github.event_name == 'push' && endsWith(github.ref, '/master') }} # never write code sign file on pull requests
+      uses: Ceiridge/base64-to-file@master
+      with:
+        fileName: 'codesign.pfx'
+        encodedString: ${{ secrets.CODE_SIGN_PFX }}
+
+    - name: Add signtool to PATH
+      shell: cmd
+      run: |
+        echo "::add-path::C:\Program Files (x86)\Windows Kits\10\bin\10.0.19041.0\x64\"
+
     - name: Build with MSBuild
       shell: cmd
       run: |

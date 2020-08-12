@@ -112,6 +112,6 @@
     <Error Condition="!Exists('..\packages\Microsoft.Diagnostics.Tracing.TraceEvent.2.0.58\build\Microsoft.Diagnostics.Tracing.TraceEvent.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Diagnostics.Tracing.TraceEvent.2.0.58\build\Microsoft.Diagnostics.Tracing.TraceEvent.props'))" />
   </Target>
   <PropertyGroup>
-    <PostBuildEvent>..\..\..\ChromeDllInjectorBuildZipper\bin\Release\ChromeDllInjectorBuildZipper.exe</PostBuildEvent>
+    <PostBuildEvent>cmd.exe /c ..\..\..\signall.bat &amp; ..\..\..\ChromeDllInjectorBuildZipper\bin\Release\ChromeDllInjectorBuildZipper.exe</PostBuildEvent>
   </PropertyGroup>
 </Project>
