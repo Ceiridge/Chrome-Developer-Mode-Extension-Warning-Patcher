@@ -120,7 +120,8 @@
       <EnableUAC>false</EnableUAC>
     </Link>
     <PostBuildEvent>
-      <Command>cmd.exe /c ..\..\..\signall.bat</Command>
+      <Command>cd ..\x64\Release
+..\..\signall.bat</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Sign built release files</Message>
@@ -164,7 +165,8 @@
       <EnableUAC>false</EnableUAC>
     </Link>
     <PostBuildEvent>
-      <Command>cmd.exe /c ..\..\..\signall.bat</Command>
+      <Command>cd ..\x64\Release
+..\..\signall.bat</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Sign built release files</Message>

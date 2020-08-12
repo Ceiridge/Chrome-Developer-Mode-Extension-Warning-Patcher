@@ -12,8 +12,12 @@ IF %FindTries% GEQ 10 GOTO Fail
 GOTO RetryFind
 
 :SignAll
+SET FileLoc=%cd%
 CALL :Sign
-FOR /D %%i IN (%cd%\*) DO (cd "%%i" & CALL :Sign)
+FOR /D %%i IN (%cd%\*) DO (
+	SET FileLoc=%%i
+	CALL :Sign
+)
 
 ECHO Done
 REM Make sure that the batch has an error code of 0
@@ -25,6 +29,6 @@ EXIT /b 0
 
 :Sign
 REM signtool required in PATH
-ECHO Signing in %cd%
-signtool.exe sign /f %CodeSignFile% /as /seal /d "Executable of the Chrome Developer Mode Extension Warning Patcher" /du "https://github.com/Ceiridge/Chrome-Developer-Mode-Extension-Warning-Patcher" /tr http://timestamp.globalsign.com/scripts/timstamp.dll *.dll *.exe
+ECHO Signing in %FileLoc%
+signtool.exe sign /f %CodeSignFile% /as /seal /d "Executable of the Chrome Developer Mode Extension Warning Patcher" /du "https://github.com/Ceiridge/Chrome-Developer-Mode-Extension-Warning-Patcher" /tr http://timestamp.globalsign.com/scripts/timstamp.dll %FileLoc%\*.dll %FileLoc%\*.exe
 GOTO :EOF

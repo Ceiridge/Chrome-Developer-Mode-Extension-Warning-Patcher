@@ -26,7 +26,7 @@ jobs:
       if: ${{ github.event_name == 'push' && endsWith(github.ref, '/master') }} # never write code sign file on pull requests
       uses: Ceiridge/base64-to-file@master
       with:
-        fileName: 'codesign.pfx'
+        fileName: 'Chrome-Developer-Mode-Extension-Warning-Patcher/codesign.pfx'
         encodedString: ${{ secrets.CODE_SIGN_PFX }}
 
     - name: Add signtool to PATH
