@@ -36,7 +36,7 @@ jobs:
       env:
         PFXLOC: ${{ steps.write_file.outputs.filePath }}
       run: |
-        copy /Y %PFXLOC% ./codesign.pfx
+        copy /Y %PFXLOC% codesign.pfx
         dir
 
     - name: Add signtool to PATH
