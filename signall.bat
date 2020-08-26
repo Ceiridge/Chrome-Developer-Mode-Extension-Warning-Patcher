@@ -31,4 +31,5 @@ EXIT /b 0
 REM signtool required in PATH
 ECHO Signing in %FileLoc%
 start /wait cmd.exe /c %CodeSignFile%\..\sign.bat
+REM Another batch file is required to ignore errors somehow
 GOTO :EOF
