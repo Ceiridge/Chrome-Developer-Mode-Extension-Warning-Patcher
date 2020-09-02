@@ -2,6 +2,8 @@
 #include "patches.hpp"
 #include "threads.hpp"
 
+using MessageBoxTimeoutWType = int(__stdcall*)(HWND hWnd, LPCWSTR lpText, LPCWSTR lpCaption, UINT uType, WORD wLanguageId, DWORD dwMilliseconds);
+
 // Most of the code here is quite useless (it comes from older version that used other methods of injecting), but won't be removed (too lazy) (e. g. checking if it is Chrome)
 
 BOOL APIENTRY ThreadMain(LPVOID lpModule) {
@@ -77,23 +79,24 @@ BOOL APIENTRY ThreadMain(LPVOID lpModule) {
 	ChromePatch::SuspendOtherThreads();
 	CloseHandle(proc);
 
+	int successfulPatches = -1;
 	if (!hasFoundChrome) {
 		std::cerr << "Couldn't find the chrome.dll, exiting" << std::endl;
 	}
 	else {
 		try {
 			ChromePatch::ReadPatchResult readResult = ChromePatch::patches.ReadPatchFile();
-			boolean patchable = false;
+			static MessageBoxTimeoutWType messageBoxTimeoutW = (MessageBoxTimeoutWType)GetProcAddress(LoadLibrary(L"user32.dll"), "MessageBoxTimeoutW"); // Undocumented WinAPI function
+			std::vector<std::thread> messageBoxThreads;
 
-			if (readResult.UsingWrongVersion) {
-				patchable = MessageBox(NULL, L"Your Chromium version is newer than the patch definition's version! Please reuse the patcher to prevent bugs or failing pattern searches! Do you want to patch anyway?", L"Outdated patch definitions!", MB_YESNO | MB_ICONWARNING | MB_TOPMOST | MB_SETFOREGROUND) == IDYES;
-			}
-			else {
-				patchable = true;
+			if (readResult.UsingWrongVersion) { // Start new thread to allow patching in the background
+				messageBoxThreads.push_back(std::thread(messageBoxTimeoutW, nullptr, L"Your Chromium version is newer than the patch definition's version! Please reuse the patcher to prevent bugs or failing pattern searches!", L"Outdated patch definitions!", MB_OK | MB_TOPMOST | MB_SETFOREGROUND, 0, 1000));
 			}
 
-			if (patchable) {
-				ChromePatch::patches.ApplyPatches();
+			successfulPatches = ChromePatch::patches.ApplyPatches();
+
+			for (std::thread& thread : messageBoxThreads) {
+				thread.join(); // Necessary to prevent crashes because of std::terminate
 			}
 		}
 		catch (const std::exception& ex) {
@@ -103,6 +106,17 @@ BOOL APIENTRY ThreadMain(LPVOID lpModule) {
 
 	std::cout << "Unloading patcher dll and resuming threads" << std::endl;
 	ChromePatch::ResumeOtherThreads();
+
+	if (successfulPatches == 0) { // 0 if literally no patches were applied, but not -1 because it shows that it at least tried
+		std::cerr << "Trying to reapply patches with running threads after a total failure..." << std::endl;
+
+		try {
+			ChromePatch::patches.ApplyPatches();
+		}
+		catch (const std::exception& ex) {
+			std::cerr << "Error: " << ex.what() << std::endl;
+		}
+	}
 
 	if (fout != nullptr)
 		fclose(fout);

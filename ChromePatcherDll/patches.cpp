@@ -115,7 +115,8 @@ namespace ChromePatch {
 		return _byteswap_ulong(integer);
 	}
 
-	void Patches::ApplyPatches() {
+	int Patches::ApplyPatches() {
+		int successfulPatches = 0;
 		std::cout << "Applying patches, please wait..." << std::endl;
 		HANDLE proc = GetCurrentProcess();
 		MODULEINFO chromeDllInfo;
@@ -206,8 +207,12 @@ namespace ChromePatch {
 			if (!patch.successfulPatch) {
 				std::cerr << "Couldn't patch " << patch.patterns[0].pattern.size() << " " << patch.offsets[0] << std::endl;
 			}
+			else {
+				successfulPatches++;
+			}
 		}
 
 		CloseHandle(proc);
+		return successfulPatches;
 	}
 }
