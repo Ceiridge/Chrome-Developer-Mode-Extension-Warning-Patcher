@@ -86,7 +86,12 @@ BOOL APIENTRY ThreadMain(LPVOID lpModule) {
 	else {
 		try {
 			ChromePatch::ReadPatchResult readResult = ChromePatch::patches.ReadPatchFile();
-			static MessageBoxTimeoutWType messageBoxTimeoutW = (MessageBoxTimeoutWType)GetProcAddress(LoadLibrary(L"user32.dll"), "MessageBoxTimeoutW"); // Undocumented WinAPI function
+			
+			std::cout << "Read Result: UWV: " << readResult.UsingWrongVersion << std::endl;
+			successfulPatches = ChromePatch::patches.ApplyPatches();
+
+			// Disabled, because it was annoying:
+			/*static MessageBoxTimeoutWType messageBoxTimeoutW = (MessageBoxTimeoutWType)GetProcAddress(LoadLibrary(L"user32.dll"), "MessageBoxTimeoutW"); // Undocumented WinAPI function
 			std::vector<std::thread> messageBoxThreads;
 
 			if (readResult.UsingWrongVersion) { // Start new thread to allow patching in the background
@@ -97,7 +102,7 @@ BOOL APIENTRY ThreadMain(LPVOID lpModule) {
 
 			for (std::thread& thread : messageBoxThreads) {
 				thread.join(); // Necessary to prevent crashes because of std::terminate
-			}
+			}*/
 		}
 		catch (const std::exception& ex) {
 			std::cerr << "Error: " << ex.what() << std::endl;
