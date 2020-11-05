@@ -72,3 +72,12 @@ Used open source libraries:
 - [haf/DotNetZip.Semverd](https://github.com/haf/DotNetZip.Semverd)
 - [commandlineparser/commandline](https://github.com/commandlineparser/commandline)
 - Some Microsoft NuGet Packages
+
+## Copyright
+Chrome-Developer-Mode-Extension-Warning-Patcher is released into the public domain according to the GPL 3.0 license by the copyright holders.
+
+Disclaimer: This repository and the used names "Chrome", "Chromium", "Edge" in this project are not affiliated with or endorsed by Google LLC, Microsoft, The Chromium Project, Microsoft Edge, Google Chrome or other third parties. This repository and the used names "Chrome", "Chromium", "Edge" are also not affiliated with any existing trademarks.
+
+**No code was copied** or used from any other browser in this repository. Chromium is licensed under the open source BSD License.
+
+This repository does not infringe any copyright of proprietary browsers, as it only patches bytes on the end user's computer, without having any copyright-protected code or text included in this repository.
