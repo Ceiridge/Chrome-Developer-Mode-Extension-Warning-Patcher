@@ -58,13 +58,17 @@ BOOL APIENTRY ThreadMain(LPVOID lpModule) {
 				HMODULE mod = modules[i];
 				TCHAR modulePath[1024];
 
-				if (GetModuleFileName(mod, modulePath, ARRAYSIZE(modulePath))) { // analyze the module's file path with regex
+				if (GetModuleFileName(mod, modulePath, ARRAYSIZE(modulePath))) { // Analyze the module's file path with regex
 					if (std::regex_search(modulePath, chromeDllRegex)) {
 						std::wcout << L"Found chrome.dll module: " << modulePath << L" with handle: " << mod << std::endl;
 						
 						ChromePatch::patches.chromeDll = mod;
 						ChromePatch::patches.chromeDllPath = modulePath;
 						hasFoundChrome = true;
+						break; /* Break this module enumeration after the right dll has been found
+								  There is also a special case for newer versions of MSEdge, where 
+								  other dlls matche with the regex query and would set a wrong one.
+							   */
 					}
 				}
 			}
@@ -73,7 +77,7 @@ BOOL APIENTRY ThreadMain(LPVOID lpModule) {
 			std::cerr << "Couldn't enumerate modules" << std::endl;
 		}
 
-		Sleep(1);
+		Sleep(1); // Sleeping to let the process load its modules
 		attempts++;
 	}
 	ChromePatch::SuspendOtherThreads();
