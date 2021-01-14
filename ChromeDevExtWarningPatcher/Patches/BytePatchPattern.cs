@@ -6,7 +6,7 @@ namespace ChromeDevExtWarningPatcher.Patches {
 		public List<byte[]> AlternativePatternsX64 = new List<byte[]>();
 
 		public BytePatchPattern(string name) {
-			Name = name;
+			this.Name = name;
 		}
 	}
 }

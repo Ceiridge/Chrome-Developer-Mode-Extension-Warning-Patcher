@@ -3,7 +3,6 @@ using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -13,123 +12,130 @@ namespace ChromeDevExtWarningPatcher {
 	public partial class PatcherGui : Window {
 
 		public PatcherGui() {
-			InitializeComponent();
+			this.InitializeComponent();
 		}
 
 		private void SelectFolderBtn_Click(object sender, RoutedEventArgs e) {
-			OpenFileDialog openFile = new OpenFileDialog();
-			openFile.Title = "Select a chrome.dll";
-			openFile.Filter = "chrome.dll/msedge.dll file (chrome.dll;msedge.dll)|chrome.dll;msedge.dll|Alternative chrome.dll file (*.dll)|*.dll|All files (*.*)|*.*";
-			openFile.FilterIndex = 1;
+			OpenFileDialog openFile = new OpenFileDialog {
+				Title = "Select a chrome.dll",
+				Filter = "chrome.dll/msedge.dll file (chrome.dll;msedge.dll)|chrome.dll;msedge.dll|Alternative chrome.dll file (*.dll)|*.dll|All files (*.*)|*.*",
+				FilterIndex = 1
+			};
 			openFile.CheckFileExists = openFile.CheckPathExists = openFile.AddExtension = true;
 
-			if (openFile.ShowDialog(this) == true) { // No, I'm not a noob, I have to do it like this and further below
-				string chromeDllPath = openFile.FileName;
-
-				openFile = new OpenFileDialog();
-				openFile.Title = "Select a chrome.exe";
-				openFile.Filter = "Browser executable file (*.exe)|*.exe|All files (*.*)|*.*";
-				openFile.FilterIndex = 1;
-				openFile.CheckFileExists = openFile.CheckPathExists = openFile.AddExtension = true;
-				openFile.InitialDirectory = Directory.GetParent(Path.GetDirectoryName(chromeDllPath)).FullName;
-
-				if (openFile.ShowDialog(this) == true) {
-					string chromeExePath = openFile.FileName;
-					AddChromiumInstallation(new InstallationPaths(chromeDllPath, chromeExePath), false);
-				}
+			if (openFile.ShowDialog(this) != true) { // No, I'm not a noob, I have to do it like this and further below
+				return;
 			}
+
+			string chromeDllPath = openFile.FileName;
+
+			openFile = new OpenFileDialog {
+				Title = "Select a chrome.exe",
+				Filter = "Browser executable file (*.exe)|*.exe|All files (*.*)|*.*",
+				FilterIndex = 1
+			};
+			openFile.CheckFileExists = openFile.CheckPathExists = openFile.AddExtension = true;
+			openFile.InitialDirectory = Directory.GetParent(Path.GetDirectoryName(chromeDllPath)).FullName;
+
+			if (openFile.ShowDialog(this) != true) {
+				return;
+			}
+
+			string chromeExePath = openFile.FileName;
+			this.AddChromiumInstallation(new InstallationPaths(chromeDllPath, chromeExePath), false);
 		}
 
 		private void PatchBtn_Click(object sender, RoutedEventArgs e) {
-			PatchBtn.IsEnabled = UnPatchBtn.IsEnabled = false;
+			this.PatchBtn.IsEnabled = this.UnPatchBtn.IsEnabled = false;
 
-			Program.bytePatchManager.DisabledGroups.Clear();
-			foreach (CustomCheckBox patchBox in PatchGroupList.Items) {
-				if (patchBox.IsChecked == false)
-					Program.bytePatchManager.DisabledGroups.Add(patchBox.Group);
+			Program.BytePatchManager.DisabledGroups.Clear();
+			foreach (CustomCheckBox patchBox in this.PatchGroupList.Items) {
+				if (patchBox.IsChecked == false) {
+					Program.BytePatchManager.DisabledGroups.Add(patchBox.Group);
+				}
 			}
 
 			try {
 				List<InstallationPaths> installPaths = new List<InstallationPaths>();
-				foreach (CustomCheckBox installBox in InstallationList.Items) {
+				foreach (CustomCheckBox installBox in this.InstallationList.Items) {
 					if (installBox.IsChecked == true) {
 						installPaths.Add(new InstallationPaths(installBox.Content.ToString(), installBox.ToolTip.ToString().Split(new string[] { " & " }, StringSplitOptions.None)[1]));
 					}
 				}
 
 				PatcherInstaller installer = new PatcherInstaller(installPaths);
-				if (installer.Install(Log)) {
-					foreach (CustomCheckBox installBox in InstallationList.Items) {
+				if (installer.Install(this.Log)) {
+					foreach (CustomCheckBox installBox in this.InstallationList.Items) {
 						if (installBox.IsChecked == true) {
 							installBox.Foreground = installBox.BorderBrush = new SolidColorBrush(Color.FromRgb(72, 207, 133));
 						}
 					}
 				}
 			} catch (Exception ex) {
-				Log("Error while installing:" + ex.Message);
+				this.Log("Error while installing:" + ex.Message);
 			}
 
-			PatchBtn.IsEnabled = UnPatchBtn.IsEnabled = true;
+			this.PatchBtn.IsEnabled = this.UnPatchBtn.IsEnabled = true;
 		}
 
 		private void UnPatchBtn_Click(object sender, RoutedEventArgs e) {
-			PatchBtn.IsEnabled = UnPatchBtn.IsEnabled = false;
+			this.PatchBtn.IsEnabled = this.UnPatchBtn.IsEnabled = false;
 
 			try {
 				List<InstallationPaths> installPaths = new List<InstallationPaths>();
-				foreach (CustomCheckBox installBox in InstallationList.Items) {
+				foreach (CustomCheckBox installBox in this.InstallationList.Items) {
 					installPaths.Add(new InstallationPaths(installBox.Content.ToString(), installBox.ToolTip.ToString().Split(new string[] { " & " }, StringSplitOptions.None)[1])); // chromeExePath is always in the ToolTip after " & "
 				}
 
 				PatcherInstaller installer = new PatcherInstaller(installPaths);
-				if (installer.UninstallAll(Log)) {
-					foreach (CustomCheckBox installBox in InstallationList.Items) {
+				if (installer.UninstallAll(this.Log)) {
+					foreach (CustomCheckBox installBox in this.InstallationList.Items) {
 						if (installBox.IsChecked == true) {
 							installBox.Foreground = installBox.BorderBrush = new SolidColorBrush(Color.FromRgb(72, 207, 133));
 						}
 					}
 				}
 			} catch (Exception ex) {
-				Log("Error while uninstalling:" + ex.Message);
+				this.Log("Error while uninstalling:" + ex.Message);
 			}
 
-			PatchBtn.IsEnabled = UnPatchBtn.IsEnabled = true;
+			this.PatchBtn.IsEnabled = this.UnPatchBtn.IsEnabled = true;
 		}
 
 		private void CopyBtn_Click(object sender, RoutedEventArgs e) {
-			Clipboard.SetText(ConsoleBox.GetTotalTextRange().Text);
+			Clipboard.SetText(this.ConsoleBox.GetTotalTextRange().Text);
 		}
 
 		protected override void OnInitialized(EventArgs e) {
 			base.OnInitialized(e);
 
-			ConsoleBox.GetTotalTextRange().Text = "";
+			this.ConsoleBox.GetTotalTextRange().Text = "";
 
-			Log("Patcher gui initialized");
-			Log("Searching for Chromium installations...");
+			this.Log("Patcher gui initialized");
+			this.Log("Searching for Chromium installations...");
 
-			foreach (InstallationPaths paths in new InstallationFinder.InstallationManager().FindAllChromiumInstallations()) {
-				AddChromiumInstallation(paths);
+			foreach (InstallationPaths paths in new InstallationManager().FindAllChromiumInstallations()) {
+				this.AddChromiumInstallation(paths);
 			}
 
-			foreach (GuiPatchGroupData patchGroup in Program.bytePatchManager.PatchGroups) {
-				PatchGroupList.Items.Add(new CustomCheckBox(patchGroup));
+			foreach (GuiPatchGroupData patchGroup in Program.BytePatchManager.PatchGroups) {
+				this.PatchGroupList.Items.Add(new CustomCheckBox(patchGroup));
 			}
 		}
 
 		public void Log(string str) {
-			ConsoleBox.Dispatcher.Invoke(new Action(() => {
+			this.ConsoleBox.Dispatcher.Invoke(new Action(() => {
 				Paragraph logParagraph = new Paragraph();
 				logParagraph.Inlines.Add(str);
 
-				ConsoleBox.Document.Blocks.Add(logParagraph);
-				ConsoleBox.ScrollToEnd();
+				this.ConsoleBox.Document.Blocks.Add(logParagraph);
+				this.ConsoleBox.ScrollToEnd();
 			}));
 		}
 
 		private void AddChromiumInstallation(InstallationPaths chromePaths, bool suppressErrors = true) {
-			if(!chromePaths.Is64Bit()) {
-				if(!suppressErrors) {
+			if (!chromePaths.Is64Bit()) {
+				if (!suppressErrors) {
 					MessageBox.Show("A 64-bit Chromium installation is required", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
 				}
 				return;
@@ -139,8 +145,8 @@ namespace ChromeDevExtWarningPatcher {
 			installationBox.IsChecked = true;
 			installationBox.ToolTip = chromePaths.ChromeDllPath + " & " + chromePaths.ChromeExePath;
 
-			InstallationList.Items.Add(installationBox);
-			Log("Added Chromium installation at " + chromePaths.ChromeDllPath);
+			this.InstallationList.Items.Add(installationBox);
+			this.Log("Added Chromium installation at " + chromePaths.ChromeDllPath);
 		}
 	}
 

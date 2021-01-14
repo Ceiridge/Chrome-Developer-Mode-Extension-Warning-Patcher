@@ -5,17 +5,18 @@ namespace ChromeDevExtWarningPatcher {
 	class CustomCheckBox : CheckBox {
 		public int Group;
 
-		public CustomCheckBox(string text, string tooltip, int group) : base() {
-			Content = text;
-			Foreground = BorderBrush = new SolidColorBrush(Color.FromRgb(202, 62, 71));
-			Group = group;
+		public CustomCheckBox(string text, string tooltip, int group) {
+			this.Content = text;
+			this.Foreground = this.BorderBrush = new SolidColorBrush(Color.FromRgb(202, 62, 71));
+			this.Group = group;
 
-			if (tooltip != null)
-				ToolTip = tooltip;
+			if (tooltip != null) {
+				this.ToolTip = tooltip;
+			}
 		}
 
 		public CustomCheckBox(GuiPatchGroupData patchGroupData) : this(patchGroupData.Name, patchGroupData.Tooltip, patchGroupData.Group) {
-			IsChecked = patchGroupData.Default;
+			this.IsChecked = patchGroupData.Default;
 		}
 
 		public CustomCheckBox(string text) : this(text, null, -1) { }

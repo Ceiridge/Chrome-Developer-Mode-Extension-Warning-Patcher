@@ -5,17 +5,17 @@ namespace ChromeDevExtWarningPatcher.InstallationFinder {
 		public string ChromeDllPath, ChromeExePath;
 
 		public InstallationPaths(string chromeDllPath, string chromeExePath) {
-			ChromeDllPath = chromeDllPath;
-			ChromeExePath = chromeExePath;
+			this.ChromeDllPath = chromeDllPath;
+			this.ChromeExePath = chromeExePath;
 		}
 
 		public InstallationPaths(FileInfo chromeDll, FileInfo chromeExe) {
-			ChromeDllPath = chromeDll.FullName;  
-			ChromeExePath = chromeExe.FullName;
+			this.ChromeDllPath = chromeDll.FullName;
+			this.ChromeExePath = chromeExe.FullName;
 		}
 
 		public bool Is64Bit() {
-			return InstallationManager.IsImageX64(ChromeDllPath) && InstallationManager.IsImageX64(ChromeExePath);
+			return InstallationManager.IsImageX64(this.ChromeDllPath) && InstallationManager.IsImageX64(this.ChromeExePath);
 		}
 	}
 }

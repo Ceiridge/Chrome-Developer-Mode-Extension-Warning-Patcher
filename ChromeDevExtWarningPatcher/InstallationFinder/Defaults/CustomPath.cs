@@ -3,19 +3,19 @@ using System.IO;
 
 namespace ChromeDevExtWarningPatcher.InstallationFinder.Defaults {
 	class CustomPath : Installation {
-		private string Path;
+		private readonly string path;
 
 		public CustomPath(string path) : base("CustomPath") {
-			Path = path;
+			this.path = path;
 		}
 
 		public override List<InstallationPaths> FindInstallationPaths() {
 			List<InstallationPaths> dllFiles = new List<InstallationPaths>();
 
-			AddDllAndExeToList(dllFiles, GetLatestDllAndExe(new DirectoryInfo(Path), "chrome.dll", "chrome.exe"));
-			AddDllAndExeToList(dllFiles, GetLatestDllAndExe(new DirectoryInfo(Path), "msedge.dll", "msedge.exe"));
-			AddDllAndExeToList(dllFiles, GetLatestDllAndExe(new DirectoryInfo(Path), "chrome.dll", "brave.exe"));
-			AddDllAndExeToList(dllFiles, GetLatestDllAndExe(new DirectoryInfo(Path), "browser.dll", "browser.exe"));
+			AddDllAndExeToList(dllFiles, GetLatestDllAndExe(new DirectoryInfo(this.path), "chrome.dll", "chrome.exe"));
+			AddDllAndExeToList(dllFiles, GetLatestDllAndExe(new DirectoryInfo(this.path), "msedge.dll", "msedge.exe"));
+			AddDllAndExeToList(dllFiles, GetLatestDllAndExe(new DirectoryInfo(this.path), "chrome.dll", "brave.exe"));
+			AddDllAndExeToList(dllFiles, GetLatestDllAndExe(new DirectoryInfo(this.path), "browser.dll", "browser.exe"));
 
 			return dllFiles;
 		}

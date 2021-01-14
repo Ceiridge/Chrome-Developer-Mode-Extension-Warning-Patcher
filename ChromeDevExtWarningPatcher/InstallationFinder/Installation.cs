@@ -7,15 +7,17 @@ namespace ChromeDevExtWarningPatcher.InstallationFinder {
 	abstract class Installation {
 		protected string Name;
 
-		public Installation(string Name) {
-			this.Name = Name;
+		protected Installation(string name) {
+			this.Name = name;
 		}
 
 		public abstract List<InstallationPaths> FindInstallationPaths();
 
 		protected static InstallationPaths GetLatestDllAndExe(DirectoryInfo versionsFolder, string dllName, string exeName) {
-			if (!versionsFolder.Exists)
+			if (!versionsFolder.Exists) {
 				return new InstallationPaths();
+			}
+
 			InstallationPaths paths = new InstallationPaths();
 
 			List<DirectoryInfo> chromeVersions = new List<DirectoryInfo>(versionsFolder.EnumerateDirectories());
@@ -42,8 +44,10 @@ namespace ChromeDevExtWarningPatcher.InstallationFinder {
 		}
 
 		protected static void AddDllAndExeToList(List<InstallationPaths> pathList, InstallationPaths latestDllAndExe) {
-			if (latestDllAndExe.ChromeDllPath == null || latestDllAndExe.ChromeExePath == null)
+			if (latestDllAndExe.ChromeDllPath == null || latestDllAndExe.ChromeExePath == null) {
 				return;
+			}
+
 			pathList.Add(latestDllAndExe);
 		}
 
