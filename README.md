@@ -4,18 +4,19 @@
 ## Supported browsers
 See below for the custom paths (commandline option).
 ```javascript
+(✓ represents fully supported and tested browsers)
 - All x64 bit Chromium-based browsers, including:
 - Chrome ✓
 - Chromium
 - Brave ✓
-- New Edge ✓
+- Edge ✓
 - Opera?
 - Vivaldi
 - Blisk
 - Colibri
 - Epic Browser
 - Iron Browser
-- Ungoogled Chromium?
+- Ungoogled Chromium ?
 ```
 
 ## Gui Screenshot
