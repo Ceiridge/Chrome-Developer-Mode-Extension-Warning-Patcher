@@ -22,14 +22,14 @@
 	
 		<Pattern name="Remove Debug Warning">
 			<!-- MaybeAddInfoBar; "MaybeAddInfoBar" in the function -->
-			<BytePattern>41 57 41 56 41 55 41 54 56 57 53 48 83 EC ? 48 8B 05 ? ? ? ? 48 31 E0 48 89 44 24 ? 80 79 ? ? 0F 85 ? ? ? ? 48 89 CE 48 83 C2 ?</BytePattern>  <!-- Chr 84 -->
+			<BytePattern>41 57 41 56 41 55 41 54 56 57 53 48 83 EC ? 48 8B 05 ? ? ? ? 48 31 E0 48 89 44 24 ? 80 79 ? ? 0F 85 ? ? ? ? 48 89 CE 48 83 C2 ?</BytePattern>  <!-- Chr 84 --> <!-- Not working anymore -->
 
 			<BytePattern>41 57 41 56 56 57 53 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 31 E0 48 89 84 24 ? ? ? ? 80 79 ? ? 74 ? 48 8B 8C 24 ? ? ? ? 48 31 E1 E8 ? ? ? ? 90 48 81 C4 ? ? ? ? 5B 5F 5E 41 5E 41 5F C3 48 89 CE 48 83 C2 ?</BytePattern> <!-- Edg 84 -->
 		</Pattern>
 	
 		<Pattern name="Remove Elision">
 			<!-- ShouldPreventElision; "jknemblkbdhdcpllfgbfekkdciegfboi" or "omnibox.prevent_url_elisions" in the function or "https://support.google.com/chrome/?p=unauthenticated" 3rd function in the vtable OR IN EDGE: "https://to-be-replaced.invalid/chrome/?p=unauthenticated" or "https://permanently-removed.invalid/chrome/?p=unauthenticated" -->
-			<BytePattern>56 57 55 53 48 83 EC ? 48 8B 05 ? ? ? ? 48 31 E0 48 89 44 24 ? 48 8B 01 FF 90 ? ? ? ?</BytePattern> <!-- Chr 85 -->
+			<BytePattern>48 83 EC ? E8 ? ? ? ? 85 C0 0F 95 C0 48 83 C4 ? C3 ? ? ? ? ? ? ? ? ? ? ? ? ? 41 56</BytePattern> <!-- Chr 89 -->
 
 			<BytePattern>56 48 83 EC ? 48 89 CE 48 8D 0D ? ? ? ? 31 D2 E8 ? ? ? ? 84 C0 75 ? 48 89 F1</BytePattern> <!-- Edg 84 -->
 		</Pattern>
@@ -93,7 +93,7 @@
 		</Patch>
 
 		<Patch pattern="Remove Elision" group="2">
-			<PatchData type="x64" orig="0x56" patch="0xC3" sig="false">
+			<PatchData type="x64" orig="0xFF" patch="0xC3" sig="false"> <!-- 0xFF orig = wildcard to support Edge hopefully -->
 				<Offset>0x00</Offset>
 			</PatchData> <!-- 0xC3 = ret -->
 		</Patch>
