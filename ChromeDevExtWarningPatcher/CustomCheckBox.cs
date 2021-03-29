@@ -7,7 +7,7 @@ namespace ChromeDevExtWarningPatcher {
 
 		public CustomCheckBox(string text, string tooltip, int group) {
 			this.Content = text;
-			this.Foreground = this.BorderBrush = new SolidColorBrush(Color.FromRgb(202, 62, 71));
+			this.Foreground = this.BorderBrush = new SolidColorBrush(Color.FromRgb(19, 19, 19));
 			this.Group = group;
 
 			if (tooltip != null) {
