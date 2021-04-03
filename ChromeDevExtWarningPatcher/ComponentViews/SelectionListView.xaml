@@ -11,14 +11,18 @@
 		<ListView ItemsSource="{Binding ElementList}">
 			<ListView.ItemTemplate>
 				<DataTemplate>
-					<Grid>
+					<Grid ToolTip="{Binding Tooltip}">
 						<Grid.ColumnDefinitions>
 							<ColumnDefinition Width="Auto" />
 							<ColumnDefinition Width="Auto" MaxWidth="150" />
 							<ColumnDefinition Width="Auto" />
 						</Grid.ColumnDefinitions>
 
-						<CheckBox IsChecked="{Binding IsSelected}" />
+						<CheckBox IsChecked="{Binding IsSelected}">
+							<CheckBox.LayoutTransform>
+								<ScaleTransform ScaleX="1.5" ScaleY="1.5" />
+							</CheckBox.LayoutTransform>
+						</CheckBox>
 						<Image Grid.Column="1" Source="{Binding IconImage}" Margin="5, 0, 5, 0" />
 						<StackPanel Grid.Column="2" Orientation="Vertical">
 							<TextBlock FontSize="16" Text="{Binding Name}" />

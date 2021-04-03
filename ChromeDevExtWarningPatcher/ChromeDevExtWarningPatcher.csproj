@@ -25,6 +25,7 @@
 
   <ItemGroup>
 	<PackageReference Include="MaterialDesignThemes" Version="4.0.0" />
+	<PackageReference Include="System.Drawing.Common" Version="5.0.2" />
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">

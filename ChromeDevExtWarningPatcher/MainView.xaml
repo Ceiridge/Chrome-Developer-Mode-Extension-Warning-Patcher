@@ -14,15 +14,23 @@
 			<RowDefinition Height="Auto" />
 		</Grid.RowDefinitions>
 		
-		<Expander Header="Select Browsers" IsExpanded="True">
-			<cv:SelectionListView DataContext="{Binding BrowserListModel}" />
+		<Expander x:Name="BrowserExpander" Header="Select Browsers" IsExpanded="True" Expanded="OnExpanderExpand">
+			<Grid>
+				<Grid.RowDefinitions>
+					<RowDefinition Height="85*" />
+					<RowDefinition Height="Auto" />
+				</Grid.RowDefinitions>
+
+				<cv:SelectionListView DataContext="{Binding BrowserListModel}" />
+				<Button Grid.Row="1" Content="Add a custom path" Style="{DynamicResource MaterialDesignRaisedLightButton}" HorizontalAlignment="Center" Width="Auto" Margin="0, 3, 0, 0" />
+			</Grid>
 		</Expander>
 		
-		<Expander Grid.Row="1" Header="Select Patches">
+		<Expander x:Name="PatchExpander" Grid.Row="1" Header="Select Patches" Expanded="OnExpanderExpand">
 			<cv:SelectionListView DataContext="{Binding PatchListModel}" />
 		</Expander>
 		
-		<Expander Grid.Row="2" Header="Install Patches">
+		<Expander x:Name="InstallExpander" Grid.Row="2" Header="Install Patches" Expanded="OnExpanderExpand">
 			<Grid>
 				<Grid.RowDefinitions>
 					<RowDefinition Height="Auto" />
@@ -31,7 +39,7 @@
 
 				<StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0, 3, 0, 3">
 					<Button Content="(Re-)Install" />
-					<Button Content="Uninstall" Style="{DynamicResource MaterialDesignRaisedLightButton}" Margin="5, 0, 0, 0" />
+					<Button Content="Uninstall" Style="{DynamicResource MaterialDesignRaisedLightButton}" Margin="5, 0, 0, 0" Cursor="Hand" />
 				</StackPanel>
 
 				<RichTextBox Grid.Row="1" x:Name="ConsoleBox" Margin="0, 0, 0, 5" IsUndoEnabled="False" IsReadOnly="True" IsReadOnlyCaretVisible="True">
