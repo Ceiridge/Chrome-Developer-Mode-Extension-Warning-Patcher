@@ -1,12 +1,47 @@
 ﻿<Window x:Class="ChromeDevExtWarningPatcher.MainView"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:ChromeDevExtWarningPatcher"
-        mc:Ignorable="d"
-        Title="MainView" Height="450" Width="800">
-    <Grid>
+		xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+		xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		xmlns:cv="clr-namespace:ChromeDevExtWarningPatcher.ComponentViews"
+		xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+		mc:Ignorable="d"
+		Title="Ceiridge's Chromium Patcher (Extension Warning Patcher)" Height="450" Width="800" WindowStartupLocation="CenterScreen" Background="{DynamicResource MaterialDesignPaper}" FontFamily="{DynamicResource MaterialDesignFont}" TextElement.Foreground="{DynamicResource MaterialDesignBody}" TextElement.FontWeight="Medium" TextElement.FontSize="14">
+	<Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="Auto" />
+		</Grid.RowDefinitions>
+		
+		<Expander Header="Select Browsers" IsExpanded="True">
+			<cv:SelectionListView DataContext="{Binding BrowserListModel}" />
+		</Expander>
+		
+		<Expander Grid.Row="1" Header="Select Patches">
+			<cv:SelectionListView DataContext="{Binding PatchListModel}" />
+		</Expander>
+		
+		<Expander Grid.Row="2" Header="Install Patches">
+			<Grid>
+				<Grid.RowDefinitions>
+					<RowDefinition Height="Auto" />
+					<RowDefinition Height="75*" />
+				</Grid.RowDefinitions>
 
-    </Grid>
+				<StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0, 3, 0, 3">
+					<Button Content="(Re-)Install" />
+					<Button Content="Uninstall" Style="{DynamicResource MaterialDesignRaisedLightButton}" Margin="5, 0, 0, 0" />
+				</StackPanel>
+
+				<RichTextBox Grid.Row="1" x:Name="ConsoleBox" Margin="0, 0, 0, 5" IsUndoEnabled="False" IsReadOnly="True" IsReadOnlyCaretVisible="True">
+					<FlowDocument LineHeight="1">
+						<Paragraph>
+							<Run Text="Console" />
+						</Paragraph>
+					</FlowDocument>
+				</RichTextBox>
+			</Grid>
+		</Expander>
+	</Grid>
 </Window>

@@ -15,6 +15,11 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChromeDllInjectorBuildZipper", "ChromeDllInjectorBuildZipper\ChromeDllInjectorBuildZipper.csproj", "{8178E5BD-BE0E-4840-8F26-4152682068C1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChromeDevExtWarningPatcher", "ChromeDevExtWarningPatcher\ChromeDevExtWarningPatcher.csproj", "{9F535953-6B7C-49B5-B0E4-B5C845ECEF47}"
+	ProjectSection(ProjectDependencies) = postProject
+		{BA6B041F-E0E9-45EC-86D8-BC5D1D864AE5} = {BA6B041F-E0E9-45EC-86D8-BC5D1D864AE5}
+		{BAA11244-ECA8-44B9-B976-B9BCDF37BF99} = {BAA11244-ECA8-44B9-B976-B9BCDF37BF99}
+		{29D94F79-97B1-4801-8A65-4A8BECBF2D46} = {29D94F79-97B1-4801-8A65-4A8BECBF2D46}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
