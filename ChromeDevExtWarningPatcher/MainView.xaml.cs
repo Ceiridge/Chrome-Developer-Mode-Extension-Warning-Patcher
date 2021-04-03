@@ -9,12 +9,14 @@ using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using ChromeDevExtWarningPatcher.InstallationFinder.Defaults;
+using ChromeDevExtWarningPatcher.Patches;
 using Brush = System.Windows.Media.Brush;
 
 namespace ChromeDevExtWarningPatcher {
 	public partial class MainView : Window {
 		private readonly MainModel mainModel = new MainModel();
 		private readonly InstallationManager installationManager = new InstallationManager();
+		private BytePatchManager? bytePatchManager;
 
 		public MainView() {
 			this.InitializeComponent();
@@ -44,6 +46,8 @@ namespace ChromeDevExtWarningPatcher {
 			foreach (InstallationPaths paths in this.installationManager.FindAllChromiumInstallations()) {
 				this.AddInstallationPath(paths);
 			}
+
+			this.bytePatchManager = new BytePatchManager(MessageBox.Show, this.mainModel.PatchListModel);
 		}
 
 		private void AddInstallationPath(InstallationPaths paths) {
@@ -73,6 +77,12 @@ namespace ChromeDevExtWarningPatcher {
 					expander.IsExpanded = false;
 				}
 			}
+		}
+
+		private void OnInstall(object sender, RoutedEventArgs e) {
+			this.InstallButton.IsEnabled = this.UninstallButton.IsEnabled = false;
+
+
 		}
 	}
 }

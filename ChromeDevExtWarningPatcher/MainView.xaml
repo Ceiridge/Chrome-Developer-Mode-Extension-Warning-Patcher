@@ -39,8 +39,8 @@
 					</Grid.RowDefinitions>
 
 					<StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0, 3, 0, 3">
-						<Button Content="(Re-)Install" />
-						<Button Content="Uninstall" Style="{DynamicResource MaterialDesignRaisedLightButton}" Margin="5, 0, 0, 0" />
+						<Button x:Name="InstallButton" Content="(Re-)Install" Click="OnInstall" />
+						<Button x:Name="UninstallButton" Content="Uninstall" Style="{DynamicResource MaterialDesignRaisedLightButton}" Margin="5, 0, 0, 0" />
 					</StackPanel>
 
 					<RichTextBox Grid.Row="1" x:Name="ConsoleBox" Margin="0, 0, 0, 5" IsUndoEnabled="False" IsReadOnly="True" IsReadOnlyCaretVisible="True">
