@@ -18,7 +18,7 @@
 			<Expander x:Name="BrowserExpander" Header="Select Browsers" IsExpanded="True" Expanded="OnExpanderExpand">
 				<Grid>
 					<Grid.RowDefinitions>
-						<RowDefinition Height="85*" />
+						<RowDefinition Height="*" />
 						<RowDefinition Height="Auto" />
 					</Grid.RowDefinitions>
 
@@ -35,15 +35,15 @@
 				<Grid>
 					<Grid.RowDefinitions>
 						<RowDefinition Height="Auto" />
-						<RowDefinition Height="75*" />
+						<RowDefinition Height="*" />
 					</Grid.RowDefinitions>
 
 					<StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0, 3, 0, 3">
 						<Button x:Name="InstallButton" Content="(Re-)Install" Click="OnInstall" />
-						<Button x:Name="UninstallButton" Content="Uninstall" Style="{DynamicResource MaterialDesignRaisedLightButton}" Margin="5, 0, 0, 0" />
+						<Button x:Name="UninstallButton" Content="Uninstall" Style="{DynamicResource MaterialDesignRaisedLightButton}" Margin="5, 0, 0, 0" Cursor="Hand" Click="OnUninstall" />
 					</StackPanel>
 
-					<RichTextBox Grid.Row="1" x:Name="ConsoleBox" Margin="0, 0, 0, 5" IsUndoEnabled="False" IsReadOnly="True" IsReadOnlyCaretVisible="True">
+					<RichTextBox Grid.Row="1" x:Name="ConsoleBox" Margin="5, 0, 5, 5" IsUndoEnabled="False" IsReadOnly="True" IsReadOnlyCaretVisible="True">
 						<FlowDocument LineHeight="1">
 							<Paragraph>
 								<Run Text="Console" />

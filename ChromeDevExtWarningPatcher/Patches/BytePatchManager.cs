@@ -22,11 +22,11 @@ namespace ChromeDevExtWarningPatcher.Patches {
 			this.bytePatterns.Clear();
 
 			XDocument xmlDoc;
-			const string xmlFile =
+			string xmlFile =
 #if DEBUG
 				@"..\..\..\..\patterns.xml";
 #else
-				(Path.GetTempPath() + "chrome_patcher_patterns.xml");
+				Path.GetTempPath() + "chrome_patcher_patterns.xml";
 #endif
 
 			try {
@@ -108,8 +108,7 @@ namespace ChromeDevExtWarningPatcher.Patches {
 
 			if (selectionList != null) {
 				foreach (XElement patchGroup in xmlDoc.Root.Element("GroupedPatches").Elements("GroupedPatch")) {
-					selectionList.ElementList.Add(new SelectionListElement(patchGroup.Element("Name").Value) {
-						//Group = int.Parse(patchGroup.Attribute("group").Value),
+					selectionList.ElementList.Add(new PatchGroupElement(patchGroup.Element("Name").Value, int.Parse(patchGroup.Attribute("group").Value)) {
 						IsSelected = bool.Parse(patchGroup.Attribute("default").Value),
 						Description = patchGroup.Element("Tooltip").Value
 					});
