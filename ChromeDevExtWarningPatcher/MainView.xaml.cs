@@ -8,6 +8,7 @@ using System.Windows.Documents;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using ChromeDevExtWarningPatcher.InstallationFinder.Defaults;
 using Brush = System.Windows.Media.Brush;
 
 namespace ChromeDevExtWarningPatcher {
@@ -40,21 +41,28 @@ namespace ChromeDevExtWarningPatcher {
 			this.Log("Patcher gui initialized");
 			this.Log("Searching for Chromium installations...");
 
-			#region Browser List Initialization
-
 			foreach (InstallationPaths paths in this.installationManager.FindAllChromiumInstallations()) {
-				Icon? icon = System.Drawing.Icon.ExtractAssociatedIcon(paths.ChromeExePath!);
-				ImageSource? source = icon != null ? Imaging.CreateBitmapSourceFromHIcon(icon.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions()) : null; // Turn the icon into an ImageSource for the WPF gui
-
-				this.mainModel.BrowserListModel.ElementList.Add(new SelectionListElement(paths.Name) {
-					Description = paths.ChromeDllPath,
-					IconImage = source,
-					Tooltip = paths.ChromeExePath + " & " + paths.ChromeDllPath,
-					IsSelected = true
-				});
+				this.AddInstallationPath(paths);
 			}
+		}
 
-			#endregion
+		private void AddInstallationPath(InstallationPaths paths) {
+			Icon? icon = System.Drawing.Icon.ExtractAssociatedIcon(paths.ChromeExePath!);
+			ImageSource? source = icon != null ? Imaging.CreateBitmapSourceFromHIcon(icon.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions()) : null; // Turn the icon into an ImageSource for the WPF gui
+
+			this.mainModel.BrowserListModel.ElementList.Add(new SelectionListElement(paths.Name) {
+				Description = paths.ChromeDllPath,
+				IconImage = source,
+				Tooltip = paths.ChromeExePath + " & " + paths.ChromeDllPath,
+				IsSelected = true
+			});
+		}
+
+		private void OnAddCustomPath(object sender, RoutedEventArgs e) {
+			InstallationPaths? paths = CustomPath.GuiAddCustomPath();
+			if (paths != null) {
+				this.AddInstallationPath(paths);
+			}
 		}
 
 		private void OnExpanderExpand(object sender, RoutedEventArgs e) {
