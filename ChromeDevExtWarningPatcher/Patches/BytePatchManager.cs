@@ -8,36 +8,39 @@ using System.Reflection;
 using System.Threading;
 using System.Windows;
 using System.Xml.Linq;
+using ChromeDevExtWarningPatcher.ComponentModels;
 
 namespace ChromeDevExtWarningPatcher.Patches {
-	class BytePatchManager {
+	public class BytePatchManager {
 		public List<BytePatch> BytePatches = new List<BytePatch>();
+		public delegate MessageBoxResult WriteLineOrMessageBox(string str, string title);
 		private readonly Dictionary<string, BytePatchPattern> bytePatterns = new Dictionary<string, BytePatchPattern>();
 
-		public List<int> DisabledGroups = new List<int>();
-		public List<GuiPatchGroupData> PatchGroups = new List<GuiPatchGroupData>();
 
-		public delegate MessageBoxResult WriteLineOrMessageBox(string str, string title);
-		public BytePatchManager(WriteLineOrMessageBox log) {
+		public BytePatchManager(WriteLineOrMessageBox log, SelectionListModel? selectionList = null) {
 			this.BytePatches.Clear();
 			this.bytePatterns.Clear();
 
-			XDocument xmlDoc = null;
-			string xmlFile = Program.DEBUG ? @"..\..\..\patterns.xml" : (Path.GetTempPath() + "chrome_patcher_patterns.xml");
+			XDocument xmlDoc;
+			string xmlFile =
+#if DEBUG
+				@"..\..\..\..\patterns.xml";
+#else
+				Path.GetTempPath() + "chrome_patcher_patterns.xml";
+#endif
 
 			try {
-				if (Program.DEBUG) {
-					throw new Exception("Forcing to use local patterns.xml");
-				}
+#if DEBUG
+				throw new Exception("Forcing to use local patterns.xml");
+#endif
 
-				using (WebClient web = new WebClient()) {
-					ServicePointManager.SecurityProtocol = (SecurityProtocolType)3072; // TLS 1.2, which is required for Github
+				using WebClient web = new WebClient();
+				ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12; // TLS 1.2, which is required for Github
 
-					string xmlStr;
-					xmlDoc = XDocument.Parse(xmlStr = web.DownloadString("https://raw.githubusercontent.com/Ceiridge/Chrome-Developer-Mode-Extension-Warning-Patcher/master/patterns.xml")); // Hardcoded defaults xml file; This makes quick fixes possible
+				string xmlStr;
+				xmlDoc = XDocument.Parse(xmlStr = web.DownloadString("https://raw.githubusercontent.com/Ceiridge/Chrome-Developer-Mode-Extension-Warning-Patcher/master/patterns.xml")); // Hardcoded defaults xml file; This makes quick fixes possible
 
-					File.WriteAllText(xmlFile, xmlStr);
-				}
+				File.WriteAllText(xmlFile, xmlStr);
 			} catch (Exception ex) {
 				if (File.Exists(xmlFile)) {
 					xmlDoc = XDocument.Parse(File.ReadAllText(xmlFile));
@@ -45,13 +48,13 @@ namespace ChromeDevExtWarningPatcher.Patches {
 				} else {
 					log("An error occurred trying to fetch the new patterns. The program has to exit, as no cached version of this file has been found.\n\n" + ex.Message, "Error");
 					Environment.Exit(1);
+					return;
 				}
 			}
 
+#nullable disable // Many things could be null here, but a crash would be wanted
 
-			// Comma culture setter from https://stackoverflow.com/questions/9160059/set-up-dot-instead-of-comma-in-numeric-values
-			CultureInfo customCulture = (CultureInfo)Thread.CurrentThread.CurrentCulture.Clone(); customCulture.NumberFormat.NumberDecimalSeparator = ".";
-			Thread.CurrentThread.CurrentCulture = customCulture;
+			Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
 
 			float newVersion = float.Parse(xmlDoc.Root.Attribute("version").Value);
 			Version myVersion = Assembly.GetCallingAssembly().GetName().Version;
@@ -103,14 +106,17 @@ namespace ChromeDevExtWarningPatcher.Patches {
 				this.BytePatches.Add(new BytePatch(pattern, origX64, patchX64, offsetsX64, @group, sig, sigOffset));
 			}
 
-			foreach (XElement patchGroup in xmlDoc.Root.Element("GroupedPatches").Elements("GroupedPatch")) {
-				this.PatchGroups.Add(new GuiPatchGroupData {
-					Group = int.Parse(patchGroup.Attribute("group").Value),
-					Default = bool.Parse(patchGroup.Attribute("default").Value),
-					Name = patchGroup.Element("Name").Value,
-					Tooltip = patchGroup.Element("Tooltip").Value
-				});
+			if (selectionList != null) {
+				foreach (XElement patchGroup in xmlDoc.Root.Element("GroupedPatches").Elements("GroupedPatch")) {
+					selectionList.ElementList.Add(new PatchGroupElement(patchGroup.Element("Name").Value, int.Parse(patchGroup.Attribute("group").Value)) {
+						IsSelected = bool.Parse(patchGroup.Attribute("default").Value),
+						Description = patchGroup.Element("Tooltip").Value
+					});
+				}
 			}
+
+#nullable restore
+
 		}
 	}
 }

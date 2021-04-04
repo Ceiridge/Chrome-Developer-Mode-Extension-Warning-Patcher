@@ -1,25 +1,26 @@
 ﻿using ChromeDevExtWarningPatcher.InstallationFinder;
-using Ionic.Zip;
+using ChromeDevExtWarningPatcher.Patches;
 using Microsoft.Win32;
 using Microsoft.Win32.TaskScheduler;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security.Principal;
 using System.Text;
 using System.Threading;
+using Task = Microsoft.Win32.TaskScheduler.Task;
 
 namespace ChromeDevExtWarningPatcher {
-	class PatcherInstaller {
-		private static readonly uint fileHeader = BitConverter.ToUInt32(BitConverter.GetBytes(0xCE161D6E).Reverse().ToArray(), 0);
-		private static readonly uint patchHeader = BitConverter.ToUInt32(BitConverter.GetBytes(0x8A7C5000).Reverse().ToArray(), 0); // fix for wrong endianess
+	internal class PatcherInstaller {
+		private static readonly uint FILE_HEADER = BitConverter.ToUInt32(BitConverter.GetBytes(0xCE161D6E).Reverse().ToArray(), 0);
+		private static readonly uint PATCH_HEADER = BitConverter.ToUInt32(BitConverter.GetBytes(0x8A7C5000).Reverse().ToArray(), 0); // Reverse because of wrong endianess
 
 		[DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
 		private static extern bool SendNotifyMessage(IntPtr hWnd, uint msg, UIntPtr wParam,
    IntPtr lParam);
-
 
 		private readonly List<InstallationPaths> installationPaths;
 
@@ -27,23 +28,23 @@ namespace ChromeDevExtWarningPatcher {
 			this.installationPaths = installationPaths;
 		}
 
-		private static byte[] GetPatchFileBinary(InstallationPaths paths) {
+		private static byte[] GetPatchFileBinary(InstallationPaths paths, List<int> disabledGroups) {
 			MemoryStream stream = new MemoryStream();
 			BinaryWriter writer = new BinaryWriter(stream);
 
-			writer.Write(fileHeader);
-			writer.Write(paths.ChromeDllPath.Length); // Needed, so it takes 4 bytes
+			writer.Write(FILE_HEADER);
+			writer.Write(paths.ChromeDllPath!.Length); // Needed, so it takes 4 bytes
 			writer.Write(Encoding.ASCII.GetBytes(paths.ChromeDllPath));
 
-			foreach (BytePatch patch in Program.BytePatchManager.BytePatches) {
-				if (Program.BytePatchManager.DisabledGroups.Contains(patch.Group)) {
+			foreach (BytePatch patch in MainClass.BytePatchManager!.BytePatches) {
+				if (disabledGroups.Contains(patch.Group)) {
 					continue;
 				}
 
-				writer.Write(patchHeader);
+				writer.Write(PATCH_HEADER);
 				writer.Write(patch.Pattern.AlternativePatternsX64.Count);
 
-				foreach (byte[] pattern in patch.Pattern.AlternativePatternsX64) {
+				foreach (byte[] pattern in patch.Pattern.AlternativePatternsX64) { // Write all possible patterns
 					writer.Write(pattern.Length);
 					writer.Write(pattern);
 				}
@@ -107,7 +108,7 @@ namespace ChromeDevExtWarningPatcher {
 		}
 
 		public delegate void WriteToLog(string str);
-		public bool Install(WriteToLog log) {
+		public bool Install(WriteToLog log, List<int> disabledGroups) {
 			using (TaskService ts = new TaskService()) {
 				foreach (Task task in ts.RootFolder.Tasks) {
 					if (task.Name.Equals("ChromeDllInjector")) {
@@ -130,15 +131,15 @@ namespace ChromeDevExtWarningPatcher {
 
 				int i = 0;
 				foreach (InstallationPaths paths in this.installationPaths) {
-					string appDir = Path.GetDirectoryName(paths.ChromeExePath);
+					string appDir = Path.GetDirectoryName(paths.ChromeExePath!)!;
 
 					// Write patch data info file
-					byte[] patchData = GetPatchFileBinary(paths);
+					byte[] patchData = GetPatchFileBinary(paths, disabledGroups);
 					File.WriteAllBytes(Path.Combine(appDir, "ChromePatches.bin"), patchData);
 					log("Wrote patch file to " + appDir);
 
 					// Add chrome dll to the registry key
-					dllPathKeys.SetValue(i.ToString(), paths.ChromeExePath);
+					dllPathKeys.SetValue(i.ToString(), paths.ChromeExePath!);
 					i++;
 					log("Appended " + paths.ChromeDllPath + " to the registry key");
 				}
@@ -152,9 +153,14 @@ namespace ChromeDevExtWarningPatcher {
 				Directory.CreateDirectory(programsFolder.FullName); // Also creates all subdirectories
 			}
 
-			using (ZipFile zip = ZipFile.Read(new MemoryStream(Properties.Resources.ChromeDllInjector))) {
-				foreach (ZipEntry entry in zip) {
-					entry.Extract(programsFolder.FullName, ExtractExistingFileAction.OverwriteSilently);
+			using (ZipArchive zip = new ZipArchive(new MemoryStream(Properties.Resources.ChromeDllInjector), ZipArchiveMode.Read)) {
+				foreach (ZipArchiveEntry entry in zip.Entries) {
+					string combinedPath = Path.Combine(programsFolder.FullName, entry.FullName);
+					new FileInfo(combinedPath).Directory?.Create(); // Create the necessary folders that contain the file
+
+					using Stream entryStream = entry.Open();
+					using FileStream writeStream = File.OpenWrite(combinedPath);
+					entryStream.CopyTo(writeStream);
 				}
 			}
 			log("Extracted injector zip");
@@ -220,7 +226,7 @@ namespace ChromeDevExtWarningPatcher {
 			}
 
 			foreach (InstallationPaths paths in this.installationPaths) {
-				string appDir = Path.GetDirectoryName(paths.ChromeExePath);
+				string appDir = Path.GetDirectoryName(paths.ChromeExePath!)!;
 				string patchesFile = Path.Combine(appDir, "ChromePatches.bin");
 
 				if (File.Exists(patchesFile)) {

@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 
 namespace ChromeDevExtWarningPatcher.InstallationFinder {
-	abstract class Installation {
+	internal abstract class Installation {
 		protected string Name;
 
 		protected Installation(string name) {
@@ -13,12 +13,12 @@ namespace ChromeDevExtWarningPatcher.InstallationFinder {
 
 		public abstract List<InstallationPaths> FindInstallationPaths();
 
-		protected static InstallationPaths GetLatestDllAndExe(DirectoryInfo versionsFolder, string dllName, string exeName) {
+		protected InstallationPaths GetLatestDllAndExe(DirectoryInfo versionsFolder, string dllName, string exeName) {
 			if (!versionsFolder.Exists) {
-				return new InstallationPaths();
+				return new InstallationPaths(this.Name);
 			}
 
-			InstallationPaths paths = new InstallationPaths();
+			InstallationPaths paths = new InstallationPaths(this.Name);
 
 			List<DirectoryInfo> chromeVersions = new List<DirectoryInfo>(versionsFolder.EnumerateDirectories());
 			chromeVersions = chromeVersions.OrderByDescending(dirInfo => GetUnixTime(dirInfo.LastWriteTime)).ToList();
@@ -40,15 +40,13 @@ namespace ChromeDevExtWarningPatcher.InstallationFinder {
 				return paths;
 			}
 
-			return new InstallationPaths();
+			return new InstallationPaths(this.Name);
 		}
 
 		protected static void AddDllAndExeToList(List<InstallationPaths> pathList, InstallationPaths latestDllAndExe) {
-			if (latestDllAndExe.ChromeDllPath == null || latestDllAndExe.ChromeExePath == null) {
-				return;
+			if (latestDllAndExe.ChromeDllPath != null && latestDllAndExe.ChromeExePath != null) {
+				pathList.Add(latestDllAndExe);
 			}
-
-			pathList.Add(latestDllAndExe);
 		}
 
 		public static double GetUnixTime(DateTime date) {

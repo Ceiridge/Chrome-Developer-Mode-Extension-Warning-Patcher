@@ -1,7 +1,7 @@
 ﻿using ChromeDevExtWarningPatcher.Patches;
 using System.Collections.Generic;
 
-namespace ChromeDevExtWarningPatcher {
+namespace ChromeDevExtWarningPatcher.Patches {
 	public class BytePatch {
 		public byte OrigByte, PatchByte;
 		public List<int> Offsets;

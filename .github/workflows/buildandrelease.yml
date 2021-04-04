@@ -62,8 +62,8 @@ jobs:
     - name: Zip the builds
       shell: powershell
       run: |
-        cd ChromeDevExtWarningPatcher\bin\Release;
-        Compress-Archive -DestinationPath ChromeDevExtWarningPatcher.zip -Path ChromeDevExtWarningPatcher.exe,CommandLine.dll,Microsoft.Win32.TaskScheduler.dll,DotNetZip.dll;
+        cd ChromeDevExtWarningPatcher\bin\Release\net5.0-windows;
+        Compress-Archive -DestinationPath ChromeDevExtWarningPatcher.zip -Path ChromeDevExtWarningPatcher.exe,ChromeDevExtWarningPatcher.dll,ChromeDevExtWarningPatcher.runtimeconfig.json,ChromeDevExtWarningPatcher.deps.json,CommandLine.dll,Dia2Lib.dll,MaterialDesignColors.dll,MaterialDesignThemes.Wpf.dll,Microsoft.Win32.TaskScheduler.dll,OSExtensions.dll,System.Drawing.Common.dll,TraceReloggerLib.dll,runtimes;
         dir;
 
     - uses: "Ceiridge/action-automatic-releases@master" # actually made by marvinpinto
@@ -74,4 +74,4 @@ jobs:
         prerelease: true
         title: "Prerelease Build"
         files: |
-          ChromeDevExtWarningPatcher/bin/Release/ChromeDevExtWarningPatcher.zip
+          ChromeDevExtWarningPatcher/bin/Release/net5.0-windows/ChromeDevExtWarningPatcher.zip
