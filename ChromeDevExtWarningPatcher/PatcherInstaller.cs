@@ -36,7 +36,7 @@ namespace ChromeDevExtWarningPatcher {
 			writer.Write(paths.ChromeDllPath!.Length); // Needed, so it takes 4 bytes
 			writer.Write(Encoding.ASCII.GetBytes(paths.ChromeDllPath));
 
-			foreach (BytePatch patch in App.BytePatchManager!.BytePatches) {
+			foreach (BytePatch patch in MainClass.BytePatchManager!.BytePatches) {
 				if (disabledGroups.Contains(patch.Group)) {
 					continue;
 				}

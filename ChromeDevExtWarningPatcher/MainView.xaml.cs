@@ -1,18 +1,17 @@
 ﻿using ChromeDevExtWarningPatcher.ComponentModels;
 using ChromeDevExtWarningPatcher.InstallationFinder;
+using ChromeDevExtWarningPatcher.InstallationFinder.Defaults;
+using ChromeDevExtWarningPatcher.Patches;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using ChromeDevExtWarningPatcher.InstallationFinder.Defaults;
-using ChromeDevExtWarningPatcher.Patches;
 using Brush = System.Windows.Media.Brush;
 using Brushes = System.Windows.Media.Brushes;
 
@@ -54,7 +53,7 @@ namespace ChromeDevExtWarningPatcher {
 				this.AddInstallationPath(paths);
 			}
 
-			App.BytePatchManager = new BytePatchManager(MessageBox.Show, this.mainModel.PatchListModel);
+			MainClass.BytePatchManager = new BytePatchManager(MessageBox.Show, this.mainModel.PatchListModel);
 		}
 
 		private void AddInstallationPath(InstallationPaths paths) {
@@ -107,7 +106,7 @@ namespace ChromeDevExtWarningPatcher {
 
 			List<int> disabledGroups = new List<int>(); // Get all disabled patch groups from the UI
 			foreach (SelectionListElement element in this.mainModel.PatchListModel.ElementList) {
-				if (element is PatchGroupElement {IsSelected: true} patchGroup) {
+				if (element is PatchGroupElement { IsSelected: true } patchGroup) {
 					disabledGroups.Add(patchGroup.Group);
 				}
 			}
