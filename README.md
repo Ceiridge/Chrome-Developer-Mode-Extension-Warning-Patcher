@@ -10,7 +10,7 @@ See below for the custom paths (commandline option).
 - Chromium
 - Brave ✓
 - Edge ✓
-- Opera?
+- Opera ?
 - Vivaldi
 - Blisk
 - Colibri
