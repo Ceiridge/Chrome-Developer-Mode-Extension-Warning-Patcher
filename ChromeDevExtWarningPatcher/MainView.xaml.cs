@@ -106,7 +106,7 @@ namespace ChromeDevExtWarningPatcher {
 
 			List<int> disabledGroups = new List<int>(); // Get all disabled patch groups from the UI
 			foreach (SelectionListElement element in this.mainModel.PatchListModel.ElementList) {
-				if (element is PatchGroupElement { IsSelected: true } patchGroup) {
+				if (element is PatchGroupElement { IsSelected: false } patchGroup) {
 					disabledGroups.Add(patchGroup.Group);
 				}
 			}
