@@ -14,23 +14,24 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Brush = System.Windows.Media.Brush;
 using Brushes = System.Windows.Media.Brushes;
+using Color = System.Windows.Media.Color;
 
 namespace ChromeDevExtWarningPatcher {
 	public partial class MainView : Window {
 		private readonly MainModel mainModel = new MainModel();
 		private readonly InstallationManager installationManager = new InstallationManager();
+		private static readonly Brush GRAY_BRUSH = new SolidColorBrush(Color.FromRgb(148, 148, 148));
 
 		public MainView() {
 			this.InitializeComponent();
 			this.DataContext = this.mainModel;
 		}
 
-		public void Log(string str, Brush? color = null) { // Add a line to the ConsoleBox and scroll to end
+		public void Log(string str, Brush? color) { // Add a line to the ConsoleBox and scroll to end
 			this.ConsoleBox.Dispatcher.Invoke(() => {
-				Paragraph logParagraph = new Paragraph();
-				if (color != null) {
-					logParagraph.Foreground = color;
-				}
+				Paragraph logParagraph = new Paragraph {
+					Foreground = color ?? GRAY_BRUSH
+				};
 				logParagraph.Inlines.Add(str);
 
 				this.ConsoleBox.Document.Blocks.Add(logParagraph);
