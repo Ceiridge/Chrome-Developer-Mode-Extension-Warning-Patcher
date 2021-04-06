@@ -51,7 +51,7 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-	<Exec Command="cmd.exe /c ..\signall.bat" />
+	<Exec Command="cmd.exe /c IF &quot;$(ConfigurationName)&quot; == &quot;Release&quot; (localsignall.bat)" />
   </Target>
 
 </Project>
