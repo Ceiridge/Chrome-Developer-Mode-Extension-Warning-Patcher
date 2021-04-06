@@ -1,5 +1,5 @@
 # Disable Chromium's and Chrome's Developer Mode Extension Warning Popup & Elision WWW/HTTPS Hiding & Debugging Extension Popup
-**Download** it in the [release section](https://github.com/Ceiridge/Chrome-Developer-Mode-Extension-Warning-Patcher/releases). The patterns and patches auto-update with the `patterns.xml`.
+**Download** it in the [release section](https://github.com/Ceiridge/Chrome-Developer-Mode-Extension-Warning-Patcher/releases). The patterns and patches auto-update with the `patterns.xml`. The [.NET 5 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/5.0/runtime) is required.
 
 ## Supported browsers
 See below for the custom paths (commandline option).
@@ -70,7 +70,7 @@ The idea originates from an answer on StackOverflow that also patched the `chrom
 Used open source libraries:
 - [dahall/taskscheduler](https://github.com/dahall/taskscheduler)
 - [dahall/Vanara](https://github.com/dahall/Vanara)
-- [haf/DotNetZip.Semverd](https://github.com/haf/DotNetZip.Semverd)
+- [MaterialDesignInXAML/MaterialDesignInXamlToolkit](https://github.com/MaterialDesignInXAML/MaterialDesignInXamlToolkit)
 - [commandlineparser/commandline](https://github.com/commandlineparser/commandline)
 - Some Microsoft NuGet Packages
 
