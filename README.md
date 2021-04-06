@@ -72,7 +72,6 @@ Used open source libraries:
 - [dahall/Vanara](https://github.com/dahall/Vanara)
 - [MaterialDesignInXAML/MaterialDesignInXamlToolkit](https://github.com/MaterialDesignInXAML/MaterialDesignInXamlToolkit)
 - [commandlineparser/commandline](https://github.com/commandlineparser/commandline)
-- Some Microsoft NuGet Packages
 
 ## Copyright
 Chrome-Developer-Mode-Extension-Warning-Patcher is released into the public domain according to the GPL 3.0 license by the copyright holders.
