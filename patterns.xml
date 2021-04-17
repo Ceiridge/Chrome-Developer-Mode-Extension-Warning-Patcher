@@ -9,9 +9,11 @@
 	Normally, I prefer JSON over XML, but C# already has XML parsing built-in, so no extra library is needed.
 
 	Create a new issue if a pattern stops working with any browser.
+
+	New method: Debug Chrome in WinDBG, download the respective chrome.dll.pdb and load it for the chrome.dll module. Then use x /D /f chrome_**!*FUNCTION_NAME* to search for functions. Note down the offset and find it in a disassembler to make a pattern/signature.
 -->
 
-<Defaults version="4.5">
+<Defaults version="5.1">
 	<Patterns>
 		<Pattern name="Remove Extension Warning">
 			<!-- ShouldIncludeExtension; "ProxyOverriddenBubble.UserSelection" 2nd function in the vtable -->
@@ -22,16 +24,16 @@
 	
 		<Pattern name="Remove Debug Warning">
 			<!-- MaybeAddInfoBar; "MaybeAddInfoBar" in the function -->
-			<BytePattern>41 57 41 56 41 55 41 54 56 57 53 48 83 EC ? 48 8B 05 ? ? ? ? 48 31 E0 48 89 44 24 ? 80 79 ? ? 0F 85 ? ? ? ? 48 89 CE 48 83 C2 ?</BytePattern>  <!-- Chr 84 --> <!-- Not working anymore -->
+			<BytePattern>41 57 41 56 41 55 41 54 56 57 53 48 83 ec ? 48 8b 05 ? ? ? ? 48 31 e0 48 89 44 ? ? 80 79 ? ? 0f 85 ? ? ? ? 49 89 cd 48 83 c2 ? 48 8d 05 ? ? ? ? 48 89 d1 48 89 c2 e8 ? ? ? ? 48 8d 78 ? 48 85 c0 48 0f 44 f8 49 8b 55 ? 48 85 d2 74 ? 49 8d 45 ? 48 89 c1</BytePattern>  <!-- Chr 90, only working for Chrome -->
 
 			<BytePattern>41 57 41 56 56 57 53 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 31 E0 48 89 84 24 ? ? ? ? 80 79 ? ? 74 ? 48 8B 8C 24 ? ? ? ? 48 31 E1 E8 ? ? ? ? 90 48 81 C4 ? ? ? ? 5B 5F 5E 41 5E 41 5F C3 48 89 CE 48 83 C2 ?</BytePattern> <!-- Edg 84 -->
 		</Pattern>
 	
 		<Pattern name="Remove Elision">
-			<!-- ShouldPreventElision; "jknemblkbdhdcpllfgbfekkdciegfboi" or "omnibox.prevent_url_elisions" in the function or "https://support.google.com/chrome/?p=unauthenticated" 3rd function in the vtable OR IN EDGE: "https://to-be-replaced.invalid/chrome/?p=unauthenticated" or "https://permanently-removed.invalid/chrome/?p=unauthenticated" -->
-			<BytePattern>48 83 EC ? E8 ? ? ? ? 85 C0 0F 95 C0 48 83 C4 ? C3 ? ? ? ? ? ? ? ? ? ? ? ? ? 41 56</BytePattern> <!-- Chr 89 -->
+			<!-- ShouldPreventElision/GetElisionConfig; "jknemblkbdhdcpllfgbfekkdciegfboi" or "omnibox.prevent_url_elisions" in the function or "https://support.google.com/chrome/?p=unauthenticated" 3rd function in the vtable OR IN EDGE: "https://to-be-replaced.invalid/chrome/?p=unauthenticated" or "https://permanently-removed.invalid/chrome/?p=unauthenticated" -->
+			<BytePattern>41 56 56 57 53 48 83 ec ? 48 8b 05 ? ? ? ? 48 31 e0 48 89 44 ? ? 48 8b 01 ff 90 ? ? ? ? 31 ff 48 85 c0 0f 84 ? ? ? ? 4C 8b b0 ? ? ? ? 4D 85 f6 0f 84</BytePattern> <!-- Chr 90, not working for Brave/Edge -->
 
-			<BytePattern>56 48 83 EC ? 48 89 CE 48 8D 0D ? ? ? ? 31 D2 E8 ? ? ? ? 84 C0 75 ? 48 89 F1</BytePattern> <!-- Edg 84 -->
+			<BytePattern>56 48 83 EC ? 48 89 CE 48 8D 0D ? ? ? ? 31 D2 E8 ? ? ? ? 84 C0 75 ? 48 89 F1</BytePattern> <!-- Edg 84 (stopped working, Edge seems to have no Elision anymore anyway) -->
 		</Pattern>
 
 		<Pattern name="Remove Crash Warning">

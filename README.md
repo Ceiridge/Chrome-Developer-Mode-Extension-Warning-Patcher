@@ -1,29 +1,30 @@
 # Disable Chromium's and Chrome's Developer Mode Extension Warning Popup & Elision WWW/HTTPS Hiding & Debugging Extension Popup
-**Download** it in the [release section](https://github.com/Ceiridge/Chrome-Developer-Mode-Extension-Warning-Patcher/releases). The patterns and patches auto-update with the `patterns.xml`. The [.NET 5 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/5.0/runtime) is required.
+**Download** it in the [release section](https://github.com/Ceiridge/Chrome-Developer-Mode-Extension-Warning-Patcher/releases). The [.NET 5 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/5.0/runtime) is required. All patterns and patches auto-update with the `patterns.xml` on every install.
 
 ## Supported browsers
 See below for the custom paths (commandline option).
 ```javascript
-(✓ represents fully supported and tested browsers)
-- All x64 bit Chromium-based browsers, including:
+(✓ represents mostly supported and tested browsers)
+All x64 bit Chromium-based browsers, including:
 - Chrome ✓
-- Chromium
-- Brave ✓
+- Chromium ✓
 - Edge ✓
+- Brave ✓
+- Ungoogled Chromium ?
 - Opera ?
+- Yandex Browser
 - Vivaldi
 - Blisk
 - Colibri
 - Epic Browser
 - Iron Browser
-- Ungoogled Chromium ?
 ```
 
 ## Gui Screenshot
 ![Gui Screenshot](https://raw.githubusercontent.com/Ceiridge/Chrome-Developer-Mode-Extension-Warning-Patcher/master/media/guiscreenshot.png)
 
 ## Commandline Options
-All commandline options are **optional** and not required. If none are given, the gui will start. **Warning**: The command line cannot uninstall the entire patcher and if you run it with customPath, all other installations will be removed!
+All commandline options are **optional** and not required. If none are given, the gui will start. **Warning**: The inferior command line cannot uninstall the entire patcher and if you run it with customPath, all other installations will be removed!
 
 ```
 ChromeDevExtWarningPatcher.exe 
@@ -45,10 +46,10 @@ Chrome (default): "C:\Program Files (x86)\Google\Chrome\Application"
 Brave: "C:\Program Files (x86)\BraveSoftware\Brave-Browser\Application"
 Edge: "C:\Program Files (x86)\Microsoft\Edge\Application"
 
-Remember: The path always needs to include the latest version folder of the browser (e. g. 83.0.1123.123).
-Create a new issue with a path, if you want to contribute to this list.
+Remember: The folder of the path always needs to include the latest version folder of the browser (e. g. 83.0.1123.123).
+(Create a new issue with a path, if you want to contribute to this list.)
 ```
-Find more [here](https://github.com/Ceiridge/Chrome-Developer-Mode-Extension-Warning-Patcher/tree/master/ChromeDevExtWarningPatcher/InstallationFinder/Defaults).
+Find more paths [here](https://github.com/Ceiridge/Chrome-Developer-Mode-Extension-Warning-Patcher/tree/master/ChromeDevExtWarningPatcher/InstallationFinder/Defaults).
 
 ## What can it patch
 
@@ -78,6 +79,6 @@ Chrome-Developer-Mode-Extension-Warning-Patcher is released into the public doma
 
 Disclaimer: This repository and the used names "Chrome", "Chromium", "Edge" in this project are not affiliated with or endorsed by Google LLC, Microsoft, The Chromium Project, Microsoft Edge, Google Chrome or other third parties. This repository and the used names "Chrome", "Chromium", "Edge" are also not affiliated with any existing trademarks.
 
-**No code was copied** or used from any other browser in this repository. Chromium is licensed under the open source BSD License.
+No code was copied or used from any other browser in this repository. Chromium is licensed under the open source BSD License.
 
 This repository does not infringe any copyright of proprietary browsers, as it only patches bytes on the end user's computer, without having any copyright-protected code or text included in this repository.
