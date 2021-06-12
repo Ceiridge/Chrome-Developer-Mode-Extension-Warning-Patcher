@@ -176,7 +176,7 @@
 
 		<GroupedPatch group="5" default="false">
 			<Name>Remove QR codes</Name>
-			<Tooltip>This patch removes the context menu option "Create QR code for this page"</Tooltip>
+			<Tooltip>This patch removes the context menu option "Create QR code for this page" (Chrome only)</Tooltip>
 		</GroupedPatch>
 
 		<!--

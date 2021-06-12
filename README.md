@@ -59,6 +59,7 @@ Read the [patterns.xml](https://github.com/Ceiridge/Chrome-Developer-Mode-Extens
 - Disable Elision (Force showing WWW and HTTPS in the url bar/omnibar)
 - Remove crash warning (Remove the "Chromium crashed" popup)
 - Remove send to self (Remove the menu option "Send To Your Devices" when using Google Sync)
+- Remove QR code generation (Remove the context menu option "Create QR code for this page")
 
 ## Contributing
 Clone this repository with `git clone --recursive https://github.com/Ceiridge/Chrome-Developer-Mode-Extension-Warning-Patcher.git` and open the `.sln` file with Visual Studio 2019 or newer.
