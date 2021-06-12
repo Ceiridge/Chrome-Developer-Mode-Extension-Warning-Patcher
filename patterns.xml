@@ -10,7 +10,7 @@
 
 	Create a new issue if a pattern stops working with any browser.
 
-	New method: Debug Chrome in WinDBG, download the respective chrome.dll.pdb and load it for the chrome.dll module. Then use x /D /f chrome_**!*FUNCTION_NAME* to search for functions. Note down the offset and find it in a disassembler to make a pattern/signature.
+	New method: Debug Chrome in WinDBG, download the respective chrome.dll.pdb and load it for the chrome.dll module (.reload may be required). Then use x /D /f chrome**!*FUNCTION_NAME* to search for functions. Note down the offset and find it in a disassembler to make a pattern/signature.
 -->
 
 <Defaults version="5.1">
@@ -62,6 +62,11 @@
 			<!-- ?AppendPageItems@RenderViewContextMenu; Search for xrefs for ?ShouldOfferFeature@send_tab_to_self and find it with an test al, al afterwards
 			This acts as a backup patch for Remove Send To Your Devices 2  -->
 			<BytePattern>E8 ? ? ? ? 48 8B 8E ? ? ? ? 48 8B 01 BA ? ? ? ? FF 50 08 84 C0 74 1C</BytePattern> <!-- Chr 84-85, sig -->
+		</Pattern>
+
+		<Pattern name="Remove QR Code Availability">
+			<!-- QRCodeGeneratorBubbleController::IsGeneratorAvailable; Search in the pdb file -->
+			<BytePattern>56 48 83 ec ? 84 d2 75 ? 48 89 ce 48 8d 0d ? ? ? ? e8 ? ? ? ? 84 c0 74 ? 48 89 f1 48 83 c4 ? 5e e9</BytePattern>
 		</Pattern>
 
 		<!-- 
@@ -127,6 +132,12 @@
 			</PatchData> <!-- test => cmp; this forces the ZeroFlag to be 1 => it will skip the insertion of the menu option -->
 		</Patch>
 
+		<Patch pattern="Remove QR Code Availability" group="5">
+			<PatchData type="x64" orig="0x56" patch="0xC3" sig="false" sigOffset="0x0">
+				<Offset>0x00</Offset>
+			</PatchData> <!-- 0xC3 = ret -->
+		</Patch>
+
 		<!--
 		<Patch pattern="Disable SwReporter Upload" group="5">
 			<PatchData type="x64" orig="0x84" patch="0x38" sig="false">
@@ -161,6 +172,11 @@
 		<GroupedPatch group="4" default="false">
 			<Name>Remove send to self</Name>
 			<Tooltip>This patch removes the context menu option "Send To Your Devices" when using Google's Sync (Chrome only)</Tooltip>
+		</GroupedPatch>
+
+		<GroupedPatch group="5" default="false">
+			<Name>Remove QR codes</Name>
+			<Tooltip>This patch removes the context menu option "Create QR code for this page"</Tooltip>
 		</GroupedPatch>
 
 		<!--
