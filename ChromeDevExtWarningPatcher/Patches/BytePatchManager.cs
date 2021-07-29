@@ -86,12 +86,17 @@ namespace ChromeDevExtWarningPatcher.Patches {
 
 				byte origX64 = 0, patchX64 = 0;
 				List<int> offsetsX64 = new List<int>();
+				byte[] newBytes = null;
 				int sigOffset = 0;
 				bool sig = false;
 
 				foreach (XElement patchData in patch.Elements("PatchData")) {
 					foreach (XElement offsetElement in patchData.Elements("Offset")) {
 						offsetsX64.Add(Convert.ToInt32(offsetElement.Value.Replace("0x", ""), 16));
+					}
+
+					if (patchData.Element("NewBytes") != null) {
+						newBytes = Convert.FromHexString(patchData.Element("NewBytes").Value);
 					}
 
 					origX64 = Convert.ToByte(patchData.Attribute("orig").Value.Replace("0x", ""), 16);
@@ -103,7 +108,7 @@ namespace ChromeDevExtWarningPatcher.Patches {
 					break;
 				}
 
-				this.BytePatches.Add(new BytePatch(pattern, origX64, patchX64, offsetsX64, @group, sig, sigOffset));
+				this.BytePatches.Add(new BytePatch(pattern, origX64, patchX64, offsetsX64, @group, newBytes, sig, sigOffset));
 			}
 
 			if (selectionList != null) {

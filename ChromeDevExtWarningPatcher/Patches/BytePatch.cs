@@ -1,5 +1,4 @@
-﻿using ChromeDevExtWarningPatcher.Patches;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace ChromeDevExtWarningPatcher.Patches {
 	public class BytePatch {
@@ -8,10 +7,11 @@ namespace ChromeDevExtWarningPatcher.Patches {
 		public int SigOffset;
 		public bool IsSig;
 		public BytePatchPattern Pattern;
+		public byte[]? NewBytes;
 
 		public int Group;
 
-		public BytePatch(BytePatchPattern pattern, byte origByte, byte patchByte, List<int> offsets, int group, bool isSig = false, int sigOffset = 0) {
+		public BytePatch(BytePatchPattern pattern, byte origByte, byte patchByte, List<int> offsets, int group, byte[]? newBytes = null, bool isSig = false, int sigOffset = 0) {
 			this.Pattern = pattern;
 			this.OrigByte = origByte;
 			this.PatchByte = patchByte;
@@ -19,6 +19,7 @@ namespace ChromeDevExtWarningPatcher.Patches {
 			this.IsSig = isSig;
 			this.SigOffset = sigOffset;
 			this.Group = group;
+			this.NewBytes = newBytes;
 		}
 	}
 }

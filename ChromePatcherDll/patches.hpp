@@ -1,7 +1,7 @@
 #pragma once
 
 namespace ChromePatch {
-	struct ReadPatchResult {
+	struct ReadPatchResult { // Make sure to null-initialize all fields
 		bool UsingWrongVersion{};
 	};
 
@@ -14,6 +14,7 @@ namespace ChromePatch {
 		std::vector<PatchPattern> patterns{};
 		byte origByte{}, patchByte{};
 		std::vector<int> offsets{};
+		std::vector<byte> newBytes{};
 		bool isSig{};
 		int sigOffset{};
 		bool finishedPatch{}, successfulPatch{};

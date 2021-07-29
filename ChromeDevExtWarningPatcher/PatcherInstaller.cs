@@ -32,7 +32,7 @@ namespace ChromeDevExtWarningPatcher {
 			MemoryStream stream = new MemoryStream();
 			BinaryWriter writer = new BinaryWriter(stream);
 
-			writer.Write(FILE_HEADER);
+			writer.Write(FILE_HEADER); // Magic value
 			writer.Write(paths.ChromeDllPath!.Length); // Needed, so it takes 4 bytes
 			writer.Write(Encoding.ASCII.GetBytes(paths.ChromeDllPath));
 
@@ -49,12 +49,19 @@ namespace ChromeDevExtWarningPatcher {
 					writer.Write(pattern);
 				}
 
-				writer.Write(patch.Offsets.Count);
+				writer.Write(patch.Offsets.Count); // Write offset list
 				foreach (int offset in patch.Offsets) {
 					writer.Write(offset);
 				}
 
-				writer.Write(patch.OrigByte);
+				if (patch.NewBytes == null) { // If there is no NewBytes element => write length 0
+					writer.Write(0);
+				} else { // Write the NewBytes array
+					writer.Write(patch.NewBytes.Length);
+					writer.Write(patch.NewBytes);
+				}
+
+				writer.Write(patch.OrigByte); // Write the rest of the patch data
 				writer.Write(patch.PatchByte);
 				writer.Write(patch.IsSig);
 				writer.Write(patch.SigOffset);

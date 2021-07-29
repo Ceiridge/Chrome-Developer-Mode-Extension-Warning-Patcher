@@ -12,7 +12,7 @@ namespace ChromePatch {
 		bool firstFile = true;
 	RETRY_FILE_LABEL:
 		std::ifstream file(firstFile ? "ChromePatches.bin" : "..\\ChromePatches.bin", std::ios::binary);
-		file.unsetf(std::ios::skipws);
+		file.unsetf(std::ios::skipws); // Disable skipping of leading whitespaces while reading
 
 		if (!file.good()) {
 			if (firstFile) {
@@ -56,7 +56,7 @@ namespace ChromePatch {
 				patterns.push_back(PatchPattern{ pattern });
 			}
 
-			int offsetCount;
+			int offsetCount; // Read the Offsets list
 			ReadVar(offsetCount);
 			std::vector<int> offsets;
 			for (int i = 0; i < offsetCount; i++) {
@@ -65,14 +65,23 @@ namespace ChromePatch {
 				offsets.push_back(offset);
 			}
 
-			int sigOffset;
+			int newBytesCount; // Read the NewBytes array
+			ReadVar(newBytesCount);
+			std::vector<byte> newBytes;
+			for(int i = 0; i < newBytesCount; i++) {
+				byte newByte;
+				ReadVar(newByte);
+				newBytes.push_back(newByte);
+			}
+
+			int sigOffset; // Read the rest of the data
 			byte origByte, patchByte, isSig;
 			ReadVar(origByte);
 			ReadVar(patchByte);
 			ReadVar(isSig);
 			ReadVar(sigOffset);
 
-			Patch patch{ patterns, origByte, patchByte, offsets, isSig > 0, sigOffset };
+			Patch patch{ patterns, origByte, patchByte, offsets, newBytes, isSig > 0, sigOffset };
 			patches.push_back(patch);
 			
 			std::cout << "Loaded patch: " << patterns[0].pattern.size() << " " << (int)origByte << " " << (int)patchByte << " " << offsets[0] << std::endl;
@@ -116,6 +125,7 @@ namespace ChromePatch {
 		return _byteswap_ulong(integer); // Convert to Big Endian (for the magic values)
 	}
 
+	// TODO: Externalize this function in different implementations (traditional and with SIMD support) and add multithreading
 	int Patches::ApplyPatches() {
 		int successfulPatches = 0;
 		std::cout << "Applying patches, please wait..." << std::endl;
@@ -123,7 +133,7 @@ namespace ChromePatch {
 		MODULEINFO chromeDllInfo;
 
 		GetModuleInformation(proc, chromeDll, &chromeDllInfo, sizeof(chromeDllInfo));
-		MEMORY_BASIC_INFORMATION mbi{0};
+		MEMORY_BASIC_INFORMATION mbi{};
 
 		int patchedPatches = 0;
 		for (uintptr_t i = (uintptr_t)chromeDll; i < (uintptr_t)chromeDll + (uintptr_t)chromeDllInfo.SizeOfImage; i++) {
@@ -156,7 +166,7 @@ namespace ChromePatch {
 										uintptr_t patchAddr = addr - pattern.searchOffset + patch.offsets.at(offset) + 1;
 										std::cout << "Reading address " << std::hex << patchAddr << std::endl;
 
-										if (patch.isSig) { // rip 
+										if (patch.isSig) { // Add the offset found at the patchAddr (with a 4 byte rel. addr. offset) to the patchAddr
 											patchAddr += *(reinterpret_cast<std::int32_t*>(patchAddr)) + 4 + patch.sigOffset;
 											std::cout << "New aftersig address: " << std::hex << patchAddr << std::endl;
 										}
@@ -168,7 +178,19 @@ namespace ChromePatch {
 
 											DWORD oldProtect;
 											VirtualProtect(mbi.BaseAddress, mbi.RegionSize, PAGE_EXECUTE_READWRITE, &oldProtect);
-											*patchByte = patch.patchByte;
+
+											if(patch.newBytes.empty()) { // Patch a single byte
+												*patchByte = patch.patchByte;
+											} else { // Write the newBytes array if it is filled instead
+												const int newBytesSize = patch.newBytes.size();
+												for(int newByteI = 0; newByteI < newBytesSize; newByteI++) {
+													patchByte[newByteI] = patch.newBytes[newByteI];
+												}
+
+												std::cout << newBytesSize << " NewBytes have been written" << std::endl;
+											}
+
+											
 											VirtualProtect(mbi.BaseAddress, mbi.RegionSize, oldProtect, &oldProtect);
 											patch.successfulPatch = true;
 										}

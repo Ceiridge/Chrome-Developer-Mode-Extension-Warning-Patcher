@@ -10,7 +10,7 @@
 
 	Create a new issue if a pattern stops working with any browser.
 
-	New method: Debug Chrome in WinDBG, download the respective chrome.dll.pdb and load it for the chrome.dll module (.reload may be required). Then use x /D /f chrome**!*FUNCTION_NAME* to search for functions. Note down the offset and find it in a disassembler to make a pattern/signature.
+	New method: Debug Chrome in WinDBG, download the respective chrome.dll.pdb and load it for the chrome.dll module (lm -> ld ModuleName /f FileName) (.reload may be required). Then use x /D /f chrome**!*FUNCTION_NAME* to search for functions. Note down the offset and find it in a disassembler to make a pattern/signature.
 -->
 
 <Defaults version="5.1">
@@ -66,7 +66,7 @@
 
 		<Pattern name="Remove QR Code Availability">
 			<!-- QRCodeGeneratorBubbleController::IsGeneratorAvailable; Search in the pdb file -->
-			<BytePattern>56 48 83 ec ? 84 d2 75 ? 48 89 ce 48 8d 0d ? ? ? ? e8 ? ? ? ? 84 c0 74 ? 48 89 f1 48 83 c4 ? 5e e9</BytePattern>
+			<BytePattern>48 8b 80 ? ? ? ? 48 8b 04 ? 48 85 c0 74 ? 48 8b 40 ? 48 8b 48 ? 48 83 c1 ? 48 83 c4 ? 5e e9 ? ? ? ? 31 c0 48 83 c4 ? 5e c3</BytePattern> <!-- Chrome 92; Sig -->
 		</Pattern>
 
 		<!-- 
@@ -133,9 +133,10 @@
 		</Patch>
 
 		<Patch pattern="Remove QR Code Availability" group="5">
-			<PatchData type="x64" orig="0x56" patch="0xC3" sig="false" sigOffset="0x0">
-				<Offset>0x00</Offset>
-			</PatchData> <!-- 0xC3 = ret -->
+			<PatchData type="x64" orig="0xE9" patch="0x00" sig="true" sigOffset="0x0">
+				<Offset>0x22</Offset> <!-- Offset to get to jmp + 1 -->
+				<NewBytes>4831C0C3</NewBytes> <!-- xor rax, rax; ret; (= return 0;) -->
+			</PatchData>
 		</Patch>
 
 		<!--
