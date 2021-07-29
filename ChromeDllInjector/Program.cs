@@ -9,12 +9,14 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
+using ChromeDllInjector.ProcessListeners;
 using Vanara.PInvoke;
 
 namespace ChromeDllInjector {
 	class Program {
 		private static readonly List<string> ChromeExeFilePaths = new List<string>();
 		private static Injector Injector;
+		private static IProcessListener Listener;
 
 		static void Main(string[] _) {
 			try {
@@ -28,37 +30,27 @@ namespace ChromeDllInjector {
 				Environment.Exit(1);
 			}
 
-			TraceEventSession kernelSession = new TraceEventSession("ChromePatcherETW");
-			kernelSession.EnableKernelProvider(KernelTraceEventParser.Keywords.Process);
-			kernelSession.Source.Kernel.ProcessStart += Kernel_ProcessStart;
+			HINSTANCE ntDllInstance = Kernel32.GetModuleHandle("ntdll.dll");
+			if (ntDllInstance.IsNull) {
+				Console.WriteLine("Ntdll.dll not found!");
+				Environment.Exit(1);
+			}
 
-			new Thread(delegate () { // Required because of blocking Process() below
-				Thread.Sleep(10); // Wait a bit to make sure the ETW started processing
+			// Check if the OS supports the ETW listener library (otherwise use the compatibility mode for Windows 7)
+			if (Kernel32.GetProcAddress(ntDllInstance, "RtlGetDeviceFamilyInfoEnum") == IntPtr.Zero) {
+				Console.WriteLine("ETWs not supported. Having to use compatibility mode!");
+				Listener = new CompatibleListener();
+			} else {
+				Console.WriteLine("ETWs are supported.");
+				Listener = new EtwListener();
+			}
 
-				AdvApi32.EVENT_TRACE_PROPERTIES properties = new AdvApi32.EVENT_TRACE_PROPERTIES {
-					Wnode = new AdvApi32.WNODE_HEADER {
-						BufferSize = 1024 // Max buffer size
-					}
-				};
-
-				AdvApi32.QueryTrace(0 /* NULL Handle */, kernelSession.SessionName, ref properties); // Fill the struct with info
-				Console.WriteLine("Flush thread started: " + properties.Wnode.Guid);
-
-				while (true) {
-					Thread.Sleep(50); // Flush the ETW buffer every 50ms to be faster than Chromium starting up; The default flush timer is set to 1s (=> too slow)
-					try {
-						AdvApi32.FlushTrace(0 /* NULL Handle */, kernelSession.SessionName, ref properties);
-					} catch (Exception) { }
-				}
-			}).Start();
-
-			Console.WriteLine("Starting to process");
-			kernelSession.Source.Process(); // Blocking forever
+			Listener.StartListener(OnProcessStart); // Blocking forever
 		}
 
-		private static void Kernel_ProcessStart(ProcessTraceData obj) {
+		private static void OnProcessStart(int processId) {
 			try {
-				Process proc = Process.GetProcessById(obj.ProcessID);
+				Process proc = Process.GetProcessById(processId);
 
 				foreach (string chromePath in ChromeExeFilePaths) {
 					if (chromePath.Equals(proc.MainModule.FileName)) {
@@ -67,7 +59,7 @@ namespace ChromeDllInjector {
 						break;
 					}
 				}
-			} catch (Exception e) { // Ignore some rare errors (often occurr for very short lived processes)
+			} catch (Exception e) { // Ignore some rare errors (often occur for very short lived processes)
 				Console.WriteLine(e.Message);
 			}
 		}

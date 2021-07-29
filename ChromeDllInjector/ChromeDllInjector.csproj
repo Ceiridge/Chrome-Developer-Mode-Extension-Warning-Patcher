@@ -96,6 +96,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Injector.cs" />
+    <Compile Include="IProcessListener.cs" />
+    <Compile Include="ProcessListeners\CompatibleListener.cs" />
+    <Compile Include="ProcessListeners\EtwListener.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -104,6 +107,7 @@
     <None Include="app.manifest" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>cmd.exe /c ..\..\..\signall.bat &amp; ..\..\..\ChromeDllInjectorBuildZipper\bin\Release\ChromeDllInjectorBuildZipper.exe</PostBuildEvent>
