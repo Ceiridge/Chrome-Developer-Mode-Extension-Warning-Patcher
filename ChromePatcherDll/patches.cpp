@@ -5,7 +5,7 @@
 
 namespace ChromePatch {
 	ReadPatchResult Patches::ReadPatchFile() {
-		static const unsigned int FILE_HEADER = 0xCE161D6E;
+		static const unsigned int FILE_HEADER = 0xCE161D6E; // Magic values
 		static const unsigned int PATCH_HEADER = 0x8A7C5000;
 		ReadPatchResult result{};
 
@@ -17,7 +17,7 @@ namespace ChromePatch {
 		if (!file.good()) {
 			if (firstFile) {
 				firstFile = false;
-				goto RETRY_FILE_LABEL;
+				goto RETRY_FILE_LABEL; // Retry once if the file was not found
 			}
 
 			throw std::exception("ChromePatches.bin file not found or not accessible");
@@ -33,7 +33,7 @@ namespace ChromePatch {
 			result.UsingWrongVersion = true;
 		}
 
-		while (file.peek() != EOF) {
+		while (file.peek() != EOF) { // For each patch
 			unsigned int patchHeader = ReadUInteger(file);
 			if (patchHeader != PATCH_HEADER) {
 				throw std::runtime_error("Invalid file: Wrong patch header " + std::to_string(patchHeader));
@@ -42,7 +42,7 @@ namespace ChromePatch {
 			std::vector<PatchPattern> patterns;
 			int patternsSize;
 			ReadVar(patternsSize);
-			for (int i = 0; i < patternsSize; i++) {
+			for (int i = 0; i < patternsSize; i++) { // For each pattern, read its values
 				int patternLength;
 				ReadVar(patternLength);
 				std::vector<byte> pattern;
@@ -82,6 +82,7 @@ namespace ChromePatch {
 		return result;
 	}
 
+	// Convert a UTF8 string to a UTF16LE string
 	std::wstring Patches::MultibyteToWide(const std::string& str) {
 		if (str.empty()) {
 			return std::wstring();
@@ -112,7 +113,7 @@ namespace ChromePatch {
 		unsigned int integer;
 		ReadVar(integer);
 
-		return _byteswap_ulong(integer);
+		return _byteswap_ulong(integer); // Convert to Big Endian (for the magic values)
 	}
 
 	int Patches::ApplyPatches() {
