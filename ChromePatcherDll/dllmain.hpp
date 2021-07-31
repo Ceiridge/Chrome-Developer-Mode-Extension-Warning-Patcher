@@ -2,5 +2,5 @@
 
 // Header file for the injector
 
-_declspec(dllexport) bool InstallWinHook();
-_declspec(dllexport) bool UnInstallWinHook();
+//_declspec(dllexport) bool InstallWinHook();
+//_declspec(dllexport) bool UnInstallWinHook();

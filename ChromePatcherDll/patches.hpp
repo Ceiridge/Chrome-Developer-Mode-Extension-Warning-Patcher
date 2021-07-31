@@ -18,6 +18,8 @@ namespace ChromePatch {
 		bool isSig{};
 		int sigOffset{};
 		bool finishedPatch{}, successfulPatch{};
+
+		friend std::ostream& operator<<(std::ostream& os, const Patch& patch);
 	};
 
 	class Patches {
@@ -30,9 +32,13 @@ namespace ChromePatch {
 		int ApplyPatches();
 	private:
 		std::wstring MultibyteToWide(const std::string& str);
-		std::string ReadString(std::ifstream& stream);
-		unsigned int ReadUInteger(std::ifstream& stream);
+		std::string ReadString(std::ifstream& file);
+		unsigned int ReadUInteger(std::ifstream& file);
 	};
-
 	inline Patches patches;
+
+	class PatternSearcher {
+	public:
+		virtual byte* SearchBytePattern(std::vector<Patch>& patchList, byte* startAddr, size_t length) = 0;
+	};
 }

@@ -1,9 +1,23 @@
 #include "stdafx.h"
 #include "patches.hpp"
+#include "simplepatternsearcher.hpp"
 
 #define ReadVar(variable) file.read(reinterpret_cast<char*>(&variable), sizeof(variable)); // Makes everything easier to read
 
 namespace ChromePatch {
+	std::ostream& operator<<(std::ostream& os, const Patch& patch) { // Write identifiable data to the output stream for debugging
+		const PatchPattern& firstPattern = patch.patterns[0];
+
+		os << "First Pattern: " << std::hex;
+		for (byte b : firstPattern.pattern) {
+			os << std::setw(2) << std::setfill('0') << (int)b << " ";
+		}
+
+		os << " with PatchByte " << static_cast<int>(patch.patchByte) << std::dec;
+		return os;
+	}
+
+
 	ReadPatchResult Patches::ReadPatchFile() {
 		static const unsigned int FILE_HEADER = 0xCE161D6E; // Magic values
 		static const unsigned int PATCH_HEADER = 0x8A7C5000;
@@ -29,7 +43,7 @@ namespace ChromePatch {
 		}
 
 		std::wstring dllPath = MultibyteToWide(ReadString(file));
-		if (dllPath.compare(chromeDllPath) != 0) {
+		if (dllPath != chromeDllPath) {
 			result.UsingWrongVersion = true;
 		}
 
@@ -84,7 +98,7 @@ namespace ChromePatch {
 			Patch patch{ patterns, origByte, patchByte, offsets, newBytes, isSig > 0, sigOffset };
 			patches.push_back(patch);
 			
-			std::cout << "Loaded patch: " << patterns[0].pattern.size() << " " << (int)origByte << " " << (int)patchByte << " " << offsets[0] << std::endl;
+			std::cout << "Loaded patch: " << patch << std::endl;
 		}
 
 		file.close();
@@ -125,6 +139,9 @@ namespace ChromePatch {
 		return _byteswap_ulong(integer); // Convert to Big Endian (for the magic values)
 	}
 
+
+	auto simpleSearcher = std::make_unique<SimplePatternSearcher>();
+	
 	// TODO: Externalize this function in different implementations (traditional and with SIMD support) and add multithreading
 	int Patches::ApplyPatches() {
 		int successfulPatches = 0;
@@ -183,9 +200,7 @@ namespace ChromePatch {
 												*patchByte = patch.patchByte;
 											} else { // Write the newBytes array if it is filled instead
 												const int newBytesSize = patch.newBytes.size();
-												for(int newByteI = 0; newByteI < newBytesSize; newByteI++) {
-													patchByte[newByteI] = patch.newBytes[newByteI];
-												}
+												memcpy_s(patchByte, newBytesSize, patch.newBytes.data(), newBytesSize);
 
 												std::cout << newBytesSize << " NewBytes have been written" << std::endl;
 											}
@@ -228,7 +243,7 @@ namespace ChromePatch {
 	END_PATCH_SEARCH_LABEL:
 		for (Patch& patch : patches) {
 			if (!patch.successfulPatch) {
-				std::cerr << "Couldn't patch " << patch.patterns[0].pattern.size() << " " << patch.offsets[0] << std::endl;
+				std::cerr << "Couldn't patch " << patch << std::endl;
 			}
 			else {
 				successfulPatches++;
