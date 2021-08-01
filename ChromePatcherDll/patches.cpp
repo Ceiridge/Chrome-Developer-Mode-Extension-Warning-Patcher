@@ -152,7 +152,6 @@ namespace ChromePatch {
 		GetModuleInformation(proc, chromeDll, &chromeDllInfo, sizeof(chromeDllInfo));
 		MEMORY_BASIC_INFORMATION mbi{};
 
-		int patchedPatches = 0;
 		for (uintptr_t i = (uintptr_t)chromeDll; i < (uintptr_t)chromeDll + (uintptr_t)chromeDllInfo.SizeOfImage; i++) {
 			if (VirtualQuery((LPCVOID)i, &mbi, sizeof(mbi))) {
 				if (mbi.Protect & (PAGE_GUARD | PAGE_NOCACHE | PAGE_NOACCESS) || !(mbi.State & MEM_COMMIT)) {
@@ -164,6 +163,12 @@ namespace ChromePatch {
 						}
 
 						byte* searchResult = simpleSearcher->SearchBytePattern(patch, static_cast<byte*>(mbi.BaseAddress), mbi.RegionSize);
+
+						if(searchResult == nullptr) {
+							std::cerr << "Pattern not found for patch " << patch << std::endl;
+							patch.finishedPatch = true;
+							continue;
+						}
 
 						int offsetAttempt = 0;
 						while(!patch.successfulPatch) {
@@ -197,13 +202,12 @@ namespace ChromePatch {
 								std::cerr << "Byte (" << std::hex << (int)*patchAddr << ") not original (" << (int)patch.origByte << ") at " << patchAddr << std::endl;
 								
 								if(offsetAttempt == patch.offsets.size()) {
-									break; // Abort trying out offsets if all didn't work
+									break; // Abort trying out offsets if none worked
 								}
 							}
 						}
 						
 						patch.finishedPatch = true;
-						patchedPatches++;
 					}
 
 					i = (uintptr_t)mbi.BaseAddress + mbi.RegionSize; // Skip to the next region after this one has been searched
