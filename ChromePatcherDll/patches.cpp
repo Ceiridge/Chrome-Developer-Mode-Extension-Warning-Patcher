@@ -141,10 +141,15 @@ namespace ChromePatch {
 	}
 
 
-	auto simpleSearcher = std::make_unique<SimplePatternSearcher>();
-	
-	// TODO: Externalize this function in different implementations (traditional and with SIMD support) and add multithreading
+	// TODO: Externalize this function in different implementations (traditional and with SIMD support) and add multi-threading
 	int Patches::ApplyPatches() {
+		std::unique_ptr<PatternSearcher> patternSearcher;
+		if(SimdPatternSearcher::IsCpuSupported()) {
+			patternSearcher = std::make_unique<SimdPatternSearcher>();
+		} else {
+			patternSearcher = std::make_unique<SimplePatternSearcher>();
+		}
+		
 		int successfulPatches = 0;
 		std::cout << "Applying patches, please wait..." << std::endl;
 		HANDLE proc = GetCurrentProcess();
@@ -163,7 +168,8 @@ namespace ChromePatch {
 							continue;
 						}
 
-						byte* searchResult = simpleSearcher->SearchBytePattern(patch, static_cast<byte*>(mbi.BaseAddress), mbi.RegionSize);
+						// TODO: Check for cpu features and use the respective searcher & multi-threading
+						byte* searchResult = patternSearcher->SearchBytePattern(patch, static_cast<byte*>(mbi.BaseAddress), mbi.RegionSize);
 
 						if(searchResult == nullptr) {
 							std::cerr << "Pattern not found for patch " << patch << std::endl;

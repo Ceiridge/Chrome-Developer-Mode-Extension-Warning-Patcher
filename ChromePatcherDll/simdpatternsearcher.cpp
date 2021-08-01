@@ -7,4 +7,9 @@ namespace ChromePatch {
 		// TODO
 		return nullptr;
 	}
+
+	bool SimdPatternSearcher::IsCpuSupported() {
+		// TODO
+		return IsProcessorFeaturePresent(PF_AVX2_INSTRUCTIONS_AVAILABLE);
+	}
 }

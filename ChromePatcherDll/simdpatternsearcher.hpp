@@ -5,8 +5,9 @@ namespace ChromePatch {
 #ifdef _DEBUG
 		__declspec(dllexport)
 #endif
-	SimdPatternSearcher : PatternSearcher {
+	SimdPatternSearcher : public PatternSearcher {
 	public:
 		byte* SearchBytePattern(Patch& patch, byte* startAddr, size_t length) override;
+		static bool IsCpuSupported();
 	};
 }
