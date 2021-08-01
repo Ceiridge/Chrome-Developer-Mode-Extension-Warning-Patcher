@@ -156,96 +156,65 @@ namespace ChromePatch {
 		for (uintptr_t i = (uintptr_t)chromeDll; i < (uintptr_t)chromeDll + (uintptr_t)chromeDllInfo.SizeOfImage; i++) {
 			if (VirtualQuery((LPCVOID)i, &mbi, sizeof(mbi))) {
 				if (mbi.Protect & (PAGE_GUARD | PAGE_NOCACHE | PAGE_NOACCESS) || !(mbi.State & MEM_COMMIT)) {
-					i += mbi.RegionSize;	
-				}
-				else {
-					for (uintptr_t addr = (uintptr_t)mbi.BaseAddress; addr < (uintptr_t)mbi.BaseAddress + (uintptr_t)mbi.RegionSize; addr++) {
-						byte byt = *reinterpret_cast<byte*>(addr);
+					i += mbi.RegionSize; // Skip these regions
+				} else {
+					for (Patch& patch : patches) {
+						if (patch.finishedPatch) {
+							continue;
+						}
 
-						for (Patch& patch : patches) {
-							if (patch.finishedPatch) {
-								continue;
+						byte* searchResult = simpleSearcher->SearchBytePattern(patch, static_cast<byte*>(mbi.BaseAddress), mbi.RegionSize);
+
+						int offsetAttempt = 0;
+						while(!patch.successfulPatch) {
+							byte* patchAddr = searchResult + patch.offsets[offsetAttempt];
+							std::cout << "Reading address " << std::hex << patchAddr << std::endl;
+
+
+							if(patch.isSig) { // Add the offset found at the patchAddr (with a 4 byte rel. addr. offset) to the patchAddr
+								patchAddr += *reinterpret_cast<int*>(patchAddr) + 4 + patch.sigOffset;
+								std::cout << "New aftersig address: " << std::hex << patchAddr << std::endl;
 							}
 
-							for (PatchPattern& pattern : patch.patterns) {
-								byte searchByte = pattern.pattern[pattern.searchOffset];
-								if (searchByte == byt || searchByte == 0xFF) {
-									pattern.searchOffset++;
+							if(patch.origByte == 0xFF || *patchAddr == patch.origByte) {
+								std::cout << "Patching byte " << std::hex << (int)*patchAddr << " to " << (int)patch.patchByte << " at " << patchAddr << std::endl;
+								DWORD oldProtect;
+								VirtualProtect(mbi.BaseAddress, mbi.RegionSize, PAGE_EXECUTE_READWRITE, &oldProtect);
+
+								if (patch.newBytes.empty()) { // Patch a single byte
+									*patchAddr = patch.patchByte;
+								} else { // Write the newBytes array if it is filled instead
+									const size_t newBytesSize = patch.newBytes.size();
+									memcpy_s(patchAddr, newBytesSize, patch.newBytes.data(), newBytesSize);
+
+									std::cout << newBytesSize << " NewBytes have been written" << std::endl;
 								}
-								else {
-									pattern.searchOffset = 0;
-								}
-
-								__try {
-									if (pattern.searchOffset == pattern.pattern.size()) {
-										int offset = 0;
-									RETRY_OFFSET_LABEL:
-										uintptr_t patchAddr = addr - pattern.searchOffset + patch.offsets.at(offset) + 1;
-										std::cout << "Reading address " << std::hex << patchAddr << std::endl;
-
-										if (patch.isSig) { // Add the offset found at the patchAddr (with a 4 byte rel. addr. offset) to the patchAddr
-											patchAddr += *(reinterpret_cast<std::int32_t*>(patchAddr)) + 4 + patch.sigOffset;
-											std::cout << "New aftersig address: " << std::hex << patchAddr << std::endl;
-										}
-
-										byte* patchByte = reinterpret_cast<byte*>(patchAddr);
-
-										if (*patchByte == patch.origByte || patch.origByte == 0xFF) {
-											std::cout << "Patching byte " << (int)*patchByte << " to " << (int)patch.patchByte << " at " << std::hex << patchAddr << std::endl;
-
-											DWORD oldProtect;
-											VirtualProtect(mbi.BaseAddress, mbi.RegionSize, PAGE_EXECUTE_READWRITE, &oldProtect);
-
-											if(patch.newBytes.empty()) { // Patch a single byte
-												*patchByte = patch.patchByte;
-											} else { // Write the newBytes array if it is filled instead
-												const int newBytesSize = patch.newBytes.size();
-												memcpy_s(patchByte, newBytesSize, patch.newBytes.data(), newBytesSize);
-
-												std::cout << newBytesSize << " NewBytes have been written" << std::endl;
-											}
-
-											
-											VirtualProtect(mbi.BaseAddress, mbi.RegionSize, oldProtect, &oldProtect);
-											patch.successfulPatch = true;
-										}
-										else {
-											offset++;
-											if (offset != patch.offsets.size()) {
-												goto RETRY_OFFSET_LABEL;
-											}
-
-											std::cerr << "Byte (" << (int)*patchByte << ") not original (" << (int)patch.origByte << ") at " << std::hex << patchAddr << std::endl;
-										}
-
-										pattern.searchOffset = -1;
-										patch.finishedPatch = true;
-										patchedPatches++;
-
-										if (patchedPatches >= patches.size()) {
-											goto END_PATCH_SEARCH_LABEL;
-										}
-										break;
-									}
-								}
-								__except (EXCEPTION_EXECUTE_HANDLER) {
-									std::cerr << "SEH error" << std::endl;
+								
+								VirtualProtect(mbi.BaseAddress, mbi.RegionSize, oldProtect, &oldProtect);
+								patch.successfulPatch = true;
+							} else {
+								offsetAttempt++;
+								std::cerr << "Byte (" << std::hex << (int)*patchAddr << ") not original (" << (int)patch.origByte << ") at " << patchAddr << std::endl;
+								
+								if(offsetAttempt == patch.offsets.size()) {
+									break; // Abort trying out offsets if all didn't work
 								}
 							}
 						}
+						
+						patch.finishedPatch = true;
+						patchedPatches++;
 					}
 
-					i = (uintptr_t)mbi.BaseAddress + mbi.RegionSize;
+					i = (uintptr_t)mbi.BaseAddress + mbi.RegionSize; // Skip to the next region after this one has been searched
 				}
 			}
 		}
 
-	END_PATCH_SEARCH_LABEL:
 		for (Patch& patch : patches) {
 			if (!patch.successfulPatch) {
 				std::cerr << "Couldn't patch " << patch << std::endl;
-			}
-			else {
+			} else {
 				successfulPatches++;
 			}
 		}

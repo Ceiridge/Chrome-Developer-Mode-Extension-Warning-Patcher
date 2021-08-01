@@ -16,7 +16,7 @@
 <Defaults version="5.1">
 	<Patterns>
 		<Pattern name="Remove Extension Warning">
-			<!-- ShouldIncludeExtension; "ProxyOverriddenBubble.UserSelection" 2nd function in the vtable -->
+			<!-- DevModeBubbleDelegate::ShouldIncludeExtension; ("ProxyOverriddenBubble.UserSelection" 2nd function in the vtable) -->
 			<BytePattern>56 48 83 EC 20 48 89 D6 48 89 D1 E8 ? ? ? ? 89 C1</BytePattern> <!-- Chr 79-84 -->
 
 			<BytePattern>56 48 83 EC ? 48 89 D6 48 89 D1 E8 ? ? ? ? 83 F8 ? 74 ?</BytePattern> <!-- Edg 81-84 -->

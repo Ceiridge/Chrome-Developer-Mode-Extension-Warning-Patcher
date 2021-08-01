@@ -39,6 +39,6 @@ namespace ChromePatch {
 
 	class PatternSearcher {
 	public:
-		virtual byte* SearchBytePattern(std::vector<Patch>& patchList, byte* startAddr, size_t length) = 0;
+		virtual byte* SearchBytePattern(Patch& patch, byte* startAddr, size_t length) = 0;
 	};
 }

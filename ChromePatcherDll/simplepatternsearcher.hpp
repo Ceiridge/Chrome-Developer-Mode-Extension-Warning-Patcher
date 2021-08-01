@@ -7,6 +7,6 @@ namespace ChromePatch {
 #endif
 	SimplePatternSearcher : PatternSearcher {
 	public:
-		byte* SearchBytePattern(std::vector<Patch>& patchList, byte* startAddr, size_t length) override;
+		byte* SearchBytePattern(Patch& patch, byte* startAddr, size_t length) override;
 	};
 }
