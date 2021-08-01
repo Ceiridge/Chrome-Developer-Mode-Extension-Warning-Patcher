@@ -175,6 +175,7 @@
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="patches.cpp" />
+    <ClCompile Include="simdpatternsearcher.cpp" />
     <ClCompile Include="simplepatternsearcher.cpp" />
     <ClCompile Include="threads.cpp" />
   </ItemGroup>
@@ -182,6 +183,7 @@
     <ClInclude Include="dllmain.hpp" />
     <ClInclude Include="patches.hpp" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="simdpatternsearcher.hpp" />
     <ClInclude Include="simplepatternsearcher.hpp" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="threads.hpp" />

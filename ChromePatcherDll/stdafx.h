@@ -10,5 +10,6 @@
 #include <TlHelp32.h>
 #include <thread>
 #include <iomanip>
+#include <immintrin.h>
 
 inline HMODULE module;

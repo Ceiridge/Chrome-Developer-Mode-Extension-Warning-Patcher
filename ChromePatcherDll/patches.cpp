@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "patches.hpp"
 #include "simplepatternsearcher.hpp"
+#include "simdpatternsearcher.hpp"
 
 #define ReadVar(variable) file.read(reinterpret_cast<char*>(&variable), sizeof(variable)); // Makes everything easier to read
 

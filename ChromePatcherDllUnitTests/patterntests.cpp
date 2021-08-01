@@ -2,6 +2,7 @@
 #include "CppUnitTest.h"
 #include "patches.hpp"
 #include "simplepatternsearcher.hpp"
+#include "simdpatternsearcher.hpp"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
@@ -37,6 +38,17 @@ namespace ChromePatch {
 			
 			Assert::AreEqual(simpleSearcher->SearchBytePattern(createdPatches[0], testBytes.Bytes, testBytes.BytesLength), testBytes.Pattern1Ptr);
 			Assert::AreEqual(simpleSearcher->SearchBytePattern(createdPatches[1], testBytes.Bytes, testBytes.BytesLength), testBytes.Pattern2Ptr);
+		}
+
+		TEST_METHOD(SimdPatternSearcherTest) {
+			const TestBytes testBytes = CreateTestBytes();
+			Assert::AreEqual(testBytes.BytesLength, BYTE_ARRAY_SIZE);
+
+			auto simdSearcher = std::make_unique<SimdPatternSearcher>();
+			std::vector<Patch> createdPatches = CreatePatches();
+
+			Assert::AreEqual(simdSearcher->SearchBytePattern(createdPatches[0], testBytes.Bytes, testBytes.BytesLength), testBytes.Pattern1Ptr);
+			Assert::AreEqual(simdSearcher->SearchBytePattern(createdPatches[1], testBytes.Bytes, testBytes.BytesLength), testBytes.Pattern2Ptr);
 		}
 
 	private:

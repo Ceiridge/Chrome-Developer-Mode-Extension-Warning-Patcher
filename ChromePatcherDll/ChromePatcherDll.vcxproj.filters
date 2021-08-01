@@ -27,6 +27,9 @@
     <ClCompile Include="simplepatternsearcher.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
+    <ClCompile Include="simdpatternsearcher.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="patches.hpp">
@@ -45,6 +48,9 @@
       <Filter>Headerdateien</Filter>
     </ClInclude>
     <ClInclude Include="simplepatternsearcher.hpp">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="simdpatternsearcher.hpp">
       <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>
