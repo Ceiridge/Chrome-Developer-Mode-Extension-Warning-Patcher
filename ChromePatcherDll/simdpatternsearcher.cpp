@@ -44,25 +44,12 @@ namespace ChromePatch {
 						}
 					}
 
-					equalityMask = equalityMask & (equalityMask - 1); // Sets left-most bit to 0
+					equalityMask &= equalityMask - 1; // Sets left-most bit to 0
 				}
 			}
 		}
 		
 		return nullptr;
-	}
-
-	int SimdPatternSearcher::CountTrailingZeros(const int i) {
-		int bits = 0, ix = i;
-
-		if(ix) { // Check if i isn't 0
-			while((ix & 1) == 0) {
-				bits++;
-				ix >>= 1; // Bit shift to the right
-			}
-		}
-
-		return bits;
 	}
 
 	bool SimdPatternSearcher::IsCpuSupported() {

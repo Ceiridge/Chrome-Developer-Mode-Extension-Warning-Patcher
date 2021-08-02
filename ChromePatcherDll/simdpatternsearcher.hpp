@@ -9,7 +9,5 @@ namespace ChromePatch {
 	public:
 		byte* SearchBytePattern(Patch& patch, byte* startAddr, size_t length) override;
 		static bool IsCpuSupported();
-	private:
-		static int CountTrailingZeros(int i);
 	};
 }
