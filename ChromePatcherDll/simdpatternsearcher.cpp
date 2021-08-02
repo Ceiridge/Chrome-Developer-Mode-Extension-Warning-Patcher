@@ -14,7 +14,7 @@ namespace ChromePatch {
 			
 			for (size_t i = 0; i < length; i += SIMD_BYTE_COUNT) {
 				const size_t lastBytesAdd = i + patternSize - 1;
-				if (lastBytesAdd + 32 > length) {  // Prevent access violations
+				if (lastBytesAdd + SIMD_BYTE_COUNT > length) {  // Prevent access violations
 					return nullptr;
 				}
 				
