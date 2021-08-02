@@ -7,6 +7,52 @@ using MessageBoxTimeoutWType = int(__stdcall*)(HWND hWnd, LPCWSTR lpText, LPCWST
 // Most of the code here is quite useless (it comes from older version that used other methods of injecting), but won't be removed (too lazy) (e. g. checking if it is Chrome)
 
 BOOL APIENTRY ThreadMain(LPVOID lpModule) {
+	std::wstring cmdLine = GetCommandLine();
+
+	WCHAR _exePath[1024];
+	GetModuleFileNameW(NULL, _exePath, 1024);
+	std::wstring exePath(_exePath);
+
+	if (exePath.find(L"ChromeDllInjector.exe") != std::wstring::npos || cmdLine.find(L"--type=") != std::wstring::npos) { // Ignore the injector's process, but stay loaded & Ignore Chrome's subprocesses
+		return TRUE;
+	}
+
+	HKEY hkey;
+	DWORD dispo;
+	bool isChromeExe = false;
+	if (RegCreateKeyEx(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Ceiridge\\ChromePatcher\\ChromeExes", NULL, NULL, NULL, KEY_READ | KEY_QUERY_VALUE, NULL, &hkey, &dispo) == ERROR_SUCCESS) { // Only continue with the DLL in Chrome processes
+		WCHAR valueName[64];
+		DWORD valueNameLength = 64, valueType, dwIndex = 0;
+		WCHAR value[1024];
+		DWORD valueLength = 1024;
+
+		LSTATUS STATUS;
+		while (STATUS = RegEnumValue(hkey, dwIndex, valueName, &valueNameLength, NULL, &valueType, (LPBYTE)&value, &valueLength) == ERROR_SUCCESS) {
+			if (valueType == REG_SZ) {
+				std::wstring path = value;
+
+				if (path.compare(exePath) == 0) {
+					isChromeExe = true;
+					break;
+				}
+			}
+
+			valueLength = 1024;
+			valueNameLength = 64;
+			dwIndex++;
+		}
+
+		RegCloseKey(hkey);
+	}
+	else {
+		std::cerr << "Couldn't open regkey\n";
+		return TRUE;
+	}
+
+	if (!isChromeExe) {
+		return TRUE;
+	}
+	
 	FILE* fout = nullptr;
 	FILE* ferr = nullptr;
 #ifdef _DEBUG
@@ -89,24 +135,10 @@ BOOL APIENTRY ThreadMain(LPVOID lpModule) {
 	}
 	else {
 		try {
-			ChromePatch::ReadPatchResult readResult = ChromePatch::patches.ReadPatchFile();
+			const ChromePatch::ReadPatchResult readResult = ChromePatch::patches.ReadPatchFile();
 			
 			std::cout << "Read Result: UWV: " << readResult.UsingWrongVersion << std::endl;
 			successfulPatches = ChromePatch::patches.ApplyPatches();
-
-			// Disabled, because it was annoying:
-			/*static MessageBoxTimeoutWType messageBoxTimeoutW = (MessageBoxTimeoutWType)GetProcAddress(LoadLibrary(L"user32.dll"), "MessageBoxTimeoutW"); // Undocumented WinAPI function
-			std::vector<std::thread> messageBoxThreads;
-
-			if (readResult.UsingWrongVersion) { // Start new thread to allow patching in the background
-				messageBoxThreads.push_back(std::thread(messageBoxTimeoutW, nullptr, L"Your Chromium version is newer than the patch definition's version! Please reuse the patcher to prevent bugs or failing pattern searches!", L"Outdated patch definitions!", MB_OK | MB_TOPMOST | MB_SETFOREGROUND, 0, 1000));
-			}
-
-			successfulPatches = ChromePatch::patches.ApplyPatches();
-
-			for (std::thread& thread : messageBoxThreads) {
-				thread.join(); // Necessary to prevent crashes because of std::terminate
-			}*/
 		}
 		catch (const std::exception& ex) {
 			std::cerr << "Error: " << ex.what() << std::endl;
@@ -145,59 +177,12 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 		case DLL_PROCESS_ATTACH: {
 			module = hModule;
 			DisableThreadLibraryCalls(module);
-			std::wstring cmdLine = GetCommandLine();
-
-			WCHAR _exePath[1024];
-			GetModuleFileNameW(NULL, _exePath, 1024);
-			std::wstring exePath(_exePath);
-
-			if (exePath.find(L"ChromeDllInjector.exe") != std::wstring::npos || cmdLine.find(L"--type=") != std::wstring::npos) { // Ignore the injector's process, but stay loaded & Ignore Chrome's subprocesses
-				return TRUE;
-			}
-
-			HKEY hkey;
-			DWORD dispo;
-			bool isChromeExe = false;
-			if (RegCreateKeyEx(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Ceiridge\\ChromePatcher\\ChromeExes", NULL, NULL, NULL, KEY_READ | KEY_QUERY_VALUE, NULL, &hkey, &dispo) == ERROR_SUCCESS) { // Only continue with the DLL in Chrome processes
-				WCHAR valueName[64];
-				DWORD valueNameLength = 64, valueType, dwIndex = 0;
-				WCHAR value[1024];
-				DWORD valueLength = 1024;
-
-				LSTATUS STATUS;
-				while (STATUS = RegEnumValue(hkey, dwIndex, valueName, &valueNameLength, NULL, &valueType, (LPBYTE)&value, &valueLength) == ERROR_SUCCESS) {
-					if (valueType == REG_SZ) {
-						std::wstring path = value;
-
-						if (path.compare(exePath) == 0) {
-							isChromeExe = true;
-							break;
-						}
-					}
-
-					valueLength = 1024;
-					valueNameLength = 64;
-					dwIndex++;
-				}
-
-				RegCloseKey(hkey);
-			}
-			else {
-				std::cerr << "Couldn't open regkey\n";
-				return TRUE;
-			}
-
-			if (!isChromeExe) {
-				return TRUE;
-			}
-
 			ChromePatch::mainThreadHandle = CreateThread(NULL, NULL, (LPTHREAD_START_ROUTINE)ThreadMain, hModule, NULL, NULL);
 			break;
 		}
+		
 		case DLL_THREAD_ATTACH:
-			break;
 		case DLL_THREAD_DETACH:
-			break;
 		case DLL_PROCESS_DETACH:
 			break;
 	}

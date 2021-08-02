@@ -2,6 +2,7 @@
 #include "patches.hpp"
 #include "simplepatternsearcher.hpp"
 #include "simdpatternsearcher.hpp"
+#include "threads.hpp"
 
 #define ReadVar(variable) file.read(reinterpret_cast<char*>(&variable), sizeof(variable)); // Makes everything easier to read
 
@@ -176,7 +177,19 @@ namespace ChromePatch {
 					}
 
 					for (std::thread& patchThread : patchThreads) { // Make sure all threads have executed in this memory region
-						patchThread.join();
+						// I cannot use patchThread.join here, because it causes deadlocks
+						HANDLE patchHandle = patchThread.native_handle();
+						const time_t waitTime = std::time(nullptr);
+						
+						while(WaitForSingleObject(patchHandle, 0) != WAIT_OBJECT_0) {
+							// Active waiting required to prevent deadlocks
+							if(waitTime + (simdCpuSupport ? 1 : 5) < std::time(nullptr)) { // 1 or 5 seconds timeout
+								std::cout << "Patch Thread " << patchHandle << " timeouted! Resuming all other threads. (This is a race condition now)" << std::endl;
+								ResumeOtherThreads();
+							}
+						}
+
+						patchThread.detach();
 					}
 					patchThreads.clear();
 					
