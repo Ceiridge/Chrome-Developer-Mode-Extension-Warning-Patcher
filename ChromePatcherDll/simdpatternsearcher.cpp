@@ -15,7 +15,7 @@ namespace ChromePatch {
 			for (size_t i = 0; i < length; i += SIMD_BYTE_COUNT) {
 				const size_t lastBytesAdd = i + patternSize - 1;
 				if (lastBytesAdd + SIMD_BYTE_COUNT > length) {  // Prevent access violations
-					return nullptr;
+					break;
 				}
 				
 				const __m256i firstBytes = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(startAddr + i));
