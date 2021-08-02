@@ -180,12 +180,19 @@ namespace ChromePatch {
 						// I cannot use patchThread.join here, because it causes deadlocks
 						HANDLE patchHandle = patchThread.native_handle();
 						const time_t waitTime = std::time(nullptr);
+						bool hasNoticedTimeout = false;
 						
 						while(WaitForSingleObject(patchHandle, 0) != WAIT_OBJECT_0) {
 							// Active waiting required to prevent deadlocks
+
+							if(hasNoticedTimeout) {
+								continue;
+							}
+							
 							if(waitTime + (simdCpuSupport ? 1 : 5) < std::time(nullptr)) { // 1 or 5 seconds timeout
 								std::cout << "Patch Thread " << patchHandle << " timeouted! Resuming all other threads. (This is a race condition now)" << std::endl;
 								ResumeOtherThreads();
+								hasNoticedTimeout = true;
 							}
 						}
 
