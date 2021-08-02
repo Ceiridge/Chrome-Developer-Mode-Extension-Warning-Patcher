@@ -1,6 +1,8 @@
 #pragma once
 
 namespace ChromePatch {
+	class PatternSearcher; // Forward declaration for PatchThreadDelegate
+
 	struct ReadPatchResult { // Make sure to null-initialize all fields
 		bool UsingWrongVersion{};
 	};
@@ -34,6 +36,7 @@ namespace ChromePatch {
 		static std::wstring MultibyteToWide(const std::string& str);
 		static std::string ReadString(std::ifstream& file);
 		static unsigned int ReadUInteger(std::ifstream& file);
+		static void PatchThreadDelegate(Patch* patch, PatternSearcher* patternSearcher, MEMORY_BASIC_INFORMATION* mbi);
 	};
 	inline Patches patches;
 
