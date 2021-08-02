@@ -20,6 +20,26 @@ All x64 bit Chromium-based browsers, including:
 - Iron Browser
 ```
 
+## Features
+
+- Intuitive installer GUI
+- Autodetection of browser installations
+- Patcher injector using Event Traces for Windows to minimize cpu usage and to maximize speed
+- Compatibility for Windows 7 - Windows 11
+- SIMD (AVX2) accelerated pattern searching with a fallback for old CPUs
+- Very well documented patterns.xml
+- Easy to compile
+
+### What can it patch
+
+Read the [patterns.xml](https://github.com/Ceiridge/Chrome-Developer-Mode-Extension-Warning-Patcher/blob/master/patterns.xml) file for more information.
+- Remove extension warning (Removes the warning => main purpose of the patcher)
+- Remove debugging warning (Removes warning when using chrome.debugger in extensions)
+- Disable Elision (Force showing WWW and HTTPS in the url bar/omnibar)
+- Remove crash warning (Remove the "Chromium crashed" popup)
+- Remove send to self (Remove the menu option "Send To Your Devices" when using Google Sync)
+- Remove QR code generation (Remove the context menu option "Create QR code for this page")
+
 ## Gui Screenshot
 ![Gui Screenshot](https://raw.githubusercontent.com/Ceiridge/Chrome-Developer-Mode-Extension-Warning-Patcher/master/media/guiscreenshot.png)
 
@@ -50,16 +70,6 @@ Remember: The folder of the path always needs to include the latest version fold
 (Create a new issue with a path, if you want to contribute to this list.)
 ```
 Find more paths [here](https://github.com/Ceiridge/Chrome-Developer-Mode-Extension-Warning-Patcher/tree/master/ChromeDevExtWarningPatcher/InstallationFinder/Defaults).
-
-## What can it patch
-
-Read the [patterns.xml](https://github.com/Ceiridge/Chrome-Developer-Mode-Extension-Warning-Patcher/blob/master/patterns.xml) file for more information.
-- Remove extension warning (Removes the warning => main purpose of the patcher)
-- Remove debugging warning (Removes warning when using chrome.debugger in extensions)
-- Disable Elision (Force showing WWW and HTTPS in the url bar/omnibar)
-- Remove crash warning (Remove the "Chromium crashed" popup)
-- Remove send to self (Remove the menu option "Send To Your Devices" when using Google Sync)
-- Remove QR code generation (Remove the context menu option "Create QR code for this page")
 
 ## Contributing
 Clone this repository with `git clone --recursive https://github.com/Ceiridge/Chrome-Developer-Mode-Extension-Warning-Patcher.git` and open the `.sln` file with Visual Studio 2019 or newer.
