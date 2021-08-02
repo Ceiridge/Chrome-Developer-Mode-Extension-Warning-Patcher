@@ -4,9 +4,9 @@
 namespace ChromePatch {
 	// Partially taken from https://stackoverflow.com/questions/16684245/can-i-suspend-a-process-except-one-thread
 	void SuspendOtherThreads() {
-		DWORD pid = GetCurrentProcessId();
-		HANDLE snap = CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0);
-		DWORD mine = GetCurrentThreadId();
+		const DWORD pid = GetCurrentProcessId();
+		const HANDLE snap = CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0);
+		const DWORD mine = GetCurrentThreadId();
 
 		if (snap != INVALID_HANDLE_VALUE) {
 			THREADENTRY32 te;
@@ -17,7 +17,7 @@ namespace ChromePatch {
 					if (te.dwSize >= FIELD_OFFSET(THREADENTRY32, th32OwnerProcessID) + sizeof(te.th32OwnerProcessID)) {
 						if (te.th32ThreadID != mine && te.th32OwnerProcessID == pid)
 						{
-							HANDLE thread = OpenThread(THREAD_ALL_ACCESS, FALSE, te.th32ThreadID);
+							const HANDLE thread = OpenThread(THREAD_ALL_ACCESS, FALSE, te.th32ThreadID);
 							if (thread && thread != INVALID_HANDLE_VALUE) {
 								SuspendThread(thread);
 								CloseHandle(thread);
@@ -34,7 +34,7 @@ namespace ChromePatch {
 
 	void ResumeOtherThreads() {
 		for (DWORD tId : suspendedThreads) {
-			HANDLE thread = OpenThread(THREAD_ALL_ACCESS, FALSE, tId);
+			const HANDLE thread = OpenThread(THREAD_ALL_ACCESS, FALSE, tId);
 			if (thread && thread != INVALID_HANDLE_VALUE) {
 				ResumeThread(thread);
 				CloseHandle(thread);

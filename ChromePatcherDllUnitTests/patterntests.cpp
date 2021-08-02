@@ -31,24 +31,28 @@ namespace ChromePatch {
 	public:
 		TEST_METHOD(SimplePatternSearcherTest) {
 			const TestBytes testBytes = CreateTestBytes();
-			Assert::AreEqual(testBytes.BytesLength, BYTE_ARRAY_SIZE);
+			Assert::AreEqual(BYTE_ARRAY_SIZE, testBytes.BytesLength);
 			
 			auto simpleSearcher = std::make_unique<SimplePatternSearcher>();
 			std::vector<Patch> createdPatches = CreatePatches();
 			
-			Assert::AreEqual(simpleSearcher->SearchBytePattern(createdPatches[0], testBytes.Bytes, testBytes.BytesLength), testBytes.Pattern1Ptr);
-			Assert::AreEqual(simpleSearcher->SearchBytePattern(createdPatches[1], testBytes.Bytes, testBytes.BytesLength), testBytes.Pattern2Ptr);
+			Assert::AreEqual(testBytes.Pattern1Ptr, simpleSearcher->SearchBytePattern(createdPatches[0], testBytes.Bytes, testBytes.BytesLength));
+			Assert::AreEqual(testBytes.Pattern2Ptr, simpleSearcher->SearchBytePattern(createdPatches[1], testBytes.Bytes, testBytes.BytesLength));
 		}
 
 		TEST_METHOD(SimdPatternSearcherTest) {
 			const TestBytes testBytes = CreateTestBytes();
-			Assert::AreEqual(testBytes.BytesLength, BYTE_ARRAY_SIZE);
+			Assert::AreEqual(BYTE_ARRAY_SIZE, testBytes.BytesLength);
 
 			auto simdSearcher = std::make_unique<SimdPatternSearcher>();
 			std::vector<Patch> createdPatches = CreatePatches();
 
-			Assert::AreEqual(simdSearcher->SearchBytePattern(createdPatches[0], testBytes.Bytes, testBytes.BytesLength), testBytes.Pattern1Ptr);
-			Assert::AreEqual(simdSearcher->SearchBytePattern(createdPatches[1], testBytes.Bytes, testBytes.BytesLength), testBytes.Pattern2Ptr);
+			Assert::AreEqual(testBytes.Pattern1Ptr, simdSearcher->SearchBytePattern(createdPatches[0], testBytes.Bytes, testBytes.BytesLength));
+			Assert::AreEqual(testBytes.Pattern2Ptr, simdSearcher->SearchBytePattern(createdPatches[1], testBytes.Bytes, testBytes.BytesLength));
+		}
+
+		TEST_METHOD(SimdCpuSupport) {
+			Assert::IsTrue(SimdPatternSearcher::IsCpuSupported());
 		}
 
 	private:

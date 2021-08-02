@@ -31,8 +31,8 @@ BOOL APIENTRY ThreadMain(LPVOID lpModule) {
 		freopen_s(&ferr, winDirErr, "a", stderr);
 	}
 #endif
-	std::cout << std::time(0) << std::endl; // Log time for debug purposes
-	std::cerr << std::time(0) << std::endl;
+	std::cout << std::time(nullptr) << std::endl; // Log time for debug purposes
+	std::cerr << std::time(nullptr) << std::endl;
 
 	std::wstring mutexStr = std::wstring(L"ChromeDllMutex") + std::to_wstring(GetCurrentProcessId());
 	HANDLE mutex = OpenMutex(MUTEX_ALL_ACCESS, FALSE, mutexStr.c_str()); // Never allow the dll to be injected twice

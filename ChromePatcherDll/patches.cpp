@@ -9,12 +9,12 @@ namespace ChromePatch {
 	std::ostream& operator<<(std::ostream& os, const Patch& patch) { // Write identifiable data to the output stream for debugging
 		const PatchPattern& firstPattern = patch.patterns[0];
 
-		os << "First Pattern: " << std::hex;
+		os << "(First Pattern: " << std::hex;
 		for (byte b : firstPattern.pattern) {
 			os << std::setw(2) << std::setfill('0') << (int)b << " ";
 		}
 
-		os << " with PatchByte " << static_cast<int>(patch.patchByte) << std::dec;
+		os << "with PatchByte " << static_cast<int>(patch.patchByte) << ")" << std::dec;
 		return os;
 	}
 
@@ -144,7 +144,10 @@ namespace ChromePatch {
 	// TODO: Externalize this function in different implementations (traditional and with SIMD support) and add multi-threading
 	int Patches::ApplyPatches() {
 		std::unique_ptr<PatternSearcher> patternSearcher;
-		if(SimdPatternSearcher::IsCpuSupported()) {
+		const bool simdCpuSupport = SimdPatternSearcher::IsCpuSupported();
+		std::cout << "SIMD support: " << simdCpuSupport << std::endl;
+		
+		if(simdCpuSupport) {
 			patternSearcher = std::make_unique<SimdPatternSearcher>();
 		} else {
 			patternSearcher = std::make_unique<SimplePatternSearcher>();
@@ -152,7 +155,7 @@ namespace ChromePatch {
 		
 		int successfulPatches = 0;
 		std::cout << "Applying patches, please wait..." << std::endl;
-		HANDLE proc = GetCurrentProcess();
+		const HANDLE proc = GetCurrentProcess();
 		MODULEINFO chromeDllInfo;
 
 		GetModuleInformation(proc, chromeDll, &chromeDllInfo, sizeof(chromeDllInfo));
@@ -160,7 +163,7 @@ namespace ChromePatch {
 
 		for (uintptr_t i = (uintptr_t)chromeDll; i < (uintptr_t)chromeDll + (uintptr_t)chromeDllInfo.SizeOfImage; i++) {
 			if (VirtualQuery((LPCVOID)i, &mbi, sizeof(mbi))) {
-				if (mbi.Protect & (PAGE_GUARD | PAGE_NOCACHE | PAGE_NOACCESS) || !(mbi.State & MEM_COMMIT)) {
+				if (mbi.Protect & (PAGE_GUARD | PAGE_NOCACHE | PAGE_NOACCESS) || !(mbi.State & MEM_COMMIT) || !(mbi.Protect & (PAGE_EXECUTE_READ | PAGE_EXECUTE_READWRITE))) {
 					i += mbi.RegionSize; // Skip these regions
 				} else {
 					for (Patch& patch : patches) {
@@ -168,28 +171,24 @@ namespace ChromePatch {
 							continue;
 						}
 
-						// TODO: Check for cpu features and use the respective searcher & multi-threading
 						byte* searchResult = patternSearcher->SearchBytePattern(patch, static_cast<byte*>(mbi.BaseAddress), mbi.RegionSize);
-
-						if(searchResult == nullptr) {
-							std::cerr << "Pattern not found for patch " << patch << std::endl;
-							patch.finishedPatch = true;
+						if(!searchResult) { // is null
 							continue;
 						}
 
 						int offsetAttempt = 0;
 						while(!patch.successfulPatch) {
 							byte* patchAddr = searchResult + patch.offsets[offsetAttempt];
-							std::cout << "Reading address " << std::hex << patchAddr << std::endl;
+							std::cout << "Reading address " << std::hex << (uintptr_t)patchAddr << std::endl;
 
 
 							if(patch.isSig) { // Add the offset found at the patchAddr (with a 4 byte rel. addr. offset) to the patchAddr
 								patchAddr += *reinterpret_cast<int*>(patchAddr) + 4 + patch.sigOffset;
-								std::cout << "New aftersig address: " << std::hex << patchAddr << std::endl;
+								std::cout << "New aftersig address: " << std::hex << (uintptr_t)patchAddr << std::endl;
 							}
 
 							if(patch.origByte == 0xFF || *patchAddr == patch.origByte) {
-								std::cout << "Patching byte " << std::hex << (int)*patchAddr << " to " << (int)patch.patchByte << " at " << patchAddr << std::endl;
+								std::cout << "Patching byte " << std::hex << (int)*patchAddr << " to " << (int)patch.patchByte << " at " << (uintptr_t)patchAddr << std::endl;
 								DWORD oldProtect;
 								VirtualProtect(mbi.BaseAddress, mbi.RegionSize, PAGE_EXECUTE_READWRITE, &oldProtect);
 
@@ -206,7 +205,7 @@ namespace ChromePatch {
 								patch.successfulPatch = true;
 							} else {
 								offsetAttempt++;
-								std::cerr << "Byte (" << std::hex << (int)*patchAddr << ") not original (" << (int)patch.origByte << ") at " << patchAddr << std::endl;
+								std::cerr << "Byte (" << std::hex << (int)*patchAddr << ") not original (" << (int)patch.origByte << ") at " << (uintptr_t)patchAddr << std::endl;
 								
 								if(offsetAttempt == patch.offsets.size()) {
 									break; // Abort trying out offsets if none worked
@@ -221,7 +220,7 @@ namespace ChromePatch {
 				}
 			}
 		}
-
+		
 		for (Patch& patch : patches) {
 			if (!patch.successfulPatch) {
 				std::cerr << "Couldn't patch " << patch << std::endl;

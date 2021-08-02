@@ -31,9 +31,9 @@ namespace ChromePatch {
 		ReadPatchResult ReadPatchFile();
 		int ApplyPatches();
 	private:
-		std::wstring MultibyteToWide(const std::string& str);
-		std::string ReadString(std::ifstream& file);
-		unsigned int ReadUInteger(std::ifstream& file);
+		static std::wstring MultibyteToWide(const std::string& str);
+		static std::string ReadString(std::ifstream& file);
+		static unsigned int ReadUInteger(std::ifstream& file);
 	};
 	inline Patches patches;
 
