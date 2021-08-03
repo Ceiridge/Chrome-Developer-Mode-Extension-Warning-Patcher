@@ -26,7 +26,9 @@
 	
 		<Pattern name="Remove Debug Warning">
 			<!-- MaybeAddInfoBar; "MaybeAddInfoBar" in the function -->
-			<BytePattern>41 57 41 56 41 55 41 54 56 57 53 48 83 ec ? 48 8b 05 ? ? ? ? 48 31 e0 48 89 44 ? ? 80 79 ? ? 0f 85 ? ? ? ? 49 89 cd 48 83 c2 ? 48 8d 05 ? ? ? ? 48 89 d1 48 89 c2 e8 ? ? ? ? 48 8d 78 ? 48 85 c0 48 0f 44 f8 49 8b 55 ? 48 85 d2 74 ? 49 8d 45 ? 48 89 c1</BytePattern>  <!-- Chr 90, only working for Chrome -->
+			<BytePattern>41 57 41 56 41 54 56 57 53 48 83 ec ? 48 8b 05 ? ? ? ? 48 31 e0 48 89 44 ? ? 80 79 ? 00 0f 85 ? ? ? ? 48 89 ce 48 83 c2 ? 48 8d 05 ? ? ? ? 48 89 d1 48 89 c2 e8</BytePattern> <!-- Chrome 92 -->
+
+			<BytePattern>41 57 41 56 41 55 41 54 56 57 55 53 48 83 EC ? 48 8B ? ? ? ? ? 48 31 E0 48 89 ? ? ? 80 ? ? ? 0F 85 ? ? ? ? 48 89 CD 48 83 C2 ? 48 8D ? ? ? ? ? 48 89 D1 48 89 C2</BytePattern>  <!-- Brave 92 -->
 
 			<BytePattern>41 57 41 56 56 57 53 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 31 E0 48 89 84 24 ? ? ? ? 80 79 ? ? 74 ? 48 8B 8C 24 ? ? ? ? 48 31 E1 E8 ? ? ? ? 90 48 81 C4 ? ? ? ? 5B 5F 5E 41 5E 41 5F C3 48 89 CE 48 83 C2</BytePattern> <!-- Edg 84 -->
 		</Pattern>
@@ -70,7 +72,7 @@
 
 		<Pattern name="Remove QR Code Availability">
 			<!-- QRCodeGeneratorBubbleController::IsGeneratorAvailable; Search in the pdb file -->
-			<BytePattern>48 8b 80 ? ? ? ? 48 8b 04 ? 48 85 c0 74 ? 48 8b 40 ? 48 8b 48 ? 48 83 c1 ? 48 83 c4 ? 5e e9 ? ? ? ? 31 c0 48 83 c4 ? 5e c3</BytePattern> <!-- Chrome 92; Sig -->
+			<BytePattern>48 8b 80 ? ? ? ? 48 8b 04 ? 48 85 c0 74 ? 48 8b 40 ? 48 8b 48 ? 48 83 c1 ? 48 83 c4 ? 5e e9 ? ? ? ? 31 c0 48 83 c4 ? 5e c3</BytePattern> <!-- Chrome 92; Sig; Chrome only -->
 		</Pattern>
 
 		<!-- 
@@ -159,7 +161,7 @@
 			<Tooltip>This patch removes the warning of developer mode extensions when starting a Chromium browser</Tooltip>
 		</GroupedPatch>
 
-		<GroupedPatch group="1" default="true">
+		<GroupedPatch group="1" default="false">
 			<Name>Remove debugging warning</Name>
 			<Tooltip>This patch gets rid of the debugging warning when using chrome.debugger in extensions</Tooltip>
 		</GroupedPatch>
