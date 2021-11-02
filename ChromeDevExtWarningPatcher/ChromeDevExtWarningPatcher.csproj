@@ -5,7 +5,7 @@
 	<TargetFramework>net5.0-windows</TargetFramework>
 	<Nullable>enable</Nullable>
 	<UseWPF>true</UseWPF>
-	<Version>5.2.1.0</Version>
+	<Version>5.3.0.0</Version>
 	<Authors>Ceiridge</Authors>
 	<Company />
 	<Product>Chromium Developer Extension Warning Patcher</Product>
@@ -19,7 +19,7 @@
 	<EnableDefaultApplicationDefinition>false</EnableDefaultApplicationDefinition>
 	<StartupObject>ChromeDevExtWarningPatcher.MainClass</StartupObject>
 	<ApplicationManifest>app.manifest</ApplicationManifest>
-	<AssemblyVersion>5.2.0.0</AssemblyVersion>
+	<AssemblyVersion>5.3.0.0</AssemblyVersion>
   </PropertyGroup>
 
   <ItemGroup>

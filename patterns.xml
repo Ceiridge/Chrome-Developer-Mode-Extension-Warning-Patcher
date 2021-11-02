@@ -15,7 +15,7 @@
 	For Brave: Download .sym debug files at https://github.com/brave/brave-browser/releases/tag (Search for the function name and add the offset to the base address)
 -->
 
-<Defaults version="5.1">
+<Defaults version="5.3">
 	<Patterns>
 		<Pattern name="Remove Extension Warning">
 			<!-- DevModeBubbleDelegate::ShouldIncludeExtension; ("ProxyOverriddenBubble.UserSelection" 2nd function in the vtable) -->
