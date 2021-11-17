@@ -35,7 +35,7 @@
 	
 		<Pattern name="Remove Elision">
 			<!-- (ShouldPreventElision)/GetElisionConfig; "jknemblkbdhdcpllfgbfekkdciegfboi" or "omnibox.prevent_url_elisions" in the function or "https://support.google.com/chrome/?p=unauthenticated" 3rd function in the vtable OR IN EDGE: "https://to-be-replaced.invalid/chrome/?p=unauthenticated" or "https://permanently-removed.invalid/chrome/?p=unauthenticated" -->
-			<BytePattern>41 56 56 57 53 48 83 ec ? 48 8b 05 ? ? ? ? 48 31 e0 48 89 44 ? ? 48 8b 01 ff 90 ? ? ? ? 31 ff 48 85 c0 0f 84 ? ? ? ? ? 8b b0 ? ? ? ? ? 85 f6 0f 84</BytePattern> <!-- Chr 95, not working for Brave/Edge -->
+			<BytePattern>41 56 56 57 53 48 83 ec ? 48 8b 05 ? ? ? ? 48 31 e0 48 89 44 ? ? 48 8b 01 ff 90 ? ? ? ? 31 ff 48 85 c0 0f 84 ? ? ? ? ? 8b</BytePattern> <!-- Chr 95, not working for Brave/Edge -->
 
 			<BytePattern>56 57 55 53 48 83 EC ? 48 8B 05 ? ? ? ? 48 31 E0 48 89 ? ? ? 48 8B 01 FF 90 ? ? ? ? 31 FF 48 85 C0</BytePattern> <!-- Brave 95 -->
 
