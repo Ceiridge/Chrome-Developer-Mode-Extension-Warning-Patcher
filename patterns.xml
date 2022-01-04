@@ -19,8 +19,10 @@
 	<Patterns>
 		<Pattern name="Remove Extension Warning">
 			<!-- DevModeBubbleDelegate::ShouldIncludeExtension; ("ProxyOverriddenBubble.UserSelection" 2nd function in the vtable) -->
+			<!-- This patch might not do anything (except for Edge), because Chromium has removed the warning -->
 			<BytePattern>56 48 83 EC 20 48 89 D6 48 89 D1 E8 ? ? ? ? 89 C1</BytePattern> <!-- Chr 79-84 -->
 
+			<!-- Most likely not used, because the pattern above can be found in Edge -->
 			<BytePattern>56 48 83 EC ? 48 89 D6 48 89 D1 E8 ? ? ? ? 83 F8 ? 74</BytePattern> <!-- Edg 81-84 -->
 		</Pattern>
 	
