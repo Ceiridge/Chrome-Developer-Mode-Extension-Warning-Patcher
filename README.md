@@ -40,6 +40,7 @@ Read the [patterns.xml](https://github.com/Ceiridge/Chrome-Developer-Mode-Extens
 - Remove crash warning (Remove the "Chromium crashed" popup)
 - Remove send to self (Remove the menu option "Send To Your Devices" when using Google Sync)
 - Remove QR code generation (Remove the context menu option "Create QR code for this page")
+- Enable webRequestBlocking extension API for Manifest V3 extensions
 
 ## Gui Screenshot
 ![Gui Screenshot](https://raw.githubusercontent.com/Ceiridge/Chrome-Developer-Mode-Extension-Warning-Patcher/master/media/guiscreenshot.png)

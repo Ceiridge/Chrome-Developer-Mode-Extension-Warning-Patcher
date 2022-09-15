@@ -6,8 +6,6 @@
 	Alternative patterns exist so that the patches work on older and other versions (there are differences between Chromium 80 & 81 and Chrome & Edge (do they use another compiler?)).
 	Patterns here are stored in the default IDA format. ? is replaced to 0xFF in the C# code (and is still treated as a wildcard).
 
-	Normally, I prefer JSON over XML, but C# already has XML parsing built-in, so no extra library is needed.
-
 	Create a new issue if a pattern stops working with any browser.
 
 	New method: Debug Chrome in WinDBG, download the respective chrome.dll.pdb and load it for the chrome.dll module (lm -> ld ModuleName /f FileName) (.reload may be required). Then use x /D /f chrome**!*FUNCTION_NAME* to search for functions. Note down the offset and find it in a disassembler to make a pattern/signature.
@@ -74,6 +72,11 @@
 		<Pattern name="Remove QR Code Availability">
 			<!-- QRCodeGeneratorBubbleController::IsGeneratorAvailable; Search in the pdb file -->
 			<BytePattern>48 8b 80 ? ? ? ? 48 8b 04 ? 48 85 c0 74 ? 48 8b 40 ? 48 8b 48 ? 48 83 c1 ? 48 83 c4 ? 5e e9 ? ? ? ? 31 c0 48 83 c4 ? 5e c3</BytePattern> <!-- Chrome 92; Sig; Chrome only -->
+		</Pattern>
+
+		<Pattern name="Enable webRequestBlocking for MV3">
+			<!-- https://source.chromium.org/chromium/chromium/src/+/main:out/Debug/gen/extensions/common/api/permission_features.cc;l=848;drc=f7c258b9edbcebc3fb62f1df4af9d6afd3133d52 https://github.com/Ceiridge/Chrome-Developer-Mode-Extension-Warning-Patcher/issues/82#issuecomment-1248272748 -->
+			<BytePattern>40 B7 01 40 88 BE ? ? ? ? 41 BC 04 00 00 00 44 89 ? ? ? ? ? 48 8D 05 ? ? ? ? 48 8D ? ? ? ? ? ? 48 89 02 B8 02 00 00 00 48 89 42 08 48 89 F1 E8 ? ? ? ? 40 ? ? ? ? ? ? 41 BE 02 00 00 00 44 ? ? ? ? ? ? B9</BytePattern>
 		</Pattern>
 
 		<!-- 
@@ -146,6 +149,12 @@
 			</PatchData>
 		</Patch>
 
+		<Patch pattern="Enable webRequestBlocking for MV3" group="6">
+			<PatchData type="x64" orig="0x02" patch="0x03" sig="false">
+				<Offset>0x43</Offset> <!-- Offset to get to mov r14d, 2 -->
+			</PatchData>
+		</Patch>
+
 		<!--
 		<Patch pattern="Disable SwReporter Upload" group="5">
 			<PatchData type="x64" orig="0x84" patch="0x38" sig="false">
@@ -167,7 +176,7 @@
 			<Tooltip>This patch gets rid of the debugging warning when using chrome.debugger in extensions</Tooltip>
 		</GroupedPatch>
 
-		<GroupedPatch group="2" default="true">
+		<GroupedPatch group="2" default="false">
 			<Name>Disable Elision</Name>
 			<Tooltip>This patch forces Chromium to show WWW and HTTPS again in the url bar!</Tooltip>
 		</GroupedPatch>
@@ -185,6 +194,11 @@
 		<GroupedPatch group="5" default="false">
 			<Name>Remove QR codes</Name>
 			<Tooltip>This patch removes the context menu option "Create QR code for this page" (Chrome only)</Tooltip>
+		</GroupedPatch>
+
+		<GroupedPatch group="6" default="true">
+			<Name>Enable webRequestBlocking for MV3</Name>
+			<Tooltip>This patch enables the extension API webRequestBlocking (often used by Adblockers) for Manifest V3 extensions</Tooltip>
 		</GroupedPatch>
 
 		<!--
