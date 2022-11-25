@@ -76,7 +76,7 @@
 
 		<Pattern name="Enable webRequestBlocking for MV3">
 			<!-- https://source.chromium.org/chromium/chromium/src/+/main:out/Debug/gen/extensions/common/api/permission_features.cc;l=848;drc=f7c258b9edbcebc3fb62f1df4af9d6afd3133d52 https://github.com/Ceiridge/Chrome-Developer-Mode-Extension-Warning-Patcher/issues/82#issuecomment-1248272748 -->
-			<BytePattern>40 B7 01 40 88 BE ? ? ? ? 41 BC 04 00 00 00 44 89 ? ? ? ? ? 48 8D 05 ? ? ? ? 48 8D ? ? ? ? ? ? 48 89 02 B8 02 00 00 00 48 89 42 08 48 89 F1 E8 ? ? ? ? 40 ? ? ? ? ? ? 41 BE 02 00 00 00 44 ? ? ? ? ? ? B9</BytePattern>
+			<BytePattern>44 88 B7 ? ? ? ? 44 89 AF ? ? ? ? 48 8D 05 ? ? ? ? 48 8D ? ? ? ? ? ? 48 89 ? 48 C7 42 ? 02 00 00 00 48 89 F9 E8 ? ? ? ? 44 ? ? ? ? ? ? BD 02 00 00 00 89 AF ? ? ? ? B9</BytePattern>
 		</Pattern>
 
 		<!-- 
@@ -151,7 +151,7 @@
 
 		<Patch pattern="Enable webRequestBlocking for MV3" group="6">
 			<PatchData type="x64" orig="0x02" patch="0x03" sig="false">
-				<Offset>0x43</Offset> <!-- Offset to get to mov r14d, 2 -->
+				<Offset>0x38</Offset> <!-- Offset to get to mov ebp, 2 -->
 			</PatchData>
 		</Patch>
 
