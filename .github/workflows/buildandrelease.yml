@@ -12,20 +12,10 @@ jobs:
       with:
         submodules: true
 
-    - name: Setup NuGet for use with actions
-      uses: NuGet/setup-nuget@v1.0.5
-      with:
-        nuget-version: '5.x'
-
     - name: Setup dotnet for use with actions
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: '5.0.x'
-
-    - name: Restore the Nuget packages
-      shell: cmd
-      run: |
-        nuget restore ChromeDevExtWarningPatcher.sln
 
     - name: Write code sign file
       id: write_file
