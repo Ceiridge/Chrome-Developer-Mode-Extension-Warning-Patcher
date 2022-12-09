@@ -17,6 +17,11 @@ jobs:
       with:
         nuget-version: '5.x'
 
+    - name: Setup dotnet for use with actions
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '5.0.x'
+
     - name: Restore the Nuget packages
       shell: cmd
       run: |
