@@ -39,8 +39,10 @@ jobs:
       run: |
         echo "C:\Program Files (x86)\Windows Kits\10\bin\10.0.19041.0\x64\" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
+    - name: Turn shell into VC command prompt
+      uses: ilammy/msvc-dev-cmd@v1
+
     - name: Build with dotnet publish
-      shell: cmd
       run: |
         dotnet publish -c Release -r win-x64 -p:PublishReadyToRun=true
 
