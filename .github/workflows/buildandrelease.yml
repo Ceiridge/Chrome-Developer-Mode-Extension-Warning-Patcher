@@ -44,7 +44,7 @@ jobs:
 
     - name: Build with dotnet publish
       run: |
-        dotnet publish -c Release -r win-x64 -p:PublishReadyToRun=true
+        dotnet publish -c Release -r win-x64
 
     - uses: actions/upload-artifact@v2
       with:
