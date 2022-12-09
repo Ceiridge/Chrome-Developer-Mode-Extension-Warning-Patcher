@@ -4,18 +4,13 @@ on: [push, pull_request]
 
 jobs:
   build:
-    runs-on: windows-2019
+    runs-on: windows-2022
 
     steps:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v2
       with:
         submodules: true
-
-    - name: Setup dotnet for use with actions
-      uses: actions/setup-dotnet@v3
-      with:
-        dotnet-version: '5.0.x'
 
     - name: Write code sign file
       id: write_file
@@ -39,15 +34,22 @@ jobs:
       run: |
         echo "C:\Program Files (x86)\Windows Kits\10\bin\10.0.19041.0\x64\" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
+    - name: Setup dotnet for use with actions
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '5.0.x'
+
+    - name: Add msbuild to PATH
+      uses: microsoft/setup-msbuild@v1.1
+
     - name: Restore NuGet packages
       shell: cmd
       run: |
         dotnet restore
 
     - name: Build with MSBuild
-      shell: cmd
       run: |
-        "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\MSBuild.exe" ChromeDevExtWarningPatcher.sln -t:rebuild;publish -p:Configuration=Release;SelfContained=true;RuntimeIdentifier=win-x64
+        msbuild ChromeDevExtWarningPatcher.sln -t:rebuild;publish -p:Configuration=Release;SelfContained=true;RuntimeIdentifier=win-x64
 
     - uses: actions/upload-artifact@v2
       with:
