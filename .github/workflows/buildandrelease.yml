@@ -74,7 +74,7 @@ jobs:
       shell: powershell
       run: |
         cd ChromeDevExtWarningPatcher\bin\Release\net6.0-windows10.0.17763.0;
-        Compress-Archive -DestinationPath ChromeDevExtWarningPatcher.zip -Path *;
+        Compress-Archive -DestinationPath ChromeDevExtWarningPatcher.zip -Path amd64,arm64,runtimes,x86,ChromeDevExtWarningPatcher.deps.json,ChromeDevExtWarningPatcher.dll,ChromeDevExtWarningPatcher.exe,ChromeDevExtWarningPatcher.pdb,ChromeDevExtWarningPatcher.runtimeconfig.json,CommandLine.dll,Dia2Lib.dll,MaterialDesignColors.dll,MaterialDesignThemes.Wpf.dll,Microsoft.Win32.SystemEvents.dll,Microsoft.Win32.TaskScheduler.dll,Microsoft.Windows.SDK.NET.dll,OSExtensions.dll,System.Drawing.Common.dll,TraceReloggerLib.dll,WinRT.Runtime.dll;
         dir;
 
     - uses: "Ceiridge/action-automatic-releases@master" # Actually made by marvinpinto
