@@ -34,6 +34,10 @@ jobs:
       run: |
         echo "C:\Program Files (x86)\Windows Kits\10\bin\10.0.19041.0\x64\" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
+
+
+
+
     - name: Setup dotnet for use with actions
       uses: actions/setup-dotnet@v3
       with:
@@ -50,6 +54,11 @@ jobs:
     - name: Build with MSBuild
       run: |
         msbuild ChromeDevExtWarningPatcher.sln -t:rebuild;publish -p:Configuration=Release;SelfContained=true;RuntimeIdentifier=win-x64
+
+
+
+
+
 
     - uses: actions/upload-artifact@v2
       with:
