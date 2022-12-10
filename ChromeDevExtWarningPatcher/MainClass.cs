@@ -24,8 +24,6 @@ namespace ChromeDevExtWarningPatcher {
 			bool incompatibleArchitecture = !Environment.Is64BitOperatingSystem;
 
 			if (args.Length == 0) { // No command line arguments given => launch the GUI
-				FreeConsole(); // Hide the console to not interfere with the GUI
-
 				if (incompatibleArchitecture) {
 					MessageBox.Show(ARCH_ERROR, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
 					return;
@@ -33,6 +31,8 @@ namespace ChromeDevExtWarningPatcher {
 
 				App app = new App();
 				app.InitializeComponent();
+
+				FreeConsole(); // Hide the console to not interfere with the GUI
 				app.Run();
 			} else {
 				if (incompatibleArchitecture) {

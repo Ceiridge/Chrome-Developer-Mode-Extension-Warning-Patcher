@@ -12,6 +12,10 @@ IF %FindTries% GEQ 10 GOTO Fail
 GOTO RetryFind
 
 :SignAll
+CALL :NormalizePath %CodeSignFile% 
+SET CodeSignFile=%RETVAL%
+ECHO Found pfx at: %CodeSignFile%
+
 SET FileLoc=%cd%
 CALL :Sign
 FOR /D %%i IN (%cd%\*) DO (
@@ -30,6 +34,10 @@ EXIT /b 0
 :Sign
 REM signtool required in PATH
 ECHO Signing in %FileLoc%
-start /wait cmd.exe /c %CodeSignFile%\..\sign.bat
+START /wait cmd.exe /c %CodeSignFile%\..\sign.bat
 REM Another batch file is required to ignore errors somehow
 GOTO :EOF
+
+:NormalizePath
+SET RETVAL=%~f1
+EXIT /B

@@ -6,7 +6,7 @@
 		xmlns:cv="clr-namespace:ChromeDevExtWarningPatcher.ComponentViews"
 		xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
 		mc:Ignorable="d"
-		Title="Ceiridge's Chromium Patcher (Extension Warning Patcher)" Height="450" Width="800" WindowStartupLocation="CenterScreen" Background="{DynamicResource MaterialDesignPaper}" FontFamily="{DynamicResource MaterialDesignFont}" TextElement.Foreground="{DynamicResource MaterialDesignBody}" TextElement.FontWeight="Medium" TextElement.FontSize="14">
+		Title="Ceiridge's Chromium Patcher (Extension Warning Patcher)" Height="600" Width="800" WindowStartupLocation="CenterScreen" Background="{DynamicResource MaterialDesignPaper}" FontFamily="{DynamicResource MaterialDesignFont}" TextElement.Foreground="{DynamicResource MaterialDesignBody}" TextElement.FontWeight="Medium" TextElement.FontSize="14">
 	<ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
 		<Grid>
 			<Grid.RowDefinitions>
@@ -23,7 +23,7 @@
 					</Grid.RowDefinitions>
 
 					<cv:SelectionListView DataContext="{Binding BrowserListModel}" />
-					<Button Grid.Row="1" Content="Add a custom path" Style="{DynamicResource MaterialDesignRaisedLightButton}" HorizontalAlignment="Center" Width="Auto" Margin="0, 3, 0, 0" Click="OnAddCustomPath" />
+					<Button Grid.Row="1" Content="Add a custom path" Style="{DynamicResource MaterialDesignRaisedLightButton}" HorizontalAlignment="Center" Width="Auto" Margin="0, 3, 0, 0" Click="OnAddCustomPath" Background="#FF929292" BorderBrush="{x:Null}" />
 				</Grid>
 			</Expander>
 

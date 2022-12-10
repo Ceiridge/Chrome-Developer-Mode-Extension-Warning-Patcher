@@ -5,11 +5,11 @@ using Vanara.Extensions;
 using Vanara.PInvoke;
 
 namespace ChromeDllInjector {
-	class Injector {
-		private readonly string DllPath;
+	internal class Injector {
+		private readonly string dllPath;
 
 		public Injector(string dllPath) {
-			DllPath = dllPath;
+			this.dllPath = dllPath;
 		}
 
 		// Inject the dll with by creating a remote thread on LoadLibraryW
@@ -23,13 +23,13 @@ namespace ChromeDllInjector {
 					return;
 				}
 
-				byte[] DllPathBytes = DllPath.GetBytes(true, CharSet.Unicode); // Unicode for wide chars
-				IntPtr alloc = Kernel32.VirtualAllocEx(proc, IntPtr.Zero, DllPathBytes.Length, Kernel32.MEM_ALLOCATION_TYPE.MEM_COMMIT, Kernel32.MEM_PROTECTION.PAGE_EXECUTE_READWRITE);
+				byte[] dllPathBytes = this.dllPath.GetBytes(true, CharSet.Unicode); // Unicode for wide chars
+				IntPtr alloc = Kernel32.VirtualAllocEx(proc, IntPtr.Zero, dllPathBytes.Length, Kernel32.MEM_ALLOCATION_TYPE.MEM_COMMIT, Kernel32.MEM_PROTECTION.PAGE_EXECUTE_READWRITE);
 				if (alloc == IntPtr.Zero) {
 					Console.WriteLine("Couldn't allocate");
 					return;
 				}
-				if (!Kernel32.WriteProcessMemory(proc, alloc, DllPathBytes, DllPathBytes.Length, out _)) {
+				if (!Kernel32.WriteProcessMemory(proc, alloc, dllPathBytes, dllPathBytes.Length, out _)) {
 					Console.WriteLine("Couldn't write " + Kernel32.GetLastError());
 					return;
 				}

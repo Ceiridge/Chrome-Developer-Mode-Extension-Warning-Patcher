@@ -1,5 +1,7 @@
 # Disable Chromium's and Chrome's Developer Mode Extension Warning Popup & Elision WWW/HTTPS Hiding & Debugging Extension Popup
-**Download** it in the [release section](https://github.com/Ceiridge/Chrome-Developer-Mode-Extension-Warning-Patcher/releases). The [.NET 5 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/5.0/runtime) is required. All patterns and patches auto-update with the `patterns.xml` on every install.\
+**Download** it in the [release section](https://github.com/Ceiridge/Chrome-Developer-Mode-Extension-Warning-Patcher/releases). **The [.NET 6 DESKTOP Runtime](https://dotnet.microsoft.com/download/dotnet/6.0/runtime) is required**.
+
+All patterns and patches auto-update with the `patterns.xml` on every install.\
 Note: It seems like Chrome has completely disabled the warning popup anyway, but this patcher still provides other useful patches.
 
 ## Supported browsers

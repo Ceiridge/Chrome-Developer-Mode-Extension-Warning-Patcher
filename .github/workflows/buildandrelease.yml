@@ -4,7 +4,7 @@ on: [push, pull_request]
 
 jobs:
   build:
-    runs-on: windows-2019
+    runs-on: windows-2022
 
     steps:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
@@ -12,26 +12,16 @@ jobs:
       with:
         submodules: true
 
-    - name: Setup NuGet for use with actions
-      uses: NuGet/setup-nuget@v1.0.5
-      with:
-        nuget-version: '5.x'
-
-    - name: Restore the Nuget packages
-      shell: cmd
-      run: |
-        nuget restore ChromeDevExtWarningPatcher.sln
-
     - name: Write code sign file
       id: write_file
-      if: ${{ github.event_name == 'push' && endsWith(github.ref, '/master') }} # never write code sign file on pull requests
+      if: ${{ github.event_name == 'push' && endsWith(github.ref, '/master') }} # Never write code sign file on pull requests
       uses: Ceiridge/base64-to-file@master
       with:
         fileName: 'codesign.pfx'
         encodedString: ${{ secrets.CODE_SIGN_PFX }}
 
     - name: Copy code sign file
-      if: ${{ github.event_name == 'push' && endsWith(github.ref, '/master') }} # never write code sign file on pull requests
+      if: ${{ github.event_name == 'push' && endsWith(github.ref, '/master') }} # Never write code sign file on pull requests
       shell: cmd
       env:
         PFXLOC: ${{ steps.write_file.outputs.filePath }}
@@ -44,10 +34,31 @@ jobs:
       run: |
         echo "C:\Program Files (x86)\Windows Kits\10\bin\10.0.19041.0\x64\" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
-    - name: Build with MSBuild
+
+
+
+
+    - name: Setup dotnet for use with actions
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '6.0.x'
+
+    - name: Add msbuild to PATH
+      uses: microsoft/setup-msbuild@v1.1
+
+    - name: Restore NuGet packages
       shell: cmd
       run: |
-        "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\MSBuild.exe" ChromeDevExtWarningPatcher.sln -p:Configuration=Release
+        dotnet restore
+
+    - name: Build with MSBuild
+      run: |
+        msbuild ChromeDevExtWarningPatcher.sln -p:Configuration=Release
+
+
+
+
+
 
     - uses: actions/upload-artifact@v2
       with:
@@ -62,16 +73,16 @@ jobs:
     - name: Zip the builds
       shell: powershell
       run: |
-        cd ChromeDevExtWarningPatcher\bin\Release\net5.0-windows;
-        Compress-Archive -DestinationPath ChromeDevExtWarningPatcher.zip -Path ChromeDevExtWarningPatcher.exe,ChromeDevExtWarningPatcher.dll,ChromeDevExtWarningPatcher.runtimeconfig.json,ChromeDevExtWarningPatcher.deps.json,CommandLine.dll,Dia2Lib.dll,MaterialDesignColors.dll,MaterialDesignThemes.Wpf.dll,Microsoft.Win32.TaskScheduler.dll,OSExtensions.dll,System.Drawing.Common.dll,TraceReloggerLib.dll,runtimes,README.txt;
+        cd ChromeDevExtWarningPatcher\bin\Release\net6.0-windows10.0.17763.0;
+        Compress-Archive -DestinationPath ChromeDevExtWarningPatcher.zip -Path amd64,arm64,runtimes,x86,ChromeDevExtWarningPatcher.deps.json,ChromeDevExtWarningPatcher.dll,ChromeDevExtWarningPatcher.exe,ChromeDevExtWarningPatcher.pdb,ChromeDevExtWarningPatcher.runtimeconfig.json,CommandLine.dll,Dia2Lib.dll,MaterialDesignColors.dll,MaterialDesignThemes.Wpf.dll,Microsoft.Win32.SystemEvents.dll,Microsoft.Win32.TaskScheduler.dll,Microsoft.Windows.SDK.NET.dll,OSExtensions.dll,System.Drawing.Common.dll,TraceReloggerLib.dll,WinRT.Runtime.dll;
         dir;
 
-    - uses: "Ceiridge/action-automatic-releases@master" # actually made by marvinpinto
-      if: ${{ github.event_name == 'push' && endsWith(github.ref, '/master') }} # don't release on pull requests
+    - uses: "Ceiridge/action-automatic-releases@master" # Actually made by marvinpinto
+      if: ${{ github.event_name == 'push' && endsWith(github.ref, '/master') }} # Don't release on pull requests
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
         automatic_release_tag: latest
         prerelease: true
         title: "Prerelease Build"
         files: |
-          ChromeDevExtWarningPatcher/bin/Release/net5.0-windows/ChromeDevExtWarningPatcher.zip
+          ChromeDevExtWarningPatcher/bin/Release/net6.0-windows10.0.17763.0/ChromeDevExtWarningPatcher.zip

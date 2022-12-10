@@ -1,11 +1,11 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
 	<OutputType>Exe</OutputType>
-	<TargetFramework>net5.0-windows</TargetFramework>
+	<TargetFramework>net6.0-windows10.0.17763.0</TargetFramework>
 	<Nullable>enable</Nullable>
 	<UseWPF>true</UseWPF>
-	<Version>5.3.0.0</Version>
+	<Version>6.0.0.0</Version>
 	<Authors>Ceiridge</Authors>
 	<Company />
 	<Product>Chromium Developer Extension Warning Patcher</Product>
@@ -19,7 +19,8 @@
 	<EnableDefaultApplicationDefinition>false</EnableDefaultApplicationDefinition>
 	<StartupObject>ChromeDevExtWarningPatcher.MainClass</StartupObject>
 	<ApplicationManifest>app.manifest</ApplicationManifest>
-	<AssemblyVersion>5.3.0.0</AssemblyVersion>
+	<AssemblyVersion>6.0.0.0</AssemblyVersion>
+	<SupportedOSPlatformVersion>7.0</SupportedOSPlatformVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -30,10 +31,10 @@
   </ItemGroup>
 
   <ItemGroup>
-	<PackageReference Include="CommandLineParser" Version="2.8.0" />
-	<PackageReference Include="MaterialDesignThemes" Version="4.0.0" />
-	<PackageReference Include="System.Drawing.Common" Version="5.0.3" />
-	<PackageReference Include="TaskScheduler" Version="2.9.1" />
+	<PackageReference Include="CommandLineParser" Version="2.9.1" />
+	<PackageReference Include="MaterialDesignThemes" Version="4.6.1" />
+	<PackageReference Include="System.Drawing.Common" Version="7.0.0" />
+	<PackageReference Include="TaskScheduler" Version="2.10.1" />
   </ItemGroup>
 
   <ItemGroup>

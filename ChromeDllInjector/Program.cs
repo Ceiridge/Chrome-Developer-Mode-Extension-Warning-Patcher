@@ -1,14 +1,10 @@
-﻿using Microsoft.Diagnostics.Tracing.Parsers;
-using Microsoft.Diagnostics.Tracing.Parsers.Kernel;
-using Microsoft.Diagnostics.Tracing.Session;
-using Microsoft.Win32;
+﻿using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Threading;
 using ChromeDllInjector.ProcessListeners;
 using Vanara.PInvoke;
 
@@ -59,7 +55,8 @@ namespace ChromeDllInjector {
 						break;
 					}
 				}
-			} catch (Exception e) { // Ignore some rare errors (often occur for very short lived processes)
+			} catch (Exception e) {
+				// Ignore some rare errors (often occur for very short lived processes)
 				Console.WriteLine(e.Message);
 			}
 		}
