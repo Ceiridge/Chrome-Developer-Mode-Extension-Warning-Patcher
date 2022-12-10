@@ -14,14 +14,14 @@ jobs:
 
     - name: Write code sign file
       id: write_file
-      if: ${{ github.event_name == 'push' && endsWith(github.ref, '/master') }} # never write code sign file on pull requests
+      if: ${{ github.event_name == 'push' && endsWith(github.ref, '/master') }} # Never write code sign file on pull requests
       uses: Ceiridge/base64-to-file@master
       with:
         fileName: 'codesign.pfx'
         encodedString: ${{ secrets.CODE_SIGN_PFX }}
 
     - name: Copy code sign file
-      if: ${{ github.event_name == 'push' && endsWith(github.ref, '/master') }} # never write code sign file on pull requests
+      if: ${{ github.event_name == 'push' && endsWith(github.ref, '/master') }} # Never write code sign file on pull requests
       shell: cmd
       env:
         PFXLOC: ${{ steps.write_file.outputs.filePath }}
@@ -41,7 +41,7 @@ jobs:
     - name: Setup dotnet for use with actions
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: '5.0.x'
+        dotnet-version: '6.0.x'
 
     - name: Add msbuild to PATH
       uses: microsoft/setup-msbuild@v1.1
@@ -53,7 +53,7 @@ jobs:
 
     - name: Build with MSBuild
       run: |
-        msbuild ChromeDevExtWarningPatcher.sln -t:rebuild;publish -p:Configuration=Release;SelfContained=true;RuntimeIdentifier=win-x64
+        msbuild ChromeDevExtWarningPatcher.sln -p:Configuration=Release
 
 
 
@@ -73,16 +73,16 @@ jobs:
     - name: Zip the builds
       shell: powershell
       run: |
-        cd ChromeDevExtWarningPatcher\bin\Release\net5.0-windows;
-        Compress-Archive -DestinationPath ChromeDevExtWarningPatcher.zip -Path ChromeDevExtWarningPatcher.exe,ChromeDevExtWarningPatcher.dll,ChromeDevExtWarningPatcher.runtimeconfig.json,ChromeDevExtWarningPatcher.deps.json,CommandLine.dll,Dia2Lib.dll,MaterialDesignColors.dll,MaterialDesignThemes.Wpf.dll,Microsoft.Win32.TaskScheduler.dll,OSExtensions.dll,System.Drawing.Common.dll,TraceReloggerLib.dll,runtimes,README.txt;
+        cd ChromeDevExtWarningPatcher\bin\Release\net6.0-windows10.0.17763.0;
+        Compress-Archive -DestinationPath ChromeDevExtWarningPatcher.zip -Path *;
         dir;
 
-    - uses: "Ceiridge/action-automatic-releases@master" # actually made by marvinpinto
-      if: ${{ github.event_name == 'push' && endsWith(github.ref, '/master') }} # don't release on pull requests
+    - uses: "Ceiridge/action-automatic-releases@master" # Actually made by marvinpinto
+      if: ${{ github.event_name == 'push' && endsWith(github.ref, '/master') }} # Don't release on pull requests
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
         automatic_release_tag: latest
         prerelease: true
         title: "Prerelease Build"
         files: |
-          ChromeDevExtWarningPatcher/bin/Release/net5.0-windows/ChromeDevExtWarningPatcher.zip
+          ChromeDevExtWarningPatcher/bin/Release/net6.0-windows10.0.17763.0/ChromeDevExtWarningPatcher.zip
