@@ -99,7 +99,7 @@
 		<value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.3500.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
 	</resheader>
 	<data name="ChromeDllInjector" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    	<value>..\..\ChromeDllInjector\bin\Release\ChromeDllInjector.zip;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    	<value>..\..\ChromeDllInjector.zip;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
 	</data>
 	<data name="ChromePatcherDll" type="System.Resources.ResXFileRef, System.Windows.Forms">
 		<value>..\..\x64\Release\ChromePatcherDll.dll;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
