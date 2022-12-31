@@ -17,7 +17,9 @@ namespace ChromeDllInjector {
 		static void Main(string[] _) {
 			try {
 #if !DEBUG
-				RedirectConsole();
+				RedirectOutput();
+#else
+				AttachConsole();
 #endif
 				CreateInjector();
 				LoadChromeExePaths();
@@ -61,10 +63,15 @@ namespace ChromeDllInjector {
 			}
 		}
 
-		// Init functions to make the code cleaner
-		private static void RedirectConsole() {
-			Kernel32.FreeConsole(); // Hide the console window
+		private static void AttachConsole()
+		{
+			if (!Kernel32.AttachConsole(Kernel32.ATTACH_PARENT_PROCESS)) { // If we can't attach to the parent console, create a new one
+				Kernel32.AllocConsole();
+			}
+		}
 
+		// Init functions to make the code cleaner
+		private static void RedirectOutput() {
 			StreamWriter writer;
 			Console.SetOut(writer = new StreamWriter(new FileStream(Environment.GetFolderPath(Environment.SpecialFolder.Windows) + @"\Temp\ChromePatcherInjector.log", FileMode.Append, FileAccess.Write, FileShare.Read))); // Redirect to C:\Windows\Temp\ChromePatcherInjector.log
 			writer.AutoFlush = true;
