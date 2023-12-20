@@ -8,7 +8,7 @@
 
 	Create a new issue if a pattern stops working with any browser.
 
-	New method: Debug Chrome in WinDBG, download the respective chrome.dll.pdb and load it for the chrome.dll module (lm -> ld ModuleName /f FileName) (.reload may be required). Then use x /D /f chrome**!*FUNCTION_NAME* to search for functions. Note down the offset and find it in a disassembler to make a pattern/signature.
+	How to find functions: Debug Chrome in WinDBG, download the respective chrome.dll.pdb and load it for the chrome.dll module (lm -> ld ModuleName /f FileName) (.reload may be required). Then use x /D /f chrome**!*FUNCTION_NAME* to search for functions. Note down the offset and find it in a disassembler to make a pattern/signature.
 
 	For Brave: Download .sym debug files at https://github.com/brave/brave-browser/releases/tag (Search for the function name and add the offset to the base address)
 -->
